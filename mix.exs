@@ -69,7 +69,8 @@ defmodule SquidSonar.MixProject do
       {:phoenix_live_view, "~> 1.1"},
       squid_mesh_dep(),
       {:lazy_html, ">= 0.1.0", only: :test},
-      {:excoveralls, "~> 0.18", only: :test}
+      {:excoveralls, "~> 0.18", only: :test},
+      {:ex_doc, "~> 0.38", only: :dev, runtime: false}
     ]
   end
 

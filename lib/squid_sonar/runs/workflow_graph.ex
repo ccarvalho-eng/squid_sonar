@@ -37,8 +37,8 @@ defmodule SquidSonar.Runs.WorkflowGraph do
   @type t :: %__MODULE__{
           available?: boolean(),
           mode: :transition | :dependency | :history,
-          nodes: [Node.t()],
-          edges: [Edge.t()]
+          nodes: [struct()],
+          edges: [struct()]
         }
 
   defstruct available?: false, mode: :history, nodes: [], edges: []

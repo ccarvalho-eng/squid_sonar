@@ -98,7 +98,6 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "step_failed"
     assert html =~ "capture_payment"
     assert html =~ "Attempts"
-    assert html =~ "Attempt 1"
     assert html =~ "send_receipt"
     assert html =~ "replay_run"
     assert html =~ "squid-sonar-workflow-graph"

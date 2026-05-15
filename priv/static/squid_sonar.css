@@ -689,10 +689,15 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-detail-columns {
+  align-items: stretch;
   display: grid;
   gap: 14px;
   grid-template-columns: 2fr 1fr;
   margin-top: 12px;
+}
+
+.squid-sonar-detail-columns > .squid-sonar-detail-panel {
+  height: 100%;
 }
 
 .squid-sonar-detail-panel {
@@ -719,47 +724,6 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-detail-panel .squid-sonar-detail-item + .squid-sonar-detail-item {
   margin-top: 8px;
-}
-
-.squid-sonar-attempt-list {
-  display: grid;
-  gap: 8px;
-}
-
-.squid-sonar-attempt {
-  align-items: center;
-  background: var(--squid-sonar-surface-raised);
-  border: 1px solid var(--squid-sonar-border);
-  border-radius: 8px;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: minmax(180px, 1fr) auto minmax(150px, auto);
-  padding: 11px 12px;
-}
-
-.squid-sonar-attempt strong,
-.squid-sonar-attempt-label {
-  display: block;
-}
-
-.squid-sonar-attempt strong {
-  font-size: 13px;
-  font-weight: 650;
-  margin-top: 3px;
-}
-
-.squid-sonar-attempt-label,
-.squid-sonar-attempt time {
-  color: var(--squid-sonar-muted);
-  font-size: 12px;
-}
-
-.squid-sonar-attempt code {
-  color: var(--squid-sonar-muted);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-  grid-column: 1 / -1;
-  overflow-wrap: anywhere;
 }
 
 .squid-sonar-workflow-graph {
@@ -1006,9 +970,6 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     margin-top: 0;
   }
 
-  .squid-sonar-attempt {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 760px) {

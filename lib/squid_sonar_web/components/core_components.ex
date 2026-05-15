@@ -307,21 +307,6 @@ defmodule SquidSonarWeb.CoreComponents do
         </section>
       </div>
 
-      <section :if={@detail.step_attempts != []} class="squid-sonar-detail-panel">
-        <h3>Attempts</h3>
-        <div class="squid-sonar-attempt-list">
-          <article :for={attempt <- @detail.step_attempts} class="squid-sonar-attempt">
-            <div>
-              <span class="squid-sonar-attempt-label">{format_step(attempt.step)}</span>
-              <strong>Attempt {format_attempt_number(attempt.attempt_number)}</strong>
-            </div>
-            <.status_badge status={attempt.status} />
-            <time>{format_time(attempt.updated_at || attempt.inserted_at)}</time>
-            <code :if={attempt_error(attempt.error) != nil}>{attempt_error(attempt.error)}</code>
-          </article>
-        </div>
-      </section>
-
       <section class="squid-sonar-detail-panel">
         <h3>Workflow</h3>
         <%= if @detail.workflow_graph.nodes == [] do %>
@@ -478,22 +463,6 @@ defmodule SquidSonarWeb.CoreComponents do
   end
 
   defp last_error(_error), do: "Present"
-
-  defp format_attempt_number(nil), do: "?"
-  defp format_attempt_number(attempt_number), do: format_value(attempt_number)
-
-  defp attempt_error(nil), do: nil
-
-  defp attempt_error(error) when is_map(error) do
-    error
-    |> Map.take([:code, :message, "code", "message"])
-    |> case do
-      empty when empty == %{} -> inspect(error)
-      safe_error -> inspect(safe_error)
-    end
-  end
-
-  defp attempt_error(error), do: format_value(error)
 
   defp workflow_graph_layout(graph), do: WorkflowGraphLayout.build(graph)
 

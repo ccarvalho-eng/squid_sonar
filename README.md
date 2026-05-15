@@ -28,7 +28,7 @@
 SquidSonar adds a read-only Phoenix LiveView dashboard to applications that run
 Squid Mesh workflows. Mount it inside an existing Phoenix app to inspect recent
 runs, filter by status, search runtime metadata, and open detail pages that show
-the workflow graph, diagnosis, retry attempts, history counts, and last error
+the workflow graph, diagnosis, attempt counts, history counts, and last error
 information.
 
 ## Current Shape
@@ -47,7 +47,7 @@ The current UI includes:
 - Page size controls and pagination
 - Run detail pages with diagnosis, history counts, last error, and workflow
   graph visualization
-- Step attempt counts and retry history on run detail pages
+- Step attempt counts on run detail pages
 - Light, dark, and system theme controls
 - Embedded CSS and JavaScript served by the library
 
