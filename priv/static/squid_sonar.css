@@ -247,7 +247,6 @@
 
 .squid-sonar-metric-topline,
 .squid-sonar-metric-value,
-.squid-sonar-nav-label,
 .squid-sonar-run-title {
   align-items: center;
   display: flex;
@@ -279,41 +278,6 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-}
-
-.squid-sonar-status-pulse {
-  background: var(--squid-sonar-all);
-  border-radius: 999px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-all) 7%, transparent);
-  display: inline-flex;
-  flex: 0 0 auto;
-  height: 7px;
-  width: 7px;
-}
-
-.squid-sonar-status-pulse-completed {
-  background: var(--squid-sonar-success);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-success) 7%, transparent);
-}
-
-.squid-sonar-status-pulse-failed {
-  background: var(--squid-sonar-danger);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-danger) 7%, transparent);
-}
-
-.squid-sonar-status-pulse-retrying {
-  background: var(--squid-sonar-warning);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-warning) 8%, transparent);
-}
-
-.squid-sonar-status-pulse-paused {
-  background: var(--squid-sonar-waiting);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-waiting) 7%, transparent);
-}
-
-.squid-sonar-status-pulse-running {
-  background: var(--squid-sonar-running);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-running) 8%, transparent);
 }
 
 .squid-sonar-search span,
@@ -395,11 +359,7 @@
   position: absolute;
 }
 
-.squid-sonar-nav-label {
-  gap: 9px;
-}
-
-.squid-sonar-nav-label span:last-child {
+.squid-sonar-nav-label span {
   text-transform: capitalize;
 }
 
@@ -545,32 +505,7 @@
 }
 
 .squid-sonar-run-title {
-  gap: 10px;
   min-width: 0;
-}
-
-.squid-sonar-run-thread {
-  background: color-mix(in srgb, var(--squid-sonar-running) 58%, var(--squid-sonar-border));
-  border-radius: 999px;
-  flex: 0 0 auto;
-  height: 28px;
-  width: 3px;
-}
-
-.squid-sonar-run-thread-completed {
-  background: color-mix(in srgb, var(--squid-sonar-success) 58%, var(--squid-sonar-border));
-}
-
-.squid-sonar-run-thread-failed {
-  background: color-mix(in srgb, var(--squid-sonar-danger) 58%, var(--squid-sonar-border));
-}
-
-.squid-sonar-run-thread-retrying {
-  background: color-mix(in srgb, var(--squid-sonar-warning) 58%, var(--squid-sonar-border));
-}
-
-.squid-sonar-run-thread-paused {
-  background: color-mix(in srgb, var(--squid-sonar-waiting) 58%, var(--squid-sonar-border));
 }
 
 .squid-sonar-empty,

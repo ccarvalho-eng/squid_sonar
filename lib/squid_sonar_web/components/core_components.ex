@@ -18,10 +18,9 @@ defmodule SquidSonarWeb.CoreComponents do
 
   def status_metric(assigns) do
     ~H"""
-    <article class={["squid-sonar-metric", "squid-sonar-metric-#{@status}"]}>
+    <article class="squid-sonar-metric">
       <div class="squid-sonar-metric-topline">
         <span class="squid-sonar-metric-label">{human_status(@status)}</span>
-        <span class={["squid-sonar-status-pulse", "squid-sonar-status-pulse-#{@status}"]} />
       </div>
       <div class="squid-sonar-metric-value">
         <strong>{@count}</strong>
@@ -40,7 +39,6 @@ defmodule SquidSonarWeb.CoreComponents do
     <label class={["squid-sonar-nav-item", @active && "is-active"]}>
       <input type="radio" name="filters[status]" value={@status} checked={@active} />
       <span class="squid-sonar-nav-label">
-        <span class={["squid-sonar-status-pulse", "squid-sonar-status-pulse-#{@status}"]} />
         <span>{human_status(@status)}</span>
       </span>
       <strong>{@count}</strong>
@@ -214,7 +212,6 @@ defmodule SquidSonarWeb.CoreComponents do
           <tr :for={run <- @runs}>
             <td>
               <div class="squid-sonar-run-title">
-                <span class={["squid-sonar-run-thread", "squid-sonar-run-thread-#{run.status}"]} />
                 <.link navigate={run_path(@prefix, run.id)} class="squid-sonar-run-link">
                   <span class="squid-sonar-primary">{format_workflow(run.workflow)}</span>
                   <span class="squid-sonar-secondary">{run.id}</span>
