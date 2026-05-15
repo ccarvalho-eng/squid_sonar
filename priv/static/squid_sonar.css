@@ -693,22 +693,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: grid;
   gap: 14px;
   grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
-  grid-template-rows: auto repeat(3, minmax(58px, auto));
   margin-top: 12px;
 }
 
 .squid-sonar-detail-columns > .squid-sonar-detail-panel {
   align-self: stretch;
-  display: grid;
-  grid-row: span 4;
-  grid-template-rows: subgrid;
+  height: 100%;
   min-width: 0;
-}
-
-.squid-sonar-detail-columns .squid-sonar-detail-item {
-  align-content: start;
-  display: grid;
-  min-height: 58px;
 }
 
 .squid-sonar-detail-panel {
@@ -978,8 +969,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   }
 
   .squid-sonar-detail-columns > .squid-sonar-detail-panel {
-    display: block;
-    grid-row: auto;
+    height: auto;
   }
 
   .squid-sonar-panel {
