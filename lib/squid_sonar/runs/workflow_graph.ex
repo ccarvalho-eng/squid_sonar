@@ -61,7 +61,11 @@ defmodule SquidSonar.Runs.WorkflowGraph do
     nodes =
       inspected_steps
       |> Enum.map(fn inspected_step ->
-        node(inspected_step.step, Map.fetch!(inspected_step, :status), run)
+        node(
+          inspected_step.step,
+          display_status(inspected_step.step, inspected_step.status, run),
+          run
+        )
       end)
       |> maybe_append_complete_node(run, definition)
 
@@ -112,17 +116,14 @@ defmodule SquidSonar.Runs.WorkflowGraph do
   defp current_step_status(%{current_step: nil}), do: %{}
 
   defp current_step_status(%{current_step: current_step, status: status}) do
-    %{serialized_step(current_step) => current_status(status)}
+    %{serialized_step(current_step) => inspect_status(status)}
   end
 
-  defp current_status(:failed), do: :failed
-  defp current_status(:retrying), do: :retrying
-  defp current_status(:paused), do: :paused
-  defp current_status(:cancelling), do: :cancelled
-  defp current_status(:cancelled), do: :cancelled
-  defp current_status(:completed), do: :completed
-  defp current_status(:pending), do: :pending
-  defp current_status(_status), do: :running
+  defp inspect_status(:failed), do: :failed
+  defp inspect_status(:cancelled), do: :failed
+  defp inspect_status(:completed), do: :completed
+  defp inspect_status(:pending), do: :pending
+  defp inspect_status(_status), do: :running
 
   defp maybe_append_complete_node(nodes, %{status: :completed} = run, definition) do
     if complete_target?(definition) do
@@ -162,6 +163,25 @@ defmodule SquidSonar.Runs.WorkflowGraph do
       current?: current_step?(run.current_step, step_name)
     }
   end
+
+  defp display_status(step_name, inspect_status, run) do
+    if current_step?(run.current_step, step_name) do
+      current_display_status(run.status, inspect_status)
+    else
+      inspect_status
+    end
+  end
+
+  defp current_display_status(:retrying, _inspect_status), do: :retrying
+  defp current_display_status(:paused, _inspect_status), do: :paused
+  defp current_display_status(:cancelling, _inspect_status), do: :cancelled
+  defp current_display_status(:cancelled, _inspect_status), do: :cancelled
+
+  defp current_display_status(run_status, _inspect_status)
+       when run_status in [:failed, :completed, :pending],
+       do: run_status
+
+  defp current_display_status(_run_status, inspect_status), do: inspect_status
 
   defp current_step?(nil, _step_name), do: false
 

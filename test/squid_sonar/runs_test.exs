@@ -153,6 +153,43 @@ defmodule SquidSonar.RunsTest do
              Enum.find(detail.workflow_graph.nodes, &(&1.name == :send_receipt))
   end
 
+  test "projects current run statuses without passing them into workflow inspection" do
+    for status <- [:paused, :retrying] do
+      run = %Run{
+        id: "run-#{status}",
+        workflow: CheckoutWorkflow,
+        trigger: :manual,
+        status: status,
+        current_step: :capture_payment,
+        steps: [
+          %RunStepState{step: :load_order, status: :completed},
+          %RunStepState{step: :capture_payment, status: :running}
+        ],
+        step_runs: [
+          %StepRun{id: "step-run-#{status}-1", step: :load_order, status: :completed},
+          %StepRun{id: "step-run-#{status}-2", step: :capture_payment, status: :running}
+        ],
+        audit_events: []
+      }
+
+      explanation = %RunExplanation{
+        status: status,
+        reason: :step_running,
+        step: :capture_payment,
+        next_actions: [],
+        evidence: %{step_states: List.wrap(run.steps)}
+      }
+
+      FakeSquidMeshClient.put_inspect_run({:ok, run})
+      FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+      assert {:ok, %RunDetail{} = detail} = Runs.get_run(run.id, client: @client)
+
+      assert %{status: ^status, current?: true} =
+               Enum.find(detail.workflow_graph.nodes, &(&1.name == :capture_payment))
+    end
+  end
+
   test "returns inspect errors before explaining the run" do
     FakeSquidMeshClient.put_inspect_run({:error, :invalid_run_id})
 
