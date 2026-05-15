@@ -58,7 +58,11 @@ defmodule SquidSonarWeb.PageLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <main class={["squid-sonar-shell", "squid-sonar-theme-#{@theme}"]}>
+    <main
+      id="squid-sonar-page"
+      phx-hook="SquidSonarTheme"
+      class={["squid-sonar-shell", "squid-sonar-theme-#{@theme}"]}
+    >
       <header class="squid-sonar-topbar">
         <.link navigate={@prefix <> "/"} class="squid-sonar-brand squid-sonar-brand-link">
           <div>

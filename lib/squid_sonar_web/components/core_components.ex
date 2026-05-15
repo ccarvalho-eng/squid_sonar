@@ -98,6 +98,7 @@ defmodule SquidSonarWeb.CoreComponents do
       type="button"
       phx-click="set_theme"
       phx-value-theme={@value}
+      data-squid-sonar-theme={@value}
       title={@label}
       aria-label={@label}
     >

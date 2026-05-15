@@ -37,6 +37,8 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.status == 200
     assert Plug.Conn.get_resp_header(conn, "content-type") == ["text/javascript; charset=utf-8"]
     assert conn.resp_body =~ "new LiveSocket"
+    assert conn.resp_body =~ "squid-sonar-theme"
+    assert conn.resp_body =~ "SquidSonarTheme"
   end
 
   test "serves packaged LiveView client dependencies" do

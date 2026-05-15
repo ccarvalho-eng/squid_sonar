@@ -31,10 +31,67 @@ defmodule SquidSonarWeb.Assets do
   const livePath = script?.dataset.livePath || "/live";
   const liveTransport = script?.dataset.liveTransport || "websocket";
   const socketOptions = { params: { _csrf_token: csrfToken } };
+  const themeStorageKey = "squid-sonar-theme";
+  const themes = new Set(["system", "light", "dark"]);
+
+  const storedTheme = () => {
+    try {
+      const theme = window.localStorage.getItem(themeStorageKey);
+      return themes.has(theme) ? theme : null;
+    } catch (_error) {
+      return null;
+    }
+  };
+
+  const storeTheme = (theme) => {
+    if (!themes.has(theme)) return;
+
+    try {
+      window.localStorage.setItem(themeStorageKey, theme);
+    } catch (_error) {
+      return;
+    }
+  };
+
+  const applyTheme = (theme) => {
+    if (!themes.has(theme)) return;
+
+    document.querySelectorAll(".squid-sonar-shell").forEach((shell) => {
+      shell.classList.remove(
+        "squid-sonar-theme-system",
+        "squid-sonar-theme-light",
+        "squid-sonar-theme-dark"
+      );
+      shell.classList.add(`squid-sonar-theme-${theme}`);
+    });
+  };
+
+  const initialTheme = storedTheme();
+  if (initialTheme) applyTheme(initialTheme);
+
+  const Hooks = {
+    SquidSonarTheme: {
+      mounted() {
+        const theme = storedTheme();
+        if (theme) this.pushEvent("set_theme", { theme });
+      }
+    }
+  };
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-squid-sonar-theme]");
+    if (!button) return;
+
+    const theme = button.dataset.squidSonarTheme;
+    storeTheme(theme);
+    applyTheme(theme);
+  });
 
   if (liveTransport === "longpoll") {
     socketOptions.transport = LongPoll;
   }
+
+  socketOptions.hooks = Hooks;
 
   const liveSocket = new LiveSocket(livePath, Socket, socketOptions);
   liveSocket.connect();
