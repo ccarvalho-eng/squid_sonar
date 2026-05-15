@@ -1,7 +1,7 @@
 <div align="center">
   <img width="350" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
-  <p><strong>A polished, embeddable runtime dashboard for Squid Mesh.</strong></p>
+  <p><strong>An embeddable runtime dashboard for Squid Mesh.</strong></p>
 
   <p>
     <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml">
