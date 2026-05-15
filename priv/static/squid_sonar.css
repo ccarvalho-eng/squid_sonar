@@ -690,20 +690,23 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-detail-columns {
   align-items: stretch;
-  display: flex;
+  display: grid;
   gap: 14px;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
   margin-top: 12px;
 }
 
 .squid-sonar-detail-columns > .squid-sonar-detail-panel {
   align-self: stretch;
-  flex: 1 1 0;
-  height: 100%;
+  display: grid;
+  grid-template-rows: auto repeat(3, minmax(58px, auto));
   min-width: 0;
 }
 
-.squid-sonar-detail-columns > .squid-sonar-detail-panel:first-child {
-  flex-grow: 2;
+.squid-sonar-detail-columns .squid-sonar-detail-item {
+  align-content: start;
+  display: grid;
+  min-height: 58px;
 }
 
 .squid-sonar-detail-panel {
@@ -967,16 +970,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     min-width: 118px;
   }
 
-  .squid-sonar-detail-grid {
+  .squid-sonar-detail-grid,
+  .squid-sonar-detail-columns {
     grid-template-columns: 1fr;
   }
 
-  .squid-sonar-detail-columns {
-    flex-direction: column;
-  }
-
   .squid-sonar-detail-columns > .squid-sonar-detail-panel {
-    flex: 1 1 auto;
+    display: block;
   }
 
   .squid-sonar-panel {
