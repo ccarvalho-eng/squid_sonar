@@ -23,7 +23,23 @@ defmodule SquidSonar.RouterTest do
              &(&1.path == "/sonar/css-:digest" and &1.plug == SquidSonarWeb.Assets)
            )
 
+    assert Enum.any?(
+             routes,
+             &(&1.path == "/sonar/js-:digest" and &1.plug == SquidSonarWeb.Assets)
+           )
+
+    assert Enum.any?(
+             routes,
+             &(&1.path == "/sonar/vendor/phoenix-:digest" and &1.plug == SquidSonarWeb.Assets)
+           )
+
+    assert Enum.any?(
+             routes,
+             &(&1.path == "/sonar/vendor/live-view-:digest" and &1.plug == SquidSonarWeb.Assets)
+           )
+
     assert Enum.any?(routes, &(&1.path == "/sonar" and &1.plug == Phoenix.LiveView.Plug))
+    assert Enum.any?(routes, &(&1.path == "/sonar/runs/:id" and &1.plug == Phoenix.LiveView.Plug))
   end
 
   test "builds embeddable live session options" do

@@ -9,6 +9,7 @@ defmodule SquidSonarExample.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      listeners: [Phoenix.CodeReloader],
       aliases: aliases()
     ]
   end

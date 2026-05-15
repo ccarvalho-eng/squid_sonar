@@ -8,8 +8,52 @@ defmodule SquidSonarWeb.Assets do
   @css File.read!(css_path)
   @css_digest Base.encode16(:crypto.hash(:md5, @css), case: :lower) |> String.slice(0, 8)
 
+  @external_resource phoenix_path = Application.app_dir(:phoenix, "priv/static/phoenix.mjs")
+  @phoenix_js File.read!(phoenix_path)
+  @phoenix_digest Base.encode16(:crypto.hash(:md5, @phoenix_js), case: :lower)
+                  |> String.slice(0, 8)
+
+  @external_resource live_view_path =
+                       Application.app_dir(
+                         :phoenix_live_view,
+                         "priv/static/phoenix_live_view.esm.js"
+                       )
+  @live_view_js File.read!(live_view_path)
+  @live_view_digest Base.encode16(:crypto.hash(:md5, @live_view_js), case: :lower)
+                    |> String.slice(0, 8)
+
+  @js """
+  import { Socket, LongPoll } from "./vendor/phoenix-#{@phoenix_digest}";
+  import { LiveSocket } from "./vendor/live-view-#{@live_view_digest}";
+
+  const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute("content");
+  const script = document.querySelector("script[data-squid-sonar-client]");
+  const livePath = script?.dataset.livePath || "/live";
+  const liveTransport = script?.dataset.liveTransport || "websocket";
+  const socketOptions = { params: { _csrf_token: csrfToken } };
+
+  if (liveTransport === "longpoll") {
+    socketOptions.transport = LongPoll;
+  }
+
+  const liveSocket = new LiveSocket(livePath, Socket, socketOptions);
+  liveSocket.connect();
+
+  window.squidSonarLiveSocket = liveSocket;
+  """
+  @js_digest Base.encode16(:crypto.hash(:md5, @js), case: :lower) |> String.slice(0, 8)
+
   @doc false
   def digest, do: @css_digest
+
+  @doc false
+  def js_digest, do: @js_digest
+
+  @doc false
+  def phoenix_digest, do: @phoenix_digest
+
+  @doc false
+  def live_view_digest, do: @live_view_digest
 
   @doc false
   def css(%{params: %{"digest" => digest}} = conn, _params) when digest == @css_digest do
@@ -22,5 +66,41 @@ defmodule SquidSonarWeb.Assets do
 
   def css(conn, _params) do
     send_resp(conn, 404, "Not Found")
+  end
+
+  @doc false
+  def js(%{params: %{"digest" => digest}} = conn, _params) when digest == @js_digest do
+    send_js(conn, @js)
+  end
+
+  def js(conn, _params) do
+    send_resp(conn, 404, "Not Found")
+  end
+
+  @doc false
+  def phoenix(%{params: %{"digest" => digest}} = conn, _params) when digest == @phoenix_digest do
+    send_js(conn, @phoenix_js)
+  end
+
+  def phoenix(conn, _params) do
+    send_resp(conn, 404, "Not Found")
+  end
+
+  @doc false
+  def live_view(%{params: %{"digest" => digest}} = conn, _params)
+      when digest == @live_view_digest do
+    send_js(conn, @live_view_js)
+  end
+
+  def live_view(conn, _params) do
+    send_resp(conn, 404, "Not Found")
+  end
+
+  defp send_js(conn, body) do
+    conn
+    |> put_resp_content_type("text/javascript")
+    |> put_resp_header("cache-control", "public, max-age=31536000, immutable")
+    |> put_private(:plug_skip_csrf_protection, true)
+    |> send_resp(200, body)
   end
 end

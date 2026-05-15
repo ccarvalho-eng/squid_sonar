@@ -1,0 +1,80 @@
+defmodule SquidSonarWeb.RunLiveTest do
+  use ExUnit.Case, async: false
+
+  import Phoenix.LiveViewTest
+
+  alias Phoenix.LiveView.Socket
+  alias SquidMesh.Run
+  alias SquidMesh.RunExplanation
+  alias SquidMesh.RunStepState
+  alias SquidMesh.StepRun
+  alias SquidSonar.FakeSquidMeshClient
+  alias SquidSonarWeb.RunLive
+
+  setup do
+    previous_client = Application.get_env(:squid_sonar, :squid_mesh_client)
+    Application.put_env(:squid_sonar, :squid_mesh_client, FakeSquidMeshClient)
+
+    on_exit(fn ->
+      if previous_client do
+        Application.put_env(:squid_sonar, :squid_mesh_client, previous_client)
+      else
+        Application.delete_env(:squid_sonar, :squid_mesh_client)
+      end
+    end)
+  end
+
+  test "renders run detail through the run context" do
+    run = %Run{
+      id: "run-1",
+      workflow: SquidSonarExampleWorkflow,
+      trigger: :manual,
+      status: :failed,
+      current_step: :capture_payment,
+      inserted_at: ~U[2026-05-15 10:00:00Z],
+      updated_at: ~U[2026-05-15 10:01:00Z],
+      last_error: %{code: "gateway_unavailable", message: "Gateway unavailable"},
+      step_runs: [%StepRun{step: :capture_payment, status: :failed}]
+    }
+
+    explanation = %RunExplanation{
+      status: :failed,
+      reason: :step_failed,
+      step: :capture_payment,
+      next_actions: [:replay_run],
+      evidence: %{step_states: [%RunStepState{step: :capture_payment, status: :failed}]}
+    }
+
+    FakeSquidMeshClient.put_inspect_run({:ok, run})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "run-1"}, "/sonar/runs/run-1", socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Run detail"
+    assert html =~ "SquidSonarExampleWorkflow"
+    assert html =~ "step_failed"
+    assert html =~ "capture_payment"
+    assert html =~ "replay_run"
+  end
+
+  test "renders load errors without leaking internal reason details" do
+    FakeSquidMeshClient.put_inspect_run({:error, {:missing_config, [:repo]}})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "bad"}, "/sonar/runs/bad", socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Unable to load runs"
+    refute html =~ "missing_config"
+  end
+end

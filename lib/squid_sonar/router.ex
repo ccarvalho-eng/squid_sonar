@@ -42,8 +42,14 @@ defmodule SquidSonar.Router do
 
         live_session session_name, session_opts do
           get "/css-:digest", SquidSonarWeb.Assets, :css, as: :squid_sonar_asset
+          get "/js-:digest", SquidSonarWeb.Assets, :js, as: :squid_sonar_js
+          get "/vendor/phoenix-:digest", SquidSonarWeb.Assets, :phoenix, as: :squid_sonar_phoenix
+
+          get "/vendor/live-view-:digest", SquidSonarWeb.Assets, :live_view,
+            as: :squid_sonar_live_view
 
           live "/", SquidSonarWeb.PageLive, :index, route_opts
+          live "/runs/:id", SquidSonarWeb.RunLive, :show, route_opts
         end
       end
     end

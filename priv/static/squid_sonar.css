@@ -1,70 +1,712 @@
 :root {
-  --squid-sonar-bg: #f5f7f8;
+  --squid-sonar-bg: #f7f7fa;
   --squid-sonar-surface: #ffffff;
-  --squid-sonar-border: #d8dee4;
-  --squid-sonar-text: #18222c;
-  --squid-sonar-muted: #65717d;
-  --squid-sonar-accent: #0e7490;
+  --squid-sonar-surface-muted: #f8f9fb;
+  --squid-sonar-surface-raised: #fcfcfd;
+  --squid-sonar-border: #dde1e7;
+  --squid-sonar-border-strong: #c4cad3;
+  --squid-sonar-text: #191827;
+  --squid-sonar-muted: #677080;
+  --squid-sonar-accent: #8061d8;
+  --squid-sonar-accent-muted: #f0ebff;
+  --squid-sonar-badge-bg: color-mix(in srgb, var(--squid-sonar-accent) 8%, white);
+  --squid-sonar-alert-bg: #fff7ed;
+  --squid-sonar-alert-border: #fed7aa;
+  --squid-sonar-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 32px rgba(16, 24, 40, 0.06);
+  --squid-sonar-danger: #b42318;
+  --squid-sonar-warning: #b54708;
+  --squid-sonar-success: #067647;
+  --squid-sonar-waiting: #6c47b8;
 }
 
 .squid-sonar-shell {
+  background: var(--squid-sonar-bg);
+  box-sizing: border-box;
   color: var(--squid-sonar-text);
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  max-width: 1200px;
-  padding: 24px;
+  min-height: 100vh;
+  padding: 0;
 }
 
-.squid-sonar-header {
-  align-items: flex-start;
+.squid-sonar-shell.squid-sonar-theme-dark {
+  --squid-sonar-bg: #101014;
+  --squid-sonar-surface: #17171c;
+  --squid-sonar-surface-muted: #202027;
+  --squid-sonar-surface-raised: #1c1c22;
+  --squid-sonar-border: #2d2d36;
+  --squid-sonar-border-strong: #42424d;
+  --squid-sonar-text: #f5f5f7;
+  --squid-sonar-muted: #a3a3ad;
+  --squid-sonar-accent: #8061d8;
+  --squid-sonar-accent-muted: #282332;
+  --squid-sonar-badge-bg: #202027;
+  --squid-sonar-alert-bg: #241d18;
+  --squid-sonar-alert-border: #4b3524;
+  --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
+  --squid-sonar-danger: #ff8a80;
+  --squid-sonar-warning: #f6bc5f;
+  --squid-sonar-success: #5bd59a;
+  --squid-sonar-waiting: #b7a2ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .squid-sonar-shell.squid-sonar-theme-system {
+    --squid-sonar-bg: #101014;
+    --squid-sonar-surface: #17171c;
+    --squid-sonar-surface-muted: #202027;
+    --squid-sonar-surface-raised: #1c1c22;
+    --squid-sonar-border: #2d2d36;
+    --squid-sonar-border-strong: #42424d;
+    --squid-sonar-text: #f5f5f7;
+    --squid-sonar-muted: #a3a3ad;
+    --squid-sonar-accent: #8061d8;
+    --squid-sonar-accent-muted: #282332;
+    --squid-sonar-badge-bg: #202027;
+    --squid-sonar-alert-bg: #241d18;
+    --squid-sonar-alert-border: #4b3524;
+    --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
+    --squid-sonar-danger: #ff8a80;
+    --squid-sonar-warning: #f6bc5f;
+    --squid-sonar-success: #5bd59a;
+    --squid-sonar-waiting: #b7a2ff;
+  }
+}
+
+.squid-sonar-topbar {
+  align-items: center;
+  background: var(--squid-sonar-surface);
+  border-bottom: 1px solid var(--squid-sonar-border);
+  box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  margin-bottom: 24px;
+  min-height: 64px;
+  padding: 0 max(24px, calc((100vw - 1400px) / 2 + 24px));
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.squid-sonar-header h1 {
-  font-size: 28px;
+.squid-sonar-brand,
+.squid-sonar-topbar-actions,
+.squid-sonar-filter-row {
+  align-items: center;
+  display: flex;
+}
+
+.squid-sonar-brand {
+  gap: 10px;
+  min-width: 0;
+}
+
+.squid-sonar-topbar-actions {
+  gap: 10px;
+}
+
+.squid-sonar-theme-switcher {
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 7px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+}
+
+.squid-sonar-topbar h1 {
+  font-size: 18px;
   line-height: 1.2;
   margin: 0;
 }
 
 .squid-sonar-eyebrow {
   color: var(--squid-sonar-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+}
+
+.squid-sonar-icon-button {
+  align-items: center;
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  color: var(--squid-sonar-text);
+  cursor: pointer;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+  width: 34px;
+}
+
+.squid-sonar-icon-button svg {
+  height: 17px;
+  width: 17px;
+}
+
+.squid-sonar-icon-button:hover {
+  background: var(--squid-sonar-accent-muted);
+  border-color: color-mix(in srgb, var(--squid-sonar-accent) 45%, transparent);
+  color: var(--squid-sonar-accent);
+}
+
+.squid-sonar-icon-button.is-active {
+  background: var(--squid-sonar-surface);
+  border-color: var(--squid-sonar-border-strong);
+  color: var(--squid-sonar-accent);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
+
+.squid-sonar-theme-switcher .squid-sonar-icon-button {
+  background: transparent;
+  border-color: transparent;
+  height: 30px;
+  width: 30px;
+}
+
+.squid-sonar-theme-switcher .squid-sonar-icon-button:hover,
+.squid-sonar-theme-switcher .squid-sonar-icon-button.is-active {
+  background: var(--squid-sonar-surface);
+  border-color: var(--squid-sonar-border);
+}
+
+.squid-sonar-refresh {
+  background: var(--squid-sonar-accent);
+  border-color: var(--squid-sonar-accent);
+  color: #ffffff;
+}
+
+.squid-sonar-refresh:hover {
+  background: #6d4fc8;
+  border-color: #6d4fc8;
+  color: #ffffff;
+}
+
+.squid-sonar-content {
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 0 24px 28px;
+}
+
+.squid-sonar-summary {
+  padding-top: 16px;
+}
+
+.squid-sonar-metrics {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.squid-sonar-metric {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  box-shadow: var(--squid-sonar-shadow);
+  min-height: 72px;
+  padding: 12px;
+}
+
+.squid-sonar-metric-label {
+  color: var(--squid-sonar-muted);
+  display: block;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  margin: 0 0 4px;
+  margin-bottom: 8px;
+}
+
+.squid-sonar-metric strong {
+  display: block;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.squid-sonar-toolbar {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  box-shadow: var(--squid-sonar-shadow);
+  margin-top: 12px;
+  padding: 10px;
+}
+
+.squid-sonar-filter-row {
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.squid-sonar-toolbar-controls {
+  align-items: end;
+  display: flex;
+  gap: 10px;
+}
+
+.squid-sonar-filter-group {
+  min-width: 0;
+}
+
+.squid-sonar-filter-group strong {
+  color: var(--squid-sonar-text);
+  display: block;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.squid-sonar-toolbar-label,
+.squid-sonar-search span,
+.squid-sonar-page-size span {
+  color: var(--squid-sonar-muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 6px;
   text-transform: uppercase;
+}
+
+.squid-sonar-search {
+  flex: 0 1 320px;
+}
+
+.squid-sonar-page-size select,
+.squid-sonar-search input {
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--squid-sonar-text);
+  font: inherit;
+  font-size: 13px;
+  height: 34px;
+  padding: 0 10px;
+}
+
+.squid-sonar-page-size select {
+  min-width: 76px;
+}
+
+.squid-sonar-search input {
+  width: 100%;
+}
+
+.squid-sonar-search input:focus {
+  border-color: var(--squid-sonar-accent);
+  outline: 2px solid color-mix(in srgb, var(--squid-sonar-accent) 18%, transparent);
+}
+
+.squid-sonar-workspace {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  margin-top: 12px;
+  padding-bottom: 20px;
+}
+
+.squid-sonar-sidebar {
+  align-self: start;
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.squid-sonar-nav-item {
+  align-items: center;
+  border-radius: 5px;
+  color: var(--squid-sonar-muted);
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 10px;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.squid-sonar-nav-item input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.squid-sonar-nav-item span {
+  text-transform: capitalize;
+}
+
+.squid-sonar-nav-item strong {
+  color: inherit;
+  font-size: 12px;
+}
+
+.squid-sonar-nav-item.is-active {
+  background: var(--squid-sonar-accent-muted);
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-panel {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 8px;
-  padding: 20px;
+  box-shadow: var(--squid-sonar-shadow);
+  min-width: 0;
+  overflow: hidden;
 }
 
-.squid-sonar-panel h2 {
-  font-size: 16px;
-  line-height: 1.4;
-  margin: 0 0 8px;
+.squid-sonar-panel-heading {
+  align-items: center;
+  border-bottom: 1px solid var(--squid-sonar-border);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
 }
 
-.squid-sonar-panel p {
-  color: var(--squid-sonar-muted);
+.squid-sonar-panel-heading {
+  background: var(--squid-sonar-surface-raised);
+  padding: 12px 14px;
+}
+
+.squid-sonar-panel h2,
+.squid-sonar-empty h3,
+.squid-sonar-alert h2 {
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.4;
   margin: 0;
 }
 
+.squid-sonar-panel p,
+.squid-sonar-alert p {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 1px 0 0;
+}
+
+.squid-sonar-run-total {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.squid-sonar-table-wrap {
+  overflow-x: auto;
+}
+
+.squid-sonar-table {
+  border-collapse: collapse;
+  min-width: 820px;
+  width: 100%;
+}
+
+.squid-sonar-table th,
+.squid-sonar-table td {
+  border-bottom: 1px solid var(--squid-sonar-border);
+  font-size: 12px;
+  padding: 9px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.squid-sonar-table th {
+  background: var(--squid-sonar-surface-muted);
+  color: var(--squid-sonar-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.squid-sonar-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.squid-sonar-table tbody tr:hover {
+  background: var(--squid-sonar-surface-muted);
+}
+
+.squid-sonar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.squid-sonar-primary,
+.squid-sonar-secondary {
+  display: block;
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.squid-sonar-primary {
+  font-weight: 700;
+}
+
+.squid-sonar-secondary {
+  color: var(--squid-sonar-muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.squid-sonar-run-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.squid-sonar-run-link:hover .squid-sonar-primary {
+  color: var(--squid-sonar-accent);
+}
+
+.squid-sonar-empty,
+.squid-sonar-alert {
+  padding: 24px;
+}
+
+.squid-sonar-alert {
+  background: var(--squid-sonar-alert-bg);
+  border: 1px solid var(--squid-sonar-alert-border);
+  border-radius: 6px;
+  margin: 20px;
+}
+
 .squid-sonar-badge {
+  background: var(--squid-sonar-badge-bg);
   border: 1px solid color-mix(in srgb, var(--squid-sonar-accent) 35%, transparent);
-  border-radius: 999px;
+  border-radius: 6px;
+  color: var(--squid-sonar-accent);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 5px 8px;
+}
+
+.squid-sonar-badge-completed {
+  border-color: color-mix(in srgb, var(--squid-sonar-success) 40%, transparent);
+  color: var(--squid-sonar-success);
+}
+
+.squid-sonar-badge-failed {
+  border-color: color-mix(in srgb, var(--squid-sonar-danger) 40%, transparent);
+  color: var(--squid-sonar-danger);
+}
+
+.squid-sonar-badge-retrying {
+  border-color: color-mix(in srgb, var(--squid-sonar-warning) 40%, transparent);
+  color: var(--squid-sonar-warning);
+}
+
+.squid-sonar-badge-paused {
+  border-color: color-mix(in srgb, var(--squid-sonar-waiting) 40%, transparent);
+  color: var(--squid-sonar-waiting);
+}
+
+.squid-sonar-badge-running {
+  border-color: color-mix(in srgb, var(--squid-sonar-accent) 40%, transparent);
+  color: var(--squid-sonar-accent);
+}
+
+.squid-sonar-pagination {
+  align-items: center;
+  border-top: 1px solid var(--squid-sonar-border);
+  color: var(--squid-sonar-muted);
+  display: flex;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+
+.squid-sonar-pagination div {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.squid-sonar-pagination button {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  color: var(--squid-sonar-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.squid-sonar-pagination button:disabled {
+  color: var(--squid-sonar-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.squid-sonar-detail {
+  padding-top: 16px;
+}
+
+.squid-sonar-detail-header,
+.squid-sonar-detail-panel,
+.squid-sonar-detail-item {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  box-shadow: var(--squid-sonar-shadow);
+}
+
+.squid-sonar-detail-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px;
+}
+
+.squid-sonar-back-link {
   color: var(--squid-sonar-accent);
   display: inline-flex;
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  padding: 6px 10px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+
+.squid-sonar-detail-header h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.squid-sonar-detail-header p,
+.squid-sonar-muted-line {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
+.squid-sonar-detail-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.squid-sonar-detail-item {
+  box-shadow: none;
+  padding: 12px;
+}
+
+.squid-sonar-detail-item span {
+  color: var(--squid-sonar-muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.squid-sonar-detail-item strong {
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.squid-sonar-detail-columns {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 2fr 1fr;
+  margin-top: 12px;
+}
+
+.squid-sonar-detail-panel {
+  padding: 14px;
+}
+
+.squid-sonar-detail-columns + .squid-sonar-detail-panel {
+  margin-top: 14px;
+}
+
+.squid-sonar-detail-panel h3 {
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.squid-sonar-detail-panel > .squid-sonar-muted-line {
+  margin-top: 8px;
+}
+
+.squid-sonar-detail-panel .squid-sonar-detail-item + .squid-sonar-detail-item {
+  margin-top: 8px;
+}
+
+.squid-sonar-step-list {
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.squid-sonar-step-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.squid-sonar-step-row + .squid-sonar-step-row {
+  border-top: 1px solid var(--squid-sonar-border);
+}
+
+@media (max-width: 920px) {
+  .squid-sonar-filter-row,
+  .squid-sonar-workspace {
+    display: block;
+  }
+
+  .squid-sonar-toolbar-controls {
+    align-items: stretch;
+    display: block;
+  }
+
+  .squid-sonar-search {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .squid-sonar-detail-grid,
+  .squid-sonar-detail-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .squid-sonar-sidebar {
+    display: none;
+  }
+
+  .squid-sonar-panel {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 760px) {
+  .squid-sonar-topbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding-bottom: 12px;
+    padding-top: 12px;
+  }
+
+  .squid-sonar-topbar-actions {
+    justify-content: space-between;
+  }
+
+  .squid-sonar-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .squid-sonar-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

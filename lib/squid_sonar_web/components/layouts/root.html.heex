@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={Phoenix.Controller.get_csrf_token()} />
     <link rel="stylesheet" href={"#{@prefix}/css-#{SquidSonarWeb.Assets.digest()}"} />
+    <script
+      type="module"
+      defer
+      data-squid-sonar-client
+      data-live-path={@live_path}
+      data-live-transport={@live_transport}
+      src={"#{@prefix}/js-#{SquidSonarWeb.Assets.js_digest()}"}
+    >
+    </script>
   </head>
   <body>
     {@inner_content}
