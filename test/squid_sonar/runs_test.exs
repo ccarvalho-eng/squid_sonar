@@ -22,6 +22,7 @@ defmodule SquidSonar.RunsTest do
   alias SquidMesh.Run
   alias SquidMesh.RunExplanation
   alias SquidMesh.RunStepState
+  alias SquidMesh.StepAttempt
   alias SquidMesh.StepRun
   alias SquidSonar.FakeSquidMeshClient
   alias SquidSonar.Runs
@@ -71,7 +72,20 @@ defmodule SquidSonar.RunsTest do
       current_step: :capture_payment,
       last_error: %{"message" => "gateway unavailable"},
       step_runs: [
-        %StepRun{id: "step-run-1", step: :capture_payment, status: :failed}
+        %StepRun{
+          id: "step-run-1",
+          step: :capture_payment,
+          status: :failed,
+          attempts: [
+            %StepAttempt{
+              attempt_number: 1,
+              status: :failed,
+              error: %{"message" => "gateway unavailable"},
+              inserted_at: ~U[2026-05-15 10:00:01Z],
+              updated_at: ~U[2026-05-15 10:00:02Z]
+            }
+          ]
+        }
       ],
       audit_events: []
     }
@@ -96,6 +110,16 @@ defmodule SquidSonar.RunsTest do
     assert detail.payload == %{"order_id" => "order-1"}
     assert detail.last_error == %{"message" => "gateway unavailable"}
     assert [%StepRun{step: :capture_payment}] = detail.step_runs
+
+    assert [
+             %{
+               step: :capture_payment,
+               attempt_number: 1,
+               status: :failed,
+               error: %{"message" => "gateway unavailable"}
+             }
+           ] = detail.step_attempts
+
     assert detail.explanation.reason == :step_failed
   end
 

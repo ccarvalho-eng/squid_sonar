@@ -38,11 +38,10 @@ defmodule SquidSonarExample.WorkflowsTest do
   end
 
   defp step_context do
-    %SquidMesh.Step.Context{
+    %{
       run_id: "run_123",
       workflow: CompletedCheckout,
       step: :load_order,
-      attempt: 1,
       state: %{}
     }
   end

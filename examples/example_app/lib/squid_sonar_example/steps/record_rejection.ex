@@ -1,10 +1,10 @@
 defmodule SquidSonarExample.Steps.RecordRejection do
   @moduledoc false
 
-  use SquidMesh.Step,
-    name: :record_rejection,
+  use Jido.Action,
+    name: "record_rejection",
     description: "Records a rejected manual review result",
-    input_schema: [
+    schema: [
       order_id: [type: :string, required: true],
       approval: [type: :map, required: true]
     ]

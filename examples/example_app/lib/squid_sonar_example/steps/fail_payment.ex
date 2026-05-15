@@ -1,10 +1,10 @@
 defmodule SquidSonarExample.Steps.FailPayment do
   @moduledoc false
 
-  use SquidMesh.Step,
-    name: :fail_payment,
+  use Jido.Action,
+    name: "fail_payment",
     description: "Fails payment capture for a monitorable failed run",
-    input_schema: [
+    schema: [
       order: [type: :map, required: true]
     ]
 

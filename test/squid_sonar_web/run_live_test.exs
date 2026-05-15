@@ -25,6 +25,7 @@ defmodule SquidSonarWeb.RunLiveTest do
   alias SquidMesh.Run
   alias SquidMesh.RunExplanation
   alias SquidMesh.RunStepState
+  alias SquidMesh.StepAttempt
   alias SquidMesh.StepRun
   alias SquidSonar.FakeSquidMeshClient
   alias SquidSonarWeb.RunLive
@@ -56,7 +57,20 @@ defmodule SquidSonarWeb.RunLiveTest do
         %RunStepState{step: :load_order, status: :completed},
         %RunStepState{step: :capture_payment, status: :failed}
       ],
-      step_runs: [%StepRun{step: :capture_payment, status: :failed}]
+      step_runs: [
+        %StepRun{
+          step: :capture_payment,
+          status: :failed,
+          attempts: [
+            %StepAttempt{
+              attempt_number: 1,
+              status: :failed,
+              error: %{message: "Gateway unavailable"},
+              updated_at: ~U[2026-05-15 10:01:00Z]
+            }
+          ]
+        }
+      ]
     }
 
     explanation = %RunExplanation{
@@ -83,6 +97,8 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "CheckoutWorkflow"
     assert html =~ "step_failed"
     assert html =~ "capture_payment"
+    assert html =~ "Attempts"
+    assert html =~ "Attempt 1"
     assert html =~ "send_receipt"
     assert html =~ "replay_run"
     assert html =~ "squid-sonar-workflow-graph"

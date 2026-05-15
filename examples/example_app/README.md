@@ -29,7 +29,8 @@ immediately:
 - Manual review checkout paused for approval
 
 Each run can be opened from the dashboard to inspect status, current step,
-diagnosis, history counts, last error metadata, and the workflow graph.
+diagnosis, attempt history, history counts, last error metadata, and the
+workflow graph.
 
 ## Verification
 

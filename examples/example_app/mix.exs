@@ -45,13 +45,7 @@ defmodule SquidSonarExample.MixProject do
   end
 
   defp squid_mesh_dep do
-    local_path = Path.expand("../../../squid_mesh", __DIR__)
-
-    if File.dir?(local_path) do
-      {:squid_mesh, path: local_path}
-    else
-      {:squid_mesh, github: "ccarvalho-eng/squid_mesh"}
-    end
+    {:squid_mesh, "~> 0.1.0-alpha.7"}
   end
 
   defp aliases do

@@ -3,6 +3,8 @@ defmodule SquidSonarWeb.CoreComponents do
 
   use Phoenix.Component
 
+  alias SquidSonarWeb.WorkflowGraphLayout
+
   attr :status, :atom, required: true
 
   def status_badge(assigns) do
@@ -300,9 +302,25 @@ defmodule SquidSonarWeb.CoreComponents do
         <section class="squid-sonar-detail-panel">
           <h3>History</h3>
           <.detail_item label="Step records" value={length(@detail.step_runs)} />
+          <.detail_item label="Attempts" value={length(@detail.step_attempts)} />
           <.detail_item label="Audit events" value={length(@detail.audit_events)} />
         </section>
       </div>
+
+      <section :if={@detail.step_attempts != []} class="squid-sonar-detail-panel">
+        <h3>Attempts</h3>
+        <div class="squid-sonar-attempt-list">
+          <article :for={attempt <- @detail.step_attempts} class="squid-sonar-attempt">
+            <div>
+              <span class="squid-sonar-attempt-label">{format_step(attempt.step)}</span>
+              <strong>Attempt {format_attempt_number(attempt.attempt_number)}</strong>
+            </div>
+            <.status_badge status={attempt.status} />
+            <time>{format_time(attempt.updated_at || attempt.inserted_at)}</time>
+            <code :if={attempt_error(attempt.error) != nil}>{attempt_error(attempt.error)}</code>
+          </article>
+        </div>
+      </section>
 
       <section class="squid-sonar-detail-panel">
         <h3>Workflow</h3>
@@ -310,38 +328,54 @@ defmodule SquidSonarWeb.CoreComponents do
           <p class="squid-sonar-muted-line">No workflow graph loaded.</p>
         <% else %>
           <div class="squid-sonar-workflow-graph">
-            <div
-              :for={{node, next_connected?} <- workflow_nodes(@detail.workflow_graph)}
-              class={[
-                "squid-sonar-workflow-node-shell",
-                node.current? && "squid-sonar-workflow-node-current",
-                next_connected? && "squid-sonar-workflow-node-connected"
-              ]}
-            >
-              <article class={[
-                "squid-sonar-workflow-node",
-                "squid-sonar-workflow-node-#{node.status}",
-                node.terminal? && "squid-sonar-workflow-node-terminal"
-              ]}>
-                <div class="squid-sonar-workflow-node-main">
-                  <div>
-                    <span class="squid-sonar-workflow-node-kind">
-                      {if node.terminal?, do: "Terminal", else: "Step"}
-                    </span>
-                    <strong>{node.label}</strong>
-                  </div>
-                </div>
-                <.status_badge status={node.status} />
-              </article>
+            <% layout = workflow_graph_layout(@detail.workflow_graph) %>
 
-              <div
-                :if={node_edges(@detail.workflow_graph, node) != []}
-                class="squid-sonar-workflow-node-edges"
-              >
-                <span :for={edge <- node_edges(@detail.workflow_graph, node)}>
-                  {edge_label(edge)}
-                </span>
+            <div class="squid-sonar-workflow-graph-heading">
+              <div>
+                <strong>{format_workflow(@detail.summary.workflow)}</strong>
+                <span>{format_value(@detail.summary.trigger)}</span>
               </div>
+            </div>
+
+            <div
+              class="squid-sonar-workflow-stage"
+              style={workflow_stage_style(layout)}
+            >
+              <span
+                :for={segment <- layout.segments}
+                class={[
+                  "squid-sonar-workflow-edge-segment",
+                  "squid-sonar-workflow-edge-segment-#{segment.orientation}"
+                ]}
+                style={workflow_segment_style(segment)}
+              />
+              <span
+                :for={port <- layout.ports}
+                class="squid-sonar-workflow-port"
+                style={workflow_port_style(port)}
+              />
+
+              <article
+                :for={item <- layout.nodes}
+                class={[
+                  "squid-sonar-workflow-node",
+                  "squid-sonar-workflow-node-#{item.node.status}",
+                  item.node.current? && "squid-sonar-workflow-node-current",
+                  item.node.terminal? && "squid-sonar-workflow-node-terminal"
+                ]}
+                style={workflow_node_style(item)}
+              >
+                <div class="squid-sonar-workflow-node-main">
+                  <span class={[
+                    "squid-sonar-workflow-status-icon",
+                    "squid-sonar-workflow-status-icon-#{item.node.status}"
+                  ]} />
+                  <strong>{item.node.label}</strong>
+                </div>
+                <span class="squid-sonar-workflow-node-status">
+                  {format_graph_status(item.node.status)}
+                </span>
+              </article>
             </div>
           </div>
         <% end %>
@@ -445,38 +479,47 @@ defmodule SquidSonarWeb.CoreComponents do
 
   defp last_error(_error), do: "Present"
 
-  defp workflow_nodes(%{nodes: []}), do: []
+  defp format_attempt_number(nil), do: "?"
+  defp format_attempt_number(attempt_number), do: format_value(attempt_number)
 
-  defp workflow_nodes(graph) do
-    next_nodes = tl(graph.nodes) ++ [nil]
+  defp attempt_error(nil), do: nil
 
-    graph.nodes
-    |> Enum.zip(next_nodes)
-    |> Enum.map(fn {node, next_node} ->
-      {node, connected_to_next?(graph, node, next_node)}
-    end)
+  defp attempt_error(error) when is_map(error) do
+    error
+    |> Map.take([:code, :message, "code", "message"])
+    |> case do
+      empty when empty == %{} -> inspect(error)
+      safe_error -> inspect(safe_error)
+    end
   end
 
-  defp connected_to_next?(_graph, _node, nil), do: false
+  defp attempt_error(error), do: format_value(error)
 
-  defp connected_to_next?(graph, node, next_node) do
-    Enum.any?(graph.edges, fn edge ->
-      format_value(edge.from) == format_value(node.name) and
-        format_value(edge.to) == format_value(next_node.name)
-    end)
+  defp workflow_graph_layout(graph), do: WorkflowGraphLayout.build(graph)
+
+  defp workflow_stage_style(%{width: width, height: height}) do
+    "width: #{round(width)}px; height: #{round(height)}px;"
   end
 
-  defp node_edges(graph, node) do
-    Enum.filter(graph.edges, fn edge ->
-      format_value(edge.from) == format_value(node.name)
-    end)
+  defp workflow_node_style(%{x: x, y: y, width: width, height: height}) do
+    "left: #{round(x)}px; top: #{round(y)}px; width: #{round(width)}px; min-height: #{round(height)}px;"
   end
 
-  defp edge_label(%{outcome: outcome, to: to, recovery: nil}) do
-    "#{format_value(outcome)} -> #{format_value(to)}"
+  defp workflow_segment_style(%{x: x, y: y, width: width, height: height}) do
+    "left: #{round(x)}px; top: #{round(y)}px; width: #{round(width)}px; height: #{round(height)}px;"
   end
 
-  defp edge_label(%{outcome: outcome, to: to, recovery: recovery}) do
-    "#{format_value(outcome)} -> #{format_value(to)} (#{format_value(recovery)})"
+  defp workflow_port_style(%{x: x, y: y}) do
+    "left: #{round(x)}px; top: #{round(y)}px;"
   end
+
+  defp format_graph_status(:completed), do: "done"
+  defp format_graph_status(:failed), do: "failed"
+  defp format_graph_status(:retrying), do: "retrying"
+  defp format_graph_status(:running), do: "running"
+  defp format_graph_status(:paused), do: "paused"
+  defp format_graph_status(:cancelled), do: "cancelled"
+  defp format_graph_status(:waiting), do: "waiting"
+  defp format_graph_status(:pending), do: "pending"
+  defp format_graph_status(status), do: format_value(status)
 end

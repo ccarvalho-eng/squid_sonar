@@ -1,10 +1,10 @@
 defmodule SquidSonarExample.Steps.LoadOrder do
   @moduledoc false
 
-  use SquidMesh.Step,
-    name: :load_order,
+  use Jido.Action,
+    name: "load_order",
     description: "Loads order context",
-    input_schema: [
+    schema: [
       order_id: [type: :string, required: true],
       customer_id: [type: :string, required: true]
     ],

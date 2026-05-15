@@ -1,18 +1,35 @@
 <div align="center">
   <img width="350" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
-  **A polished, embeddable runtime dashboard for Squid Mesh.**
+  <p><strong>A polished, embeddable runtime dashboard for Squid Mesh.</strong></p>
 
   <p>
-    <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml"><img src="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-    <a href="https://github.com/ccarvalho-eng/squid_sonar/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ccarvalho-eng/squid_sonar" alt="License"></a>
+    <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml">
+      <img alt="CI" src="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml/badge.svg" />
+    </a>
+    <a href="https://hex.pm/packages/squid_sonar">
+      <img alt="Hex" src="https://img.shields.io/hexpm/v/squid_sonar" />
+    </a>
+    <a href="https://hexdocs.pm/squid_sonar">
+      <img alt="HexDocs" src="https://img.shields.io/badge/docs-hexdocs-purple" />
+    </a>
+    <a href="https://elixirforum.com/t/squid-mesh-workflow-automation-runtime-for-elixir-applications/75162">
+      <img alt="Elixir Forum" src="https://img.shields.io/badge/Forum-Discuss-4B275F?logo=elixir&logoColor=white" />
+    </a>
+    <a href="https://discord.com/channels/1323353012235796550/1504122798027571331">
+      <img alt="Discord" src="https://img.shields.io/badge/Discord-Join_Channel-5865F2?logo=discord&logoColor=white" />
+    </a>
+    <a href="https://github.com/ccarvalho-eng/squid_sonar/blob/main/LICENSE">
+      <img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" />
+    </a>
   </p>
 </div>
 
 SquidSonar adds a read-only Phoenix LiveView dashboard to applications that run
 Squid Mesh workflows. Mount it inside an existing Phoenix app to inspect recent
 runs, filter by status, search runtime metadata, and open detail pages that show
-the workflow graph, diagnosis, history counts, and last error information.
+the workflow graph, diagnosis, retry attempts, history counts, and last error
+information.
 
 ## Current Shape
 
@@ -30,6 +47,7 @@ The current UI includes:
 - Page size controls and pagination
 - Run detail pages with diagnosis, history counts, last error, and workflow
   graph visualization
+- Step attempt counts and retry history on run detail pages
 - Light, dark, and system theme controls
 - Embedded CSS and JavaScript served by the library
 
@@ -47,7 +65,7 @@ Add SquidSonar to the host application's dependencies:
 ```elixir
 def deps do
   [
-    {:squid_sonar, github: "ccarvalho-eng/squid_sonar"}
+    {:squid_sonar, "~> 0.1.0"}
   ]
 end
 ```

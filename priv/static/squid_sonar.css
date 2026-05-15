@@ -703,6 +703,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   margin-top: 14px;
 }
 
+.squid-sonar-detail-panel + .squid-sonar-detail-panel {
+  margin-top: 14px;
+}
+
 .squid-sonar-detail-panel h3 {
   font-size: 14px;
   font-weight: 650;
@@ -717,44 +721,112 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   margin-top: 8px;
 }
 
-.squid-sonar-workflow-graph {
-  display: flex;
-  gap: 0;
-  margin-top: 14px;
-  overflow-x: auto;
-  padding: 8px 4px 16px;
+.squid-sonar-attempt-list {
+  display: grid;
+  gap: 8px;
 }
 
-.squid-sonar-workflow-node-shell {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
-  --squid-sonar-node-connector-center: calc(var(--squid-sonar-node-height) / 2);
-  --squid-sonar-node-connector-width: 34px;
-  --squid-sonar-node-height: 58px;
-  flex: 0 0 220px;
-  padding-right: var(--squid-sonar-node-connector-width);
+.squid-sonar-attempt {
+  align-items: center;
+  background: var(--squid-sonar-surface-raised);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(150px, auto);
+  padding: 11px 12px;
+}
+
+.squid-sonar-attempt strong,
+.squid-sonar-attempt-label {
+  display: block;
+}
+
+.squid-sonar-attempt strong {
+  font-size: 13px;
+  font-weight: 650;
+  margin-top: 3px;
+}
+
+.squid-sonar-attempt-label,
+.squid-sonar-attempt time {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+}
+
+.squid-sonar-attempt code {
+  color: var(--squid-sonar-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+}
+
+.squid-sonar-workflow-graph {
+  background: var(--squid-sonar-bg);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  margin-top: 12px;
+  min-height: 190px;
+  overflow: auto;
+  padding: 18px 20px 22px;
+}
+
+.squid-sonar-workflow-graph-heading {
+  align-items: flex-start;
+  color: var(--squid-sonar-text);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  min-width: max-content;
+}
+
+.squid-sonar-workflow-graph-heading strong,
+.squid-sonar-workflow-graph-heading span {
+  display: block;
+}
+
+.squid-sonar-workflow-graph-heading strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.squid-sonar-workflow-graph-heading span {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.squid-sonar-workflow-stage {
+  min-width: max-content;
   position: relative;
 }
 
-.squid-sonar-workflow-node-connected::after {
-  background: var(--squid-sonar-node-color);
-  content: "";
-  height: 2px;
-  left: calc(100% - var(--squid-sonar-node-connector-width));
+.squid-sonar-workflow-edge-segment {
+  background: var(--squid-sonar-border);
   position: absolute;
-  top: calc(var(--squid-sonar-node-connector-center) - 1px);
-  width: var(--squid-sonar-node-connector-width);
+  z-index: 1;
 }
 
-.squid-sonar-workflow-node-connected::before {
-  border-right: 2px solid var(--squid-sonar-node-color);
-  border-top: 2px solid var(--squid-sonar-node-color);
-  content: "";
-  height: 8px;
-  left: calc(100% - 9.5px);
+.squid-sonar-workflow-edge-segment-horizontal {
+  border-radius: 999px;
+}
+
+.squid-sonar-workflow-edge-segment-vertical {
+  border-radius: 999px;
+}
+
+.squid-sonar-workflow-port {
+  background: var(--squid-sonar-muted);
+  border: 2px solid var(--squid-sonar-bg);
+  border-radius: 999px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
   position: absolute;
-  top: calc(var(--squid-sonar-node-connector-center) - 4px);
-  transform: rotate(45deg);
-  width: 8px;
+  width: 12px;
+  z-index: 3;
 }
 
 .squid-sonar-workflow-node {
@@ -766,21 +838,21 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 10px;
   justify-content: space-between;
-  min-height: var(--squid-sonar-node-height);
   min-width: 0;
-  padding: 9px 11px;
-  position: relative;
+  padding: 0 12px;
+  position: absolute;
   transition:
     border-color 160ms ease,
     background-color 160ms ease;
+  z-index: 2;
 }
 
-.squid-sonar-workflow-node-shell:hover .squid-sonar-workflow-node {
+.squid-sonar-workflow-node:hover {
   background: var(--squid-sonar-surface-muted);
   border-color: var(--squid-sonar-border-strong);
 }
 
-.squid-sonar-workflow-node-current .squid-sonar-workflow-node {
+.squid-sonar-workflow-node-current {
   background: var(--squid-sonar-accent-muted);
   border-color: var(--squid-sonar-accent);
 }
@@ -788,70 +860,105 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-workflow-node-main {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
-.squid-sonar-workflow-node-completed {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
+.squid-sonar-workflow-node-terminal {
+  background: var(--squid-sonar-surface);
 }
 
-.squid-sonar-workflow-node-failed {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
-}
-
-.squid-sonar-workflow-node-retrying {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
-}
-
-.squid-sonar-workflow-node-paused,
 .squid-sonar-workflow-node-waiting,
 .squid-sonar-workflow-node-pending {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
-}
-
-.squid-sonar-workflow-node-cancelled {
-  --squid-sonar-node-color: var(--squid-sonar-border-strong);
-}
-
-.squid-sonar-workflow-node-terminal {
-  background: var(--squid-sonar-surface-muted);
+  background: var(--squid-sonar-surface);
 }
 
 .squid-sonar-workflow-node strong {
   display: block;
-  font-size: 13px;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.squid-sonar-workflow-node-kind {
-  color: var(--squid-sonar-muted);
-  display: block;
-  font-size: 10px;
-  font-weight: 800;
-  margin-bottom: 3px;
-  text-transform: uppercase;
-}
-
-.squid-sonar-workflow-node-edges {
-  color: var(--squid-sonar-muted);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.squid-sonar-workflow-node-edges span {
-  background: var(--squid-sonar-surface-muted);
-  border: 1px solid var(--squid-sonar-border);
+.squid-sonar-workflow-status-icon {
+  border: 2px solid var(--squid-sonar-muted);
   border-radius: 999px;
+  flex: 0 0 auto;
+  height: 14px;
+  position: relative;
+  width: 14px;
+}
+
+.squid-sonar-workflow-status-icon-completed {
+  background: #1f7a3b;
+  border-color: #1f7a3b;
+}
+
+.squid-sonar-workflow-status-icon-completed::after {
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  content: "";
+  height: 6px;
+  left: 3px;
+  position: absolute;
+  top: 2px;
+  transform: rotate(45deg);
+  width: 3px;
+}
+
+.squid-sonar-workflow-status-icon-failed,
+.squid-sonar-workflow-status-icon-cancelled {
+  background: var(--squid-sonar-danger);
+  border-color: var(--squid-sonar-danger);
+}
+
+.squid-sonar-workflow-status-icon-failed::before,
+.squid-sonar-workflow-status-icon-failed::after,
+.squid-sonar-workflow-status-icon-cancelled::before,
+.squid-sonar-workflow-status-icon-cancelled::after {
+  background: #ffffff;
+  content: "";
+  height: 2px;
+  left: 2.5px;
+  position: absolute;
+  top: 4px;
+  width: 6px;
+}
+
+.squid-sonar-workflow-status-icon-failed::before,
+.squid-sonar-workflow-status-icon-cancelled::before {
+  transform: rotate(45deg);
+}
+
+.squid-sonar-workflow-status-icon-failed::after,
+.squid-sonar-workflow-status-icon-cancelled::after {
+  transform: rotate(-45deg);
+}
+
+.squid-sonar-workflow-status-icon-running,
+.squid-sonar-workflow-status-icon-retrying {
+  border-color: var(--squid-sonar-warning);
+}
+
+.squid-sonar-workflow-status-icon-running::after,
+.squid-sonar-workflow-status-icon-retrying::after {
+  background: var(--squid-sonar-warning);
+  border-radius: 999px;
+  content: "";
+  height: 6px;
+  left: 2px;
+  position: absolute;
+  top: 2px;
+  width: 6px;
+}
+
+.squid-sonar-workflow-node-status {
+  color: var(--squid-sonar-muted);
+  flex: 0 0 auto;
   font-size: 11px;
   font-weight: 700;
-  line-height: 1;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  padding: 6px 8px;
 }
 
 @media (max-width: 920px) {
@@ -897,6 +1004,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
   .squid-sonar-panel {
     margin-top: 0;
+  }
+
+  .squid-sonar-attempt {
+    grid-template-columns: 1fr;
   }
 }
 

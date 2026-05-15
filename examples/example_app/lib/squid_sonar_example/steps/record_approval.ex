@@ -1,10 +1,10 @@
 defmodule SquidSonarExample.Steps.RecordApproval do
   @moduledoc false
 
-  use SquidMesh.Step,
-    name: :record_approval,
+  use Jido.Action,
+    name: "record_approval",
     description: "Records an approved manual review result",
-    input_schema: [
+    schema: [
       order_id: [type: :string, required: true],
       approval: [type: :map, required: true]
     ]

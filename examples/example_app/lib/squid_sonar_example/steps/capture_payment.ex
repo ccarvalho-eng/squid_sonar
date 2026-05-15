@@ -1,10 +1,10 @@
 defmodule SquidSonarExample.Steps.CapturePayment do
   @moduledoc false
 
-  use SquidMesh.Step,
-    name: :capture_payment,
+  use Jido.Action,
+    name: "capture_payment",
     description: "Captures payment for a loaded order",
-    input_schema: [
+    schema: [
       order: [type: :map, required: true]
     ],
     output_schema: [

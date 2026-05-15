@@ -50,6 +50,7 @@ defmodule SquidSonar.MixProject do
       name: "squid_sonar",
       maintainers: ["Cristiano Carvalho"],
       licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/ccarvalho-eng/squid_sonar"},
       files: ~w(lib priv docs .formatter.exs mix.exs README* CHANGELOG* LICENSE* CONTRIBUTING*)
     ]
   end
@@ -73,13 +74,7 @@ defmodule SquidSonar.MixProject do
   end
 
   defp squid_mesh_dep do
-    local_path = Path.expand("../squid_mesh", __DIR__)
-
-    if File.dir?(local_path) do
-      {:squid_mesh, path: local_path}
-    else
-      {:squid_mesh, github: "ccarvalho-eng/squid_mesh"}
-    end
+    {:squid_mesh, "~> 0.1.0-alpha.7"}
   end
 
   defp aliases do
