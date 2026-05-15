@@ -19,6 +19,23 @@
   --squid-sonar-running: #8061d8;
 }
 
+html.squid-sonar-document,
+body.squid-sonar-document {
+  background: #f8fafb;
+  margin: 0;
+  min-height: 100%;
+}
+
+body.squid-sonar-document:has(.squid-sonar-theme-dark) {
+  background: #191c22;
+}
+
+@media (prefers-color-scheme: dark) {
+  body.squid-sonar-document:has(.squid-sonar-theme-system) {
+    background: #191c22;
+  }
+}
+
 .squid-sonar-shell *,
 .squid-sonar-shell *::before,
 .squid-sonar-shell *::after {
@@ -31,7 +48,7 @@
   color: var(--squid-sonar-text);
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 0;
 }
 
