@@ -15,23 +15,6 @@ defmodule SquidSonarWeb.CoreComponents do
 
   attr :status, :atom, required: true
   attr :count, :integer, required: true
-
-  def status_metric(assigns) do
-    ~H"""
-    <article class="squid-sonar-metric">
-      <div class="squid-sonar-metric-topline">
-        <span class="squid-sonar-metric-label">{human_status(@status)}</span>
-      </div>
-      <div class="squid-sonar-metric-value">
-        <strong>{@count}</strong>
-        <span>runs</span>
-      </div>
-    </article>
-    """
-  end
-
-  attr :status, :atom, required: true
-  attr :count, :integer, required: true
   attr :active, :boolean, default: false
 
   def status_nav_item(assigns) do

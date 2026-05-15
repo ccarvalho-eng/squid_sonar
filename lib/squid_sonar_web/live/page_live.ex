@@ -75,19 +75,12 @@ defmodule SquidSonarWeb.PageLive do
         <.dashboard_error error={@dashboard.load_error} />
       <% else %>
         <div class="squid-sonar-content">
-          <section class="squid-sonar-summary" aria-label="Run status counts">
-            <div class="squid-sonar-metrics">
-              <.status_metric
-                :for={status <- @dashboard.statuses}
-                status={status}
-                count={Map.fetch!(@dashboard.status_counts, status)}
-              />
-            </div>
-          </section>
-
           <form phx-change="filter" phx-submit="filter">
             <section class="squid-sonar-workspace">
               <aside class="squid-sonar-sidebar" aria-label="Status inventory">
+                <div class="squid-sonar-sidebar-heading">
+                  <h2>Status</h2>
+                </div>
                 <.status_nav_item
                   status={:all}
                   count={@dashboard.loaded_count}
