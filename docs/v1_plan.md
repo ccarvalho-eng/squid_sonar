@@ -57,7 +57,7 @@ Explicitly out of v1:
 - secrets management
 - Python DAG support
 - independent scheduler/executor
-- replacing LiveDashboard or Oban Web
+- replacing host application dashboards
 
 ## Implementation Slices
 

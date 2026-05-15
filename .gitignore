@@ -1,8 +1,10 @@
 # The directory Mix will write compiled artifacts to.
 /_build/
+/examples/example_app/_build/
 
 # Dependency artifacts.
 /deps/
+/examples/example_app/deps/
 
 # Generated documentation.
 /doc/

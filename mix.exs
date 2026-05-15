@@ -66,10 +66,20 @@ defmodule SquidSonar.MixProject do
       {:phoenix, "~> 1.8.1"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_view, "~> 1.1"},
-      {:squid_mesh, path: "../squid_mesh"},
+      squid_mesh_dep(),
       {:lazy_html, ">= 0.1.0", only: :test},
       {:excoveralls, "~> 0.18", only: :test}
     ]
+  end
+
+  defp squid_mesh_dep do
+    local_path = Path.expand("../squid_mesh", __DIR__)
+
+    if File.dir?(local_path) do
+      {:squid_mesh, path: local_path}
+    else
+      {:squid_mesh, github: "ccarvalho-eng/squid_mesh"}
+    end
   end
 
   defp aliases do

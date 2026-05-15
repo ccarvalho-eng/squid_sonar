@@ -1,0 +1,66 @@
+defmodule SquidSonarExample.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :squid_sonar_example,
+      version: "0.1.0",
+      elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      aliases: aliases()
+    ]
+  end
+
+  def application do
+    [
+      mod: {SquidSonarExample.Application, []},
+      extra_applications: [:logger, :runtime_tools]
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [precommit: :test]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp deps do
+    [
+      {:phoenix, "~> 1.8.1"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 1.1"},
+      {:phoenix_pubsub, "~> 2.1"},
+      {:bandit, "~> 1.7"},
+      {:ecto_sql, "~> 3.13"},
+      {:postgrex, "~> 0.20"},
+      squid_mesh_dep(),
+      {:squid_sonar, path: "../.."}
+    ]
+  end
+
+  defp squid_mesh_dep do
+    local_path = Path.expand("../../../squid_mesh", __DIR__)
+
+    if File.dir?(local_path) do
+      {:squid_mesh, path: local_path}
+    else
+      {:squid_mesh, github: "ccarvalho-eng/squid_mesh"}
+    end
+  end
+
+  defp aliases do
+    [
+      test: ["ecto.create --quiet", "test"],
+      precommit: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "test"
+      ]
+    ]
+  end
+end

@@ -65,3 +65,49 @@ jobs:
 
       - name: Check for unused dependencies
         run: mix deps.unlock --check-unused
+
+  example-app:
+    name: Example App
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: squid_sonar_example_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.OTP_VERSION }}
+
+      - name: Install example dependencies
+        working-directory: examples/example_app
+        run: mix deps.get
+
+      - name: Check example formatting
+        working-directory: examples/example_app
+        run: mix format --check-formatted
+
+      - name: Compile example
+        working-directory: examples/example_app
+        run: mix compile --warnings-as-errors
+
+      - name: Test example
+        working-directory: examples/example_app
+        run: mix test
