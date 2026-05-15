@@ -2,6 +2,10 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.1 - 2026-05-15
+
+- Added visible refresh feedback while dashboard runs reload.
+
 ## 0.1.0 - 2026-05-15
 
 - Added the embeddable Phoenix LiveView dashboard for Squid Mesh runs.
