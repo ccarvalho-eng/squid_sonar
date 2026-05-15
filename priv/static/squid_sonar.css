@@ -440,7 +440,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-table th,
 .squid-sonar-table td {
   border-bottom: 1px solid var(--squid-sonar-border);
-  font-size: 12px;
+  font-size: 13px;
   padding: 13px 14px;
   text-align: left;
   vertical-align: middle;
@@ -481,7 +481,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-secondary {
   color: var(--squid-sonar-muted);
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 3px;
 }
 
@@ -517,10 +517,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-radius: 999px;
   color: var(--squid-sonar-muted);
   display: inline-flex;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   line-height: 1;
-  padding: 5px 8px;
+  padding: 5px 9px;
   text-transform: uppercase;
 }
 
