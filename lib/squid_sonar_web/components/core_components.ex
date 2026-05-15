@@ -341,7 +341,6 @@ defmodule SquidSonarWeb.CoreComponents do
                 node.terminal? && "squid-sonar-workflow-node-terminal"
               ]}>
                 <div class="squid-sonar-workflow-node-main">
-                  <span class="squid-sonar-workflow-node-status" />
                   <div>
                     <span class="squid-sonar-workflow-node-kind">
                       {if node.terminal?, do: "Terminal", else: "Step"}

@@ -797,22 +797,6 @@
   min-width: 0;
 }
 
-.squid-sonar-workflow-node-status {
-  background: var(--squid-sonar-surface);
-  border: 2px solid var(--squid-sonar-node-color);
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--squid-sonar-node-color) 12%, transparent);
-  flex: 0 0 auto;
-  height: 16px;
-  width: 16px;
-}
-
-.squid-sonar-workflow-node-current .squid-sonar-workflow-node-status {
-  box-shadow:
-    inset 0 0 0 3px color-mix(in srgb, var(--squid-sonar-node-color) 12%, transparent),
-    0 0 0 5px color-mix(in srgb, var(--squid-sonar-accent) 14%, transparent);
-}
-
 .squid-sonar-workflow-node-completed {
   --squid-sonar-node-color: var(--squid-sonar-success);
 }
