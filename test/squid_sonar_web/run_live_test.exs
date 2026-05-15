@@ -56,6 +56,7 @@ defmodule SquidSonarWeb.RunLiveTest do
       |> RunLive.render()
       |> rendered_to_string()
 
+    assert html =~ "SquidSonar"
     assert html =~ "Run detail"
     assert html =~ "SquidSonarExampleWorkflow"
     assert html =~ "step_failed"

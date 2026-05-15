@@ -13,10 +13,10 @@
   --squid-sonar-alert-bg: #fff7ed;
   --squid-sonar-alert-border: #fed7aa;
   --squid-sonar-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 32px rgba(16, 24, 40, 0.06);
-  --squid-sonar-danger: #b42318;
-  --squid-sonar-warning: #b54708;
-  --squid-sonar-success: #067647;
-  --squid-sonar-waiting: #6c47b8;
+  --squid-sonar-danger: #9a5650;
+  --squid-sonar-warning: #896d3e;
+  --squid-sonar-success: #4d7862;
+  --squid-sonar-waiting: #76679c;
   --squid-sonar-running: #8061d8;
   --squid-sonar-all: #677080;
 }
@@ -32,50 +32,50 @@
 }
 
 .squid-sonar-shell.squid-sonar-theme-dark {
-  --squid-sonar-bg: #101014;
-  --squid-sonar-surface: #17171c;
-  --squid-sonar-surface-muted: #202027;
-  --squid-sonar-surface-raised: #1c1c22;
-  --squid-sonar-border: #2d2d36;
-  --squid-sonar-border-strong: #42424d;
-  --squid-sonar-text: #f5f5f7;
-  --squid-sonar-muted: #a3a3ad;
+  --squid-sonar-bg: #282c34;
+  --squid-sonar-surface: #21252b;
+  --squid-sonar-surface-muted: #2c313a;
+  --squid-sonar-surface-raised: #2c313a;
+  --squid-sonar-border: #3e4451;
+  --squid-sonar-border-strong: #4b5263;
+  --squid-sonar-text: #e6e6e8;
+  --squid-sonar-muted: #828997;
   --squid-sonar-accent: #8061d8;
-  --squid-sonar-accent-muted: #282332;
-  --squid-sonar-badge-bg: #202027;
-  --squid-sonar-alert-bg: #241d18;
-  --squid-sonar-alert-border: #4b3524;
+  --squid-sonar-accent-muted: #332b4a;
+  --squid-sonar-badge-bg: #2c313a;
+  --squid-sonar-alert-bg: #312826;
+  --squid-sonar-alert-border: #57423e;
   --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
-  --squid-sonar-danger: #ff8a80;
-  --squid-sonar-warning: #f6bc5f;
-  --squid-sonar-success: #5bd59a;
-  --squid-sonar-waiting: #b7a2ff;
+  --squid-sonar-danger: #c3847e;
+  --squid-sonar-warning: #b69a69;
+  --squid-sonar-success: #7da894;
+  --squid-sonar-waiting: #9a91b8;
   --squid-sonar-running: #8061d8;
-  --squid-sonar-all: #a3a3ad;
+  --squid-sonar-all: #828997;
 }
 
 @media (prefers-color-scheme: dark) {
   .squid-sonar-shell.squid-sonar-theme-system {
-    --squid-sonar-bg: #101014;
-    --squid-sonar-surface: #17171c;
-    --squid-sonar-surface-muted: #202027;
-    --squid-sonar-surface-raised: #1c1c22;
-    --squid-sonar-border: #2d2d36;
-    --squid-sonar-border-strong: #42424d;
-    --squid-sonar-text: #f5f5f7;
-    --squid-sonar-muted: #a3a3ad;
+    --squid-sonar-bg: #282c34;
+    --squid-sonar-surface: #21252b;
+    --squid-sonar-surface-muted: #2c313a;
+    --squid-sonar-surface-raised: #2c313a;
+    --squid-sonar-border: #3e4451;
+    --squid-sonar-border-strong: #4b5263;
+    --squid-sonar-text: #e6e6e8;
+    --squid-sonar-muted: #828997;
     --squid-sonar-accent: #8061d8;
-    --squid-sonar-accent-muted: #282332;
-    --squid-sonar-badge-bg: #202027;
-    --squid-sonar-alert-bg: #241d18;
-    --squid-sonar-alert-border: #4b3524;
+    --squid-sonar-accent-muted: #332b4a;
+    --squid-sonar-badge-bg: #2c313a;
+    --squid-sonar-alert-bg: #312826;
+    --squid-sonar-alert-border: #57423e;
     --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
-    --squid-sonar-danger: #ff8a80;
-    --squid-sonar-warning: #f6bc5f;
-    --squid-sonar-success: #5bd59a;
-    --squid-sonar-waiting: #b7a2ff;
+    --squid-sonar-danger: #c3847e;
+    --squid-sonar-warning: #b69a69;
+    --squid-sonar-success: #7da894;
+    --squid-sonar-waiting: #9a91b8;
     --squid-sonar-running: #8061d8;
-    --squid-sonar-all: #a3a3ad;
+    --squid-sonar-all: #828997;
   }
 }
 
@@ -103,6 +103,19 @@
 .squid-sonar-brand {
   gap: 10px;
   min-width: 0;
+}
+
+.squid-sonar-brand-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.squid-sonar-brand-link h1 {
+  transition: color 120ms ease;
+}
+
+.squid-sonar-brand-link:hover h1 {
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-topbar-actions {
@@ -228,7 +241,7 @@
   content: "";
   height: 2px;
   left: 0;
-  opacity: 0.78;
+  opacity: 0.42;
   position: absolute;
   right: 0;
 }
@@ -292,7 +305,7 @@
 .squid-sonar-status-pulse {
   background: var(--squid-sonar-all);
   border-radius: 999px;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-all) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-all) 7%, transparent);
   display: inline-flex;
   flex: 0 0 auto;
   height: 7px;
@@ -301,27 +314,27 @@
 
 .squid-sonar-status-pulse-completed {
   background: var(--squid-sonar-success);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-success) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-success) 7%, transparent);
 }
 
 .squid-sonar-status-pulse-failed {
   background: var(--squid-sonar-danger);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-danger) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-danger) 7%, transparent);
 }
 
 .squid-sonar-status-pulse-retrying {
   background: var(--squid-sonar-warning);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-warning) 14%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-warning) 8%, transparent);
 }
 
 .squid-sonar-status-pulse-paused {
   background: var(--squid-sonar-waiting);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-waiting) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-waiting) 7%, transparent);
 }
 
 .squid-sonar-status-pulse-running {
   background: var(--squid-sonar-running);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-running) 12%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--squid-sonar-running) 8%, transparent);
 }
 
 .squid-sonar-search span,
@@ -457,6 +470,12 @@
   width: 100%;
 }
 
+.squid-sonar-panel-tools {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .squid-sonar-panel h2,
 .squid-sonar-empty h3,
 .squid-sonar-alert h2 {
@@ -552,7 +571,7 @@
 }
 
 .squid-sonar-run-thread {
-  background: var(--squid-sonar-running);
+  background: color-mix(in srgb, var(--squid-sonar-running) 58%, var(--squid-sonar-border));
   border-radius: 999px;
   flex: 0 0 auto;
   height: 28px;
@@ -560,19 +579,19 @@
 }
 
 .squid-sonar-run-thread-completed {
-  background: var(--squid-sonar-success);
+  background: color-mix(in srgb, var(--squid-sonar-success) 58%, var(--squid-sonar-border));
 }
 
 .squid-sonar-run-thread-failed {
-  background: var(--squid-sonar-danger);
+  background: color-mix(in srgb, var(--squid-sonar-danger) 58%, var(--squid-sonar-border));
 }
 
 .squid-sonar-run-thread-retrying {
-  background: var(--squid-sonar-warning);
+  background: color-mix(in srgb, var(--squid-sonar-warning) 58%, var(--squid-sonar-border));
 }
 
 .squid-sonar-run-thread-paused {
-  background: var(--squid-sonar-waiting);
+  background: color-mix(in srgb, var(--squid-sonar-waiting) 58%, var(--squid-sonar-border));
 }
 
 .squid-sonar-empty,
@@ -633,6 +652,22 @@
   font-weight: 700;
   justify-content: space-between;
   padding: 12px 14px;
+}
+
+.squid-sonar-pagination-summary {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.squid-sonar-pagination-summary strong {
+  color: var(--squid-sonar-text);
+  font-size: 12px;
+}
+
+.squid-sonar-pagination-summary span {
+  font-size: 12px;
 }
 
 .squid-sonar-pagination-controls {

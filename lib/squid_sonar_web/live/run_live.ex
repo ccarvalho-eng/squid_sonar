@@ -27,12 +27,12 @@ defmodule SquidSonarWeb.RunLive do
     ~H"""
     <main class={["squid-sonar-shell", "squid-sonar-theme-#{@theme}"]}>
       <header class="squid-sonar-topbar">
-        <div class="squid-sonar-brand">
+        <.link navigate={@prefix <> "/"} class="squid-sonar-brand squid-sonar-brand-link">
           <div>
-            <p class="squid-sonar-eyebrow">Squid Mesh runtime</p>
-            <h1>Run detail</h1>
+            <p class="squid-sonar-eyebrow">Run detail</p>
+            <h1>SquidSonar</h1>
           </div>
-        </div>
+        </.link>
         <.theme_switcher theme={@theme} />
       </header>
 

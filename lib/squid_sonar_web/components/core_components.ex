@@ -76,6 +76,33 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  def refresh_button(assigns) do
+    ~H"""
+    <button
+      class="squid-sonar-icon-button squid-sonar-refresh"
+      type="button"
+      phx-click="refresh"
+      title="Refresh runs"
+      aria-label="Refresh runs"
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 11a8.1 8.1 0 0 0-15.5-2" />
+        <path d="M4 5v4h4" />
+        <path d="M4 13a8.1 8.1 0 0 0 15.5 2" />
+        <path d="M20 19v-4h-4" />
+      </svg>
+    </button>
+    """
+  end
+
   attr :theme, :atom, required: true
   attr :value, :atom, required: true
   attr :label, :string, required: true
@@ -132,14 +159,6 @@ defmodule SquidSonarWeb.CoreComponents do
     ~H"""
     <section class="squid-sonar-panel">
       <div class="squid-sonar-panel-heading">
-        <div>
-          <h2>Recent runs</h2>
-          <p>
-            {@dashboard.filtered_count} matching. Sorted by latest update. Last updated
-            <.timestamp value={@dashboard.loaded_at} />
-          </p>
-        </div>
-
         <div class="squid-sonar-panel-actions">
           <label class="squid-sonar-search">
             <span>Search</span>
@@ -152,6 +171,10 @@ defmodule SquidSonarWeb.CoreComponents do
             />
           </label>
         </div>
+
+        <div class="squid-sonar-panel-tools">
+          <.refresh_button />
+        </div>
       </div>
 
       <%= if @dashboard.runs == [] do %>
@@ -162,6 +185,7 @@ defmodule SquidSonarWeb.CoreComponents do
           page={@dashboard.page}
           total_pages={@dashboard.total_pages}
           filtered_count={@dashboard.filtered_count}
+          loaded_at={@dashboard.loaded_at}
           page_size={@dashboard.page_size}
           page_sizes={@dashboard.page_sizes}
         />
@@ -211,6 +235,7 @@ defmodule SquidSonarWeb.CoreComponents do
   attr :page, :integer, required: true
   attr :total_pages, :integer, required: true
   attr :filtered_count, :integer, required: true
+  attr :loaded_at, :any, required: true
   attr :page_size, :integer, required: true
   attr :page_sizes, :list, required: true
 
@@ -222,7 +247,11 @@ defmodule SquidSonarWeb.CoreComponents do
 
     ~H"""
     <nav class="squid-sonar-pagination" aria-label="Runs pagination">
-      <span>{@filtered_count} runs</span>
+      <span class="squid-sonar-pagination-summary">
+        <strong>Recent runs</strong>
+        <span>{@filtered_count} matching</span>
+        <span>Updated <.timestamp value={@loaded_at} /></span>
+      </span>
       <div class="squid-sonar-pagination-controls">
         <label class="squid-sonar-page-size">
           <span>Page size</span>

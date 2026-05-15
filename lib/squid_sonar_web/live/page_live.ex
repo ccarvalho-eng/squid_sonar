@@ -60,36 +60,14 @@ defmodule SquidSonarWeb.PageLive do
     ~H"""
     <main class={["squid-sonar-shell", "squid-sonar-theme-#{@theme}"]}>
       <header class="squid-sonar-topbar">
-        <div class="squid-sonar-brand">
+        <.link navigate={@prefix <> "/"} class="squid-sonar-brand squid-sonar-brand-link">
           <div>
-            <p class="squid-sonar-eyebrow">Squid Mesh runtime</p>
-            <h1>Runtime dashboard</h1>
+            <p class="squid-sonar-eyebrow">Runtime dashboard</p>
+            <h1>SquidSonar</h1>
           </div>
-        </div>
+        </.link>
         <div class="squid-sonar-topbar-actions">
           <.theme_switcher theme={@theme} />
-          <button
-            class="squid-sonar-icon-button squid-sonar-refresh"
-            type="button"
-            phx-click="refresh"
-            title="Refresh"
-            aria-label="Refresh"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M20 11a8.1 8.1 0 0 0-15.5-2" />
-              <path d="M4 5v4h4" />
-              <path d="M4 13a8.1 8.1 0 0 0 15.5 2" />
-              <path d="M20 19v-4h-4" />
-            </svg>
-          </button>
         </div>
       </header>
 
