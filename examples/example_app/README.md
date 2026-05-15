@@ -7,8 +7,14 @@ workflow scenarios as each product feature lands.
 
 ```bash
 mix deps.get
+mix ecto.create
+mix ecto.migrate
+mix example.seed
 mix precommit
 mix phx.server
 ```
 
 Visit `/sonar` to inspect the embedded UI.
+
+The seed task starts real Squid Mesh workflows that cover completed, failed,
+retrying, and paused manual-review runs.

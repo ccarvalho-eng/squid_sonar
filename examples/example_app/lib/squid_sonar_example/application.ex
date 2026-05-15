@@ -7,6 +7,7 @@ defmodule SquidSonarExample.Application do
   def start(_type, _args) do
     children = [
       SquidSonarExample.Repo,
+      {Task.Supervisor, name: SquidSonarExample.SquidMeshTaskSupervisor},
       {Phoenix.PubSub, name: SquidSonarExample.PubSub},
       SquidSonarExampleWeb.Endpoint
     ]
