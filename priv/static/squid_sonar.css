@@ -1,24 +1,28 @@
 :root {
-  --squid-sonar-bg: #f7f7fa;
+  --squid-sonar-bg: #f6f7f9;
   --squid-sonar-surface: #ffffff;
-  --squid-sonar-surface-muted: #f8f9fb;
-  --squid-sonar-surface-raised: #fcfcfd;
-  --squid-sonar-border: #dde1e7;
-  --squid-sonar-border-strong: #c4cad3;
-  --squid-sonar-text: #191827;
-  --squid-sonar-muted: #677080;
+  --squid-sonar-surface-muted: #f1f3f6;
+  --squid-sonar-surface-raised: #fafbfc;
+  --squid-sonar-border: #d8dde6;
+  --squid-sonar-border-strong: #b7bfcc;
+  --squid-sonar-text: #171923;
+  --squid-sonar-muted: #667085;
   --squid-sonar-accent: #8061d8;
-  --squid-sonar-accent-muted: #f0ebff;
-  --squid-sonar-badge-bg: color-mix(in srgb, var(--squid-sonar-accent) 8%, white);
+  --squid-sonar-accent-muted: #f2efff;
+  --squid-sonar-badge-bg: #ffffff;
   --squid-sonar-alert-bg: #fff7ed;
   --squid-sonar-alert-border: #fed7aa;
-  --squid-sonar-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 32px rgba(16, 24, 40, 0.06);
   --squid-sonar-danger: #9a5650;
   --squid-sonar-warning: #896d3e;
   --squid-sonar-success: #4d7862;
   --squid-sonar-waiting: #76679c;
   --squid-sonar-running: #8061d8;
-  --squid-sonar-all: #677080;
+}
+
+.squid-sonar-shell *,
+.squid-sonar-shell *::before,
+.squid-sonar-shell *::after {
+  box-sizing: border-box;
 }
 
 .squid-sonar-shell {
@@ -42,16 +46,14 @@
   --squid-sonar-muted: #828997;
   --squid-sonar-accent: #8061d8;
   --squid-sonar-accent-muted: #332b4a;
-  --squid-sonar-badge-bg: #2c313a;
+  --squid-sonar-badge-bg: #21252b;
   --squid-sonar-alert-bg: #312826;
   --squid-sonar-alert-border: #57423e;
-  --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
   --squid-sonar-danger: #c3847e;
   --squid-sonar-warning: #b69a69;
   --squid-sonar-success: #7da894;
   --squid-sonar-waiting: #9a91b8;
   --squid-sonar-running: #8061d8;
-  --squid-sonar-all: #828997;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,16 +68,14 @@
     --squid-sonar-muted: #828997;
     --squid-sonar-accent: #8061d8;
     --squid-sonar-accent-muted: #332b4a;
-    --squid-sonar-badge-bg: #2c313a;
+    --squid-sonar-badge-bg: #21252b;
     --squid-sonar-alert-bg: #312826;
     --squid-sonar-alert-border: #57423e;
-    --squid-sonar-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 18px 36px rgba(0, 0, 0, 0.28);
     --squid-sonar-danger: #c3847e;
     --squid-sonar-warning: #b69a69;
     --squid-sonar-success: #7da894;
     --squid-sonar-waiting: #9a91b8;
     --squid-sonar-running: #8061d8;
-    --squid-sonar-all: #828997;
   }
 }
 
@@ -83,11 +83,10 @@
   align-items: center;
   background: var(--squid-sonar-surface);
   border-bottom: 1px solid var(--squid-sonar-border);
-  box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  min-height: 64px;
+  min-height: 62px;
   padding: 0 max(24px, calc((100vw - 1400px) / 2 + 24px));
   position: sticky;
   top: 0;
@@ -125,7 +124,7 @@
 .squid-sonar-theme-switcher {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 7px;
+  border-radius: 8px;
   display: inline-flex;
   gap: 2px;
   padding: 2px;
@@ -150,7 +149,7 @@
   align-items: center;
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 7px;
   color: var(--squid-sonar-text);
   cursor: pointer;
   display: inline-flex;
@@ -171,7 +170,7 @@
 
 .squid-sonar-icon-button:hover {
   background: var(--squid-sonar-accent-muted);
-  border-color: color-mix(in srgb, var(--squid-sonar-accent) 45%, transparent);
+  border-color: var(--squid-sonar-accent);
   color: var(--squid-sonar-accent);
 }
 
@@ -179,7 +178,6 @@
   background: var(--squid-sonar-surface);
   border-color: var(--squid-sonar-border-strong);
   color: var(--squid-sonar-accent);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
 }
 
 .squid-sonar-theme-switcher .squid-sonar-icon-button {
@@ -196,21 +194,21 @@
 }
 
 .squid-sonar-refresh {
-  background: var(--squid-sonar-accent);
+  background: var(--squid-sonar-surface);
   border-color: var(--squid-sonar-accent);
-  color: #ffffff;
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-refresh:hover {
-  background: #6d4fc8;
-  border-color: #6d4fc8;
-  color: #ffffff;
+  background: var(--squid-sonar-accent-muted);
+  border-color: var(--squid-sonar-accent);
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-content {
   margin: 0 auto;
   max-width: 1400px;
-  padding: 0 24px 32px;
+  padding: 0 24px 36px;
 }
 
 .squid-sonar-summary {
@@ -219,30 +217,16 @@
 
 .squid-sonar-metrics {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .squid-sonar-metric {
-  background:
-    linear-gradient(180deg, var(--squid-sonar-surface-raised), var(--squid-sonar-surface));
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-border) 82%, transparent);
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
-  min-height: 78px;
-  overflow: hidden;
-  padding: 13px 14px 12px;
-  position: relative;
-}
-
-.squid-sonar-theme-dark .squid-sonar-metric {
   background: var(--squid-sonar-surface);
-}
-
-@media (prefers-color-scheme: dark) {
-  .squid-sonar-theme-system .squid-sonar-metric {
-    background: var(--squid-sonar-surface);
-  }
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  min-height: 76px;
+  padding: 14px;
 }
 
 .squid-sonar-metric-topline,
@@ -254,8 +238,9 @@
 
 .squid-sonar-metric-label {
   color: var(--squid-sonar-muted);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
 }
 
 .squid-sonar-metric-topline {
@@ -264,13 +249,14 @@
 
 .squid-sonar-metric strong {
   display: block;
-  font-size: 26px;
+  font-size: 28px;
+  font-weight: 650;
   line-height: 1;
 }
 
 .squid-sonar-metric-value {
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
 .squid-sonar-metric-value span {
@@ -300,7 +286,7 @@
 .squid-sonar-search input {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 7px;
   box-sizing: border-box;
   color: var(--squid-sonar-text);
   font: inherit;
@@ -319,12 +305,12 @@
 
 .squid-sonar-search input:focus {
   border-color: var(--squid-sonar-accent);
-  outline: 2px solid color-mix(in srgb, var(--squid-sonar-accent) 18%, transparent);
+  outline: 2px solid var(--squid-sonar-accent-muted);
 }
 
 .squid-sonar-workspace {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   grid-template-columns: 208px minmax(0, 1fr);
   margin-top: 14px;
   padding-bottom: 20px;
@@ -333,21 +319,22 @@
 .squid-sonar-sidebar {
   align-self: start;
   background: var(--squid-sonar-surface);
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-border) 82%, transparent);
-  border-radius: 8px;
-  padding: 8px;
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 9px;
+  padding: 6px;
 }
 
 .squid-sonar-nav-item {
   align-items: center;
-  border-radius: 5px;
+  border: 1px solid transparent;
+  border-radius: 7px;
   color: var(--squid-sonar-muted);
   display: flex;
   font-size: 13px;
   font-weight: 700;
   justify-content: space-between;
-  min-height: 34px;
-  padding: 0 9px;
+  min-height: 36px;
+  padding: 0 10px;
   transition:
     background-color 120ms ease,
     color 120ms ease;
@@ -369,34 +356,29 @@
 }
 
 .squid-sonar-nav-item.is-active {
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--squid-sonar-accent) 15%, transparent),
-      color-mix(in srgb, var(--squid-sonar-accent) 6%, transparent)
-    );
+  background: var(--squid-sonar-accent-muted);
+  border-color: var(--squid-sonar-accent);
   color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-panel {
   background: var(--squid-sonar-surface);
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-border) 84%, transparent);
-  border-radius: 8px;
-  box-shadow: var(--squid-sonar-shadow);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 9px;
   min-width: 0;
   overflow: hidden;
 }
 
 .squid-sonar-panel-heading {
   align-items: center;
-  border-bottom: 1px solid color-mix(in srgb, var(--squid-sonar-border) 78%, transparent);
+  border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
   gap: 12px;
   justify-content: space-between;
 }
 
 .squid-sonar-panel-heading {
-  background: var(--squid-sonar-surface-raised);
+  background: var(--squid-sonar-surface);
   padding: 12px 14px;
 }
 
@@ -443,9 +425,9 @@
 
 .squid-sonar-table th,
 .squid-sonar-table td {
-  border-bottom: 1px solid color-mix(in srgb, var(--squid-sonar-border) 74%, transparent);
+  border-bottom: 1px solid var(--squid-sonar-border);
   font-size: 12px;
-  padding: 10px 14px;
+  padding: 11px 14px;
   text-align: left;
   vertical-align: middle;
 }
@@ -463,12 +445,7 @@
 }
 
 .squid-sonar-table tbody tr:hover {
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--squid-sonar-accent) 5%, transparent),
-      var(--squid-sonar-surface-muted)
-    );
+  background: var(--squid-sonar-surface-muted);
 }
 
 .squid-sonar-table tbody tr:last-child td {
@@ -485,7 +462,7 @@
 }
 
 .squid-sonar-primary {
-  font-weight: 700;
+  font-weight: 650;
 }
 
 .squid-sonar-secondary {
@@ -516,44 +493,44 @@
 .squid-sonar-alert {
   background: var(--squid-sonar-alert-bg);
   border: 1px solid var(--squid-sonar-alert-border);
-  border-radius: 6px;
+  border-radius: 8px;
   margin: 20px;
 }
 
 .squid-sonar-badge {
   background: var(--squid-sonar-badge-bg);
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-accent) 35%, transparent);
-  border-radius: 6px;
+  border: 1px solid var(--squid-sonar-accent);
+  border-radius: 999px;
   color: var(--squid-sonar-accent);
   display: inline-flex;
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
-  padding: 5px 8px;
+  padding: 5px 9px;
 }
 
 .squid-sonar-badge-completed {
-  border-color: color-mix(in srgb, var(--squid-sonar-success) 40%, transparent);
+  border-color: var(--squid-sonar-success);
   color: var(--squid-sonar-success);
 }
 
 .squid-sonar-badge-failed {
-  border-color: color-mix(in srgb, var(--squid-sonar-danger) 40%, transparent);
+  border-color: var(--squid-sonar-danger);
   color: var(--squid-sonar-danger);
 }
 
 .squid-sonar-badge-retrying {
-  border-color: color-mix(in srgb, var(--squid-sonar-warning) 40%, transparent);
+  border-color: var(--squid-sonar-warning);
   color: var(--squid-sonar-warning);
 }
 
 .squid-sonar-badge-paused {
-  border-color: color-mix(in srgb, var(--squid-sonar-waiting) 40%, transparent);
+  border-color: var(--squid-sonar-waiting);
   color: var(--squid-sonar-waiting);
 }
 
 .squid-sonar-badge-running {
-  border-color: color-mix(in srgb, var(--squid-sonar-accent) 40%, transparent);
+  border-color: var(--squid-sonar-accent);
   color: var(--squid-sonar-accent);
 }
 
@@ -603,7 +580,7 @@
 .squid-sonar-pagination button {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 7px;
   color: var(--squid-sonar-text);
   cursor: pointer;
   font: inherit;
@@ -626,15 +603,14 @@
 .squid-sonar-detail-item {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 8px;
-  box-shadow: var(--squid-sonar-shadow);
+  border-radius: 9px;
 }
 
 .squid-sonar-detail-header {
   align-items: flex-start;
   display: flex;
   justify-content: space-between;
-  padding: 18px;
+  padding: 18px 20px;
 }
 
 .squid-sonar-back-link {
@@ -648,6 +624,7 @@
 
 .squid-sonar-detail-header h2 {
   font-size: 20px;
+  font-weight: 650;
   margin: 0;
 }
 
@@ -660,14 +637,13 @@
 
 .squid-sonar-detail-grid {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 12px;
 }
 
 .squid-sonar-detail-item {
-  box-shadow: none;
-  padding: 12px;
+  padding: 13px 14px;
 }
 
 .squid-sonar-detail-item span {
@@ -694,13 +670,13 @@
 
 .squid-sonar-detail-columns {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   grid-template-columns: 2fr 1fr;
   margin-top: 12px;
 }
 
 .squid-sonar-detail-panel {
-  padding: 14px;
+  padding: 16px;
 }
 
 .squid-sonar-detail-columns + .squid-sonar-detail-panel {
@@ -709,6 +685,7 @@
 
 .squid-sonar-detail-panel h3 {
   font-size: 14px;
+  font-weight: 650;
   margin: 0 0 12px;
 }
 
@@ -729,7 +706,7 @@
 }
 
 .squid-sonar-workflow-node-shell {
-  --squid-sonar-node-color: var(--squid-sonar-running);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
   --squid-sonar-node-height: 58px;
   flex: 0 0 220px;
   padding-right: 34px;
@@ -737,7 +714,7 @@
 }
 
 .squid-sonar-workflow-node-connected::after {
-  background: color-mix(in srgb, var(--squid-sonar-border) 82%, var(--squid-sonar-node-color));
+  background: var(--squid-sonar-node-color);
   content: "";
   height: 2px;
   left: calc(100% - 34px);
@@ -747,8 +724,8 @@
 }
 
 .squid-sonar-workflow-node-connected::before {
-  border-right: 2px solid color-mix(in srgb, var(--squid-sonar-border) 82%, var(--squid-sonar-node-color));
-  border-top: 2px solid color-mix(in srgb, var(--squid-sonar-border) 82%, var(--squid-sonar-node-color));
+  border-right: 2px solid var(--squid-sonar-node-color);
+  border-top: 2px solid var(--squid-sonar-node-color);
   content: "";
   height: 7px;
   left: calc(100% - 10px);
@@ -761,10 +738,9 @@
 .squid-sonar-workflow-node {
   align-items: center;
   background: var(--squid-sonar-surface);
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-node-color) 16%, var(--squid-sonar-border));
+  border: 1px solid var(--squid-sonar-border);
   border-radius: 8px;
   box-sizing: border-box;
-  box-shadow: var(--squid-sonar-shadow);
   display: flex;
   gap: 10px;
   justify-content: space-between;
@@ -774,20 +750,17 @@
   position: relative;
   transition:
     border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    background-color 160ms ease;
 }
 
 .squid-sonar-workflow-node-shell:hover .squid-sonar-workflow-node {
-  border-color: color-mix(in srgb, var(--squid-sonar-node-color) 42%, var(--squid-sonar-border));
-  transform: translateY(-1px);
+  background: var(--squid-sonar-surface-muted);
+  border-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-current .squid-sonar-workflow-node {
-  border-color: color-mix(in srgb, var(--squid-sonar-accent) 76%, var(--squid-sonar-border));
-  box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--squid-sonar-accent) 15%, transparent),
-    var(--squid-sonar-shadow);
+  background: var(--squid-sonar-accent-muted);
+  border-color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-workflow-node-main {
@@ -798,29 +771,29 @@
 }
 
 .squid-sonar-workflow-node-completed {
-  --squid-sonar-node-color: var(--squid-sonar-success);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-failed {
-  --squid-sonar-node-color: var(--squid-sonar-danger);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-retrying {
-  --squid-sonar-node-color: var(--squid-sonar-warning);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-paused,
 .squid-sonar-workflow-node-waiting,
 .squid-sonar-workflow-node-pending {
-  --squid-sonar-node-color: var(--squid-sonar-waiting);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-cancelled {
-  --squid-sonar-node-color: var(--squid-sonar-muted);
+  --squid-sonar-node-color: var(--squid-sonar-border-strong);
 }
 
 .squid-sonar-workflow-node-terminal {
-  background: color-mix(in srgb, var(--squid-sonar-muted-surface) 64%, var(--squid-sonar-surface));
+  background: var(--squid-sonar-surface-muted);
 }
 
 .squid-sonar-workflow-node strong {
@@ -848,8 +821,8 @@
 }
 
 .squid-sonar-workflow-node-edges span {
-  background: color-mix(in srgb, var(--squid-sonar-muted-surface) 74%, transparent);
-  border: 1px solid color-mix(in srgb, var(--squid-sonar-border) 72%, transparent);
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
