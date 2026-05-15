@@ -1,6 +1,24 @@
 defmodule SquidSonar.RunsTest do
   use ExUnit.Case, async: true
 
+  defmodule CheckoutWorkflow do
+    use SquidMesh.Workflow
+
+    workflow do
+      trigger :manual do
+        manual()
+      end
+
+      step(:load_order, :log, message: "load order")
+      step(:capture_payment, :log, message: "capture payment")
+      step(:send_receipt, :log, message: "send receipt")
+
+      transition(:load_order, on: :ok, to: :capture_payment)
+      transition(:capture_payment, on: :ok, to: :send_receipt)
+      transition(:send_receipt, on: :ok, to: :complete)
+    end
+  end
+
   alias SquidMesh.Run
   alias SquidMesh.RunExplanation
   alias SquidMesh.RunStepState
@@ -79,6 +97,60 @@ defmodule SquidSonar.RunsTest do
     assert detail.last_error == %{"message" => "gateway unavailable"}
     assert [%StepRun{step: :capture_payment}] = detail.step_runs
     assert detail.explanation.reason == :step_failed
+  end
+
+  test "projects the declared workflow graph with the stopped step marked" do
+    run = %Run{
+      id: "run-4",
+      workflow: CheckoutWorkflow,
+      trigger: :manual,
+      status: :failed,
+      current_step: :capture_payment,
+      steps: [
+        %RunStepState{step: :load_order, status: :completed},
+        %RunStepState{step: :capture_payment, status: :failed}
+      ],
+      step_runs: [
+        %StepRun{id: "step-run-1", step: :load_order, status: :completed},
+        %StepRun{id: "step-run-2", step: :capture_payment, status: :failed}
+      ],
+      audit_events: []
+    }
+
+    explanation = %RunExplanation{
+      status: :failed,
+      reason: :step_failed,
+      step: :capture_payment,
+      next_actions: [:replay_run],
+      evidence: %{step_states: List.wrap(run.steps)}
+    }
+
+    FakeSquidMeshClient.put_inspect_run({:ok, run})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    assert {:ok, %RunDetail{} = detail} = Runs.get_run("run-4", client: @client)
+
+    assert Enum.map(detail.workflow_graph.nodes, & &1.name) == [
+             :load_order,
+             :capture_payment,
+             :send_receipt,
+             :complete
+           ]
+
+    assert Enum.map(detail.workflow_graph.edges, &{&1.from, &1.to, &1.outcome}) == [
+             {:load_order, :capture_payment, :ok},
+             {:capture_payment, :send_receipt, :ok},
+             {:send_receipt, :complete, :ok}
+           ]
+
+    assert %{status: :completed, current?: false} =
+             Enum.find(detail.workflow_graph.nodes, &(&1.name == :load_order))
+
+    assert %{status: :failed, current?: true} =
+             Enum.find(detail.workflow_graph.nodes, &(&1.name == :capture_payment))
+
+    assert %{status: :waiting, current?: false} =
+             Enum.find(detail.workflow_graph.nodes, &(&1.name == :send_receipt))
   end
 
   test "returns inspect errors before explaining the run" do

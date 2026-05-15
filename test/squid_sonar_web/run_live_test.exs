@@ -1,6 +1,24 @@
 defmodule SquidSonarWeb.RunLiveTest do
   use ExUnit.Case, async: false
 
+  defmodule CheckoutWorkflow do
+    use SquidMesh.Workflow
+
+    workflow do
+      trigger :manual do
+        manual()
+      end
+
+      step(:load_order, :log, message: "load order")
+      step(:capture_payment, :log, message: "capture payment")
+      step(:send_receipt, :log, message: "send receipt")
+
+      transition(:load_order, on: :ok, to: :capture_payment)
+      transition(:capture_payment, on: :ok, to: :send_receipt)
+      transition(:send_receipt, on: :ok, to: :complete)
+    end
+  end
+
   import Phoenix.LiveViewTest
 
   alias Phoenix.LiveView.Socket
@@ -27,13 +45,17 @@ defmodule SquidSonarWeb.RunLiveTest do
   test "renders run detail through the run context" do
     run = %Run{
       id: "run-1",
-      workflow: SquidSonarExampleWorkflow,
+      workflow: CheckoutWorkflow,
       trigger: :manual,
       status: :failed,
       current_step: :capture_payment,
       inserted_at: ~U[2026-05-15 10:00:00Z],
       updated_at: ~U[2026-05-15 10:01:00Z],
       last_error: %{code: "gateway_unavailable", message: "Gateway unavailable"},
+      steps: [
+        %RunStepState{step: :load_order, status: :completed},
+        %RunStepState{step: :capture_payment, status: :failed}
+      ],
       step_runs: [%StepRun{step: :capture_payment, status: :failed}]
     }
 
@@ -58,12 +80,14 @@ defmodule SquidSonarWeb.RunLiveTest do
 
     assert html =~ "SquidSonar"
     assert html =~ "Run detail"
-    assert html =~ "SquidSonarExampleWorkflow"
+    assert html =~ "CheckoutWorkflow"
     assert html =~ "step_failed"
     assert html =~ "capture_payment"
+    assert html =~ "send_receipt"
     assert html =~ "replay_run"
-    assert html =~ "squid-sonar-step-graph"
-    assert html =~ "squid-sonar-step-node-failed"
+    assert html =~ "squid-sonar-workflow-graph"
+    assert html =~ "squid-sonar-workflow-node-failed"
+    assert html =~ "squid-sonar-workflow-node-current"
     assert html =~ "<code>"
     assert html =~ "Gateway unavailable"
   end

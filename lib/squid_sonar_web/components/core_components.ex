@@ -325,24 +325,43 @@ defmodule SquidSonarWeb.CoreComponents do
       </div>
 
       <section class="squid-sonar-detail-panel">
-        <h3>Steps</h3>
-        <%= if @detail.step_runs == [] do %>
-          <p class="squid-sonar-muted-line">No step history loaded.</p>
+        <h3>Workflow</h3>
+        <%= if @detail.workflow_graph.nodes == [] do %>
+          <p class="squid-sonar-muted-line">No workflow graph loaded.</p>
         <% else %>
-          <div class="squid-sonar-step-graph">
+          <div class="squid-sonar-workflow-graph">
             <div
-              :for={step <- @detail.step_runs}
-              class={["squid-sonar-step-node", "squid-sonar-step-node-#{step_value(step, :status)}"]}
+              :for={{node, next_connected?} <- workflow_nodes(@detail.workflow_graph)}
+              class={[
+                "squid-sonar-workflow-node-shell",
+                node.current? && "squid-sonar-workflow-node-current",
+                next_connected? && "squid-sonar-workflow-node-connected"
+              ]}
             >
-              <div class="squid-sonar-step-rail">
-                <span class="squid-sonar-step-dot" />
-              </div>
-              <div class="squid-sonar-step-card">
-                <div>
-                  <span class="squid-sonar-step-label">Step</span>
-                  <strong>{format_value(step_value(step, :step))}</strong>
+              <article class={[
+                "squid-sonar-workflow-node",
+                "squid-sonar-workflow-node-#{node.status}",
+                node.terminal? && "squid-sonar-workflow-node-terminal"
+              ]}>
+                <div class="squid-sonar-workflow-node-main">
+                  <span class="squid-sonar-workflow-node-status" />
+                  <div>
+                    <span class="squid-sonar-workflow-node-kind">
+                      {if node.terminal?, do: "Terminal", else: "Step"}
+                    </span>
+                    <strong>{node.label}</strong>
+                  </div>
                 </div>
-                <.status_badge status={step_value(step, :status)} />
+                <.status_badge status={node.status} />
+              </article>
+
+              <div
+                :if={node_edges(@detail.workflow_graph, node) != []}
+                class="squid-sonar-workflow-node-edges"
+              >
+                <span :for={edge <- node_edges(@detail.workflow_graph, node)}>
+                  {edge_label(edge)}
+                </span>
               </div>
             </div>
           </div>
@@ -447,7 +466,38 @@ defmodule SquidSonarWeb.CoreComponents do
 
   defp last_error(_error), do: "Present"
 
-  defp step_value(%{step: step}, :step), do: step
-  defp step_value(%{status: status}, :status), do: status
-  defp step_value(_step, _field), do: nil
+  defp workflow_nodes(%{nodes: []}), do: []
+
+  defp workflow_nodes(graph) do
+    next_nodes = tl(graph.nodes) ++ [nil]
+
+    graph.nodes
+    |> Enum.zip(next_nodes)
+    |> Enum.map(fn {node, next_node} ->
+      {node, connected_to_next?(graph, node, next_node)}
+    end)
+  end
+
+  defp connected_to_next?(_graph, _node, nil), do: false
+
+  defp connected_to_next?(graph, node, next_node) do
+    Enum.any?(graph.edges, fn edge ->
+      format_value(edge.from) == format_value(node.name) and
+        format_value(edge.to) == format_value(next_node.name)
+    end)
+  end
+
+  defp node_edges(graph, node) do
+    Enum.filter(graph.edges, fn edge ->
+      format_value(edge.from) == format_value(node.name)
+    end)
+  end
+
+  defp edge_label(%{outcome: outcome, to: to, recovery: nil}) do
+    "#{format_value(outcome)} -> #{format_value(to)}"
+  end
+
+  defp edge_label(%{outcome: outcome, to: to, recovery: recovery}) do
+    "#{format_value(outcome)} -> #{format_value(to)} (#{format_value(recovery)})"
+  end
 end

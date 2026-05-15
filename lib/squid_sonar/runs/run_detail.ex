@@ -6,6 +6,7 @@ defmodule SquidSonar.Runs.RunDetail do
   alias SquidMesh.Run
   alias SquidMesh.RunExplanation
   alias SquidSonar.Runs.RunSummary
+  alias SquidSonar.Runs.WorkflowGraph
 
   @type t :: %__MODULE__{
           summary: RunSummary.t(),
@@ -14,6 +15,7 @@ defmodule SquidSonar.Runs.RunDetail do
           last_error: map() | nil,
           step_runs: [term()],
           audit_events: [term()],
+          workflow_graph: WorkflowGraph.t(),
           explanation: RunExplanation.t()
         }
 
@@ -23,6 +25,7 @@ defmodule SquidSonar.Runs.RunDetail do
     :context,
     :last_error,
     :explanation,
+    :workflow_graph,
     step_runs: [],
     audit_events: []
   ]
@@ -37,6 +40,7 @@ defmodule SquidSonar.Runs.RunDetail do
       last_error: run.last_error,
       step_runs: List.wrap(run.step_runs),
       audit_events: List.wrap(run.audit_events),
+      workflow_graph: WorkflowGraph.from_run(run, explanation),
       explanation: explanation
     }
   end
