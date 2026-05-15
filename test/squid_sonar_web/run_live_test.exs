@@ -61,6 +61,8 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "step_failed"
     assert html =~ "capture_payment"
     assert html =~ "replay_run"
+    assert html =~ "squid-sonar-step-graph"
+    assert html =~ "squid-sonar-step-node-failed"
     assert html =~ "<code>"
     assert html =~ "Gateway unavailable"
   end

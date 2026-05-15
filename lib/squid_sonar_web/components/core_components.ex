@@ -18,9 +18,15 @@ defmodule SquidSonarWeb.CoreComponents do
 
   def status_metric(assigns) do
     ~H"""
-    <article class="squid-sonar-metric">
-      <span class="squid-sonar-metric-label">{human_status(@status)}</span>
-      <strong>{@count}</strong>
+    <article class={["squid-sonar-metric", "squid-sonar-metric-#{@status}"]}>
+      <div class="squid-sonar-metric-topline">
+        <span class="squid-sonar-metric-label">{human_status(@status)}</span>
+        <span class={["squid-sonar-status-pulse", "squid-sonar-status-pulse-#{@status}"]} />
+      </div>
+      <div class="squid-sonar-metric-value">
+        <strong>{@count}</strong>
+        <span>runs</span>
+      </div>
     </article>
     """
   end
@@ -33,7 +39,10 @@ defmodule SquidSonarWeb.CoreComponents do
     ~H"""
     <label class={["squid-sonar-nav-item", @active && "is-active"]}>
       <input type="radio" name="filters[status]" value={@status} checked={@active} />
-      <span>{human_status(@status)}</span>
+      <span class="squid-sonar-nav-label">
+        <span class={["squid-sonar-status-pulse", "squid-sonar-status-pulse-#{@status}"]} />
+        <span>{human_status(@status)}</span>
+      </span>
       <strong>{@count}</strong>
     </label>
     """
@@ -180,10 +189,13 @@ defmodule SquidSonarWeb.CoreComponents do
         <tbody>
           <tr :for={run <- @runs}>
             <td>
-              <.link navigate={run_path(@prefix, run.id)} class="squid-sonar-run-link">
-                <span class="squid-sonar-primary">{format_workflow(run.workflow)}</span>
-                <span class="squid-sonar-secondary">{run.id}</span>
-              </.link>
+              <div class="squid-sonar-run-title">
+                <span class={["squid-sonar-run-thread", "squid-sonar-run-thread-#{run.status}"]} />
+                <.link navigate={run_path(@prefix, run.id)} class="squid-sonar-run-link">
+                  <span class="squid-sonar-primary">{format_workflow(run.workflow)}</span>
+                  <span class="squid-sonar-secondary">{run.id}</span>
+                </.link>
+              </div>
             </td>
             <td>{format_value(run.trigger)}</td>
             <td><.status_badge status={run.status} /></td>
@@ -288,10 +300,21 @@ defmodule SquidSonarWeb.CoreComponents do
         <%= if @detail.step_runs == [] do %>
           <p class="squid-sonar-muted-line">No step history loaded.</p>
         <% else %>
-          <div class="squid-sonar-step-list">
-            <div :for={step <- @detail.step_runs} class="squid-sonar-step-row">
-              <span>{format_value(step_value(step, :step))}</span>
-              <.status_badge status={step_value(step, :status)} />
+          <div class="squid-sonar-step-graph">
+            <div
+              :for={step <- @detail.step_runs}
+              class={["squid-sonar-step-node", "squid-sonar-step-node-#{step_value(step, :status)}"]}
+            >
+              <div class="squid-sonar-step-rail">
+                <span class="squid-sonar-step-dot" />
+              </div>
+              <div class="squid-sonar-step-card">
+                <div>
+                  <span class="squid-sonar-step-label">Step</span>
+                  <strong>{format_value(step_value(step, :step))}</strong>
+                </div>
+                <.status_badge status={step_value(step, :status)} />
+              </div>
             </div>
           </div>
         <% end %>
