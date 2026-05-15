@@ -1,11 +1,13 @@
-# SquidSonar
-
-<p>
-  <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml"><img src="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/ccarvalho-eng/squid_sonar/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ccarvalho-eng/squid_sonar" alt="License"></a>
-</p>
-
-Embeddable runtime UI for Squid Mesh.
+<div align="center">
+  <img width="350" alt="squid-sonar-logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
+  
+  **Embeddable runtime UI for Squid Mesh.**
+  
+  <p>
+    <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml"><img src="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://github.com/ccarvalho-eng/squid_sonar/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ccarvalho-eng/squid_sonar" alt="License"></a>
+  </p>
+</div>
 
 SquidSonar is intended to mount inside a Phoenix host application and focus on
 Squid Mesh workflow runs.
