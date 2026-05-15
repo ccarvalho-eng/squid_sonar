@@ -137,12 +137,84 @@ defmodule SquidSonarWeb.CoreComponents do
   end
 
   attr :dashboard, :map, required: true
+
+  def dashboard_overview(assigns) do
+    ~H"""
+    <section class="squid-sonar-overview" aria-label="Overview">
+      <.metric_item label="Total runs" value={@dashboard.loaded_count} />
+      <.metric_item label="Workflow runs" value={@dashboard.filtered_count} />
+      <.metric_item label="Failed" value={status_count(@dashboard, :failed)} tone={:danger} />
+      <.metric_item label="Running" value={status_count(@dashboard, :running)} />
+    </section>
+    """
+  end
+
+  attr :label, :string, required: true
+  attr :value, :any, required: true
+  attr :tone, :atom, default: :default
+
+  def metric_item(assigns) do
+    ~H"""
+    <div class={["squid-sonar-metric", "squid-sonar-metric-#{@tone}"]}>
+      <span>{@label}</span>
+      <strong>{@value}</strong>
+    </div>
+    """
+  end
+
+  attr :dashboard, :map, required: true
+
+  def status_distribution(assigns) do
+    assigns = assign(assigns, :segments, status_segments(assigns.dashboard))
+
+    ~H"""
+    <section class="squid-sonar-chart-panel" aria-label="Status distribution">
+      <div class="squid-sonar-chart-heading">
+        <div>
+          <h2>Status distribution</h2>
+          <p>Share of loaded runs by runtime state.</p>
+        </div>
+      </div>
+
+      <div
+        class="squid-sonar-status-chart"
+        role="img"
+        aria-label={status_chart_label(@segments)}
+      >
+        <span
+          :for={segment <- @segments}
+          class={["squid-sonar-status-segment", "squid-sonar-status-segment-#{segment.status}"]}
+          style={"width: #{segment.width}%;"}
+          title={segment.label}
+        />
+      </div>
+
+      <div class="squid-sonar-chart-legend">
+        <span :for={segment <- @segments} class="squid-sonar-chart-legend-item">
+          <span class={[
+            "squid-sonar-chart-dot",
+            "squid-sonar-chart-dot-#{segment.status}"
+          ]} />
+          <strong>{human_status(segment.status)}</strong>
+          <em>{segment.count}</em>
+        </span>
+      </div>
+    </section>
+    """
+  end
+
+  attr :dashboard, :map, required: true
   attr :prefix, :string, default: ""
 
   def runs_panel(assigns) do
     ~H"""
     <section class="squid-sonar-panel">
       <div class="squid-sonar-panel-heading">
+        <div class="squid-sonar-panel-title">
+          <h2>Workflow runs</h2>
+          <p>Recent execution activity across the host runtime.</p>
+        </div>
+
         <div class="squid-sonar-panel-actions">
           <label class="squid-sonar-search">
             <span>Search</span>
@@ -279,6 +351,7 @@ defmodule SquidSonarWeb.CoreComponents do
       <header class="squid-sonar-detail-header">
         <div>
           <.link navigate={@prefix <> "/"} class="squid-sonar-back-link">Back to runs</.link>
+          <span class="squid-sonar-section-label">Run summary</span>
           <h2>{format_workflow(@detail.summary.workflow)}</h2>
           <p>{@detail.summary.id}</p>
         </div>
@@ -436,6 +509,40 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_time(value), do: to_string(value)
 
   defp run_path(prefix, run_id), do: "#{prefix}/runs/#{run_id}"
+
+  defp status_count(dashboard, status) do
+    Map.get(dashboard.status_counts, status, 0)
+  end
+
+  defp status_segments(%{loaded_count: 0, statuses: statuses} = dashboard) do
+    Enum.map(statuses, fn status ->
+      %{
+        status: status,
+        count: status_count(dashboard, status),
+        label: "#{human_status(status)}: 0",
+        width: 0
+      }
+    end)
+  end
+
+  defp status_segments(%{loaded_count: loaded_count, statuses: statuses} = dashboard) do
+    Enum.map(statuses, fn status ->
+      count = status_count(dashboard, status)
+
+      %{
+        status: status,
+        count: count,
+        label: "#{human_status(status)}: #{count}",
+        width: Float.round(count / loaded_count * 100, 2)
+      }
+    end)
+  end
+
+  defp status_chart_label(segments) do
+    segments
+    |> Enum.map_join(", ", fn segment -> segment.label end)
+    |> then(&"Status distribution: #{&1}")
+  end
 
   defp explanation_reason(nil), do: "Unknown"
   defp explanation_reason(%{reason: reason}), do: format_value(reason)

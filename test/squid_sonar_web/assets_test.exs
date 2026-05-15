@@ -14,6 +14,7 @@ defmodule SquidSonarWeb.AssetsTest do
     assert Plug.Conn.get_resp_header(conn, "content-type") == ["text/css; charset=utf-8"]
     assert conn.resp_body =~ ".squid-sonar-shell"
     assert conn.resp_body =~ ".squid-sonar-refresh.phx-click-loading"
+    refute conn.resp_body =~ "gradient"
   end
 
   test "rejects stale CSS digests" do

@@ -80,6 +80,9 @@ defmodule SquidSonarWeb.PageLive do
       <% else %>
         <div class="squid-sonar-content">
           <form phx-change="filter" phx-submit="filter">
+            <.dashboard_overview dashboard={@dashboard} />
+            <.status_distribution dashboard={@dashboard} />
+
             <section class="squid-sonar-workspace">
               <aside class="squid-sonar-sidebar" aria-label="Status inventory">
                 <div class="squid-sonar-sidebar-heading">

@@ -94,6 +94,7 @@ defmodule SquidSonarWeb.RunLiveTest do
 
     assert html =~ "SquidSonar"
     assert html =~ "Run detail"
+    assert html =~ "Run summary"
     assert html =~ "CheckoutWorkflow"
     assert html =~ "phx-hook=\"SquidSonarTheme\""
     assert html =~ "step_failed"
