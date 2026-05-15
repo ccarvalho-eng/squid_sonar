@@ -702,6 +702,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   min-width: 0;
 }
 
+.squid-sonar-detail-columns > .squid-sonar-detail-panel + .squid-sonar-detail-panel {
+  margin-top: 0;
+}
+
 .squid-sonar-detail-panel {
   padding: 16px;
 }
