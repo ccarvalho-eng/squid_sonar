@@ -116,6 +116,51 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  attr :dashboard, :map, required: true
+  attr :prefix, :string, default: ""
+
+  def runs_panel(assigns) do
+    ~H"""
+    <section class="squid-sonar-panel">
+      <div class="squid-sonar-panel-heading">
+        <div>
+          <h2>Recent runs</h2>
+          <p>
+            {@dashboard.filtered_count} matching. Sorted by latest update. Last updated
+            <.timestamp value={@dashboard.loaded_at} />
+          </p>
+        </div>
+
+        <div class="squid-sonar-panel-actions">
+          <label class="squid-sonar-search">
+            <span>Search</span>
+            <input
+              type="search"
+              name="filters[query]"
+              value={@dashboard.filters.query}
+              placeholder="Workflow, trigger, step, run ID"
+              phx-debounce="250"
+            />
+          </label>
+        </div>
+      </div>
+
+      <%= if @dashboard.runs == [] do %>
+        <.empty_runs />
+      <% else %>
+        <.runs_table runs={@dashboard.runs} prefix={@prefix} />
+        <.pagination
+          page={@dashboard.page}
+          total_pages={@dashboard.total_pages}
+          filtered_count={@dashboard.filtered_count}
+          page_size={@dashboard.page_size}
+          page_sizes={@dashboard.page_sizes}
+        />
+      <% end %>
+    </section>
+    """
+  end
+
   attr :runs, :list, required: true
   attr :prefix, :string, default: ""
 
@@ -154,6 +199,8 @@ defmodule SquidSonarWeb.CoreComponents do
   attr :page, :integer, required: true
   attr :total_pages, :integer, required: true
   attr :filtered_count, :integer, required: true
+  attr :page_size, :integer, required: true
+  attr :page_sizes, :list, required: true
 
   def pagination(assigns) do
     assigns =
@@ -164,7 +211,19 @@ defmodule SquidSonarWeb.CoreComponents do
     ~H"""
     <nav class="squid-sonar-pagination" aria-label="Runs pagination">
       <span>{@filtered_count} runs</span>
-      <div>
+      <div class="squid-sonar-pagination-controls">
+        <label class="squid-sonar-page-size">
+          <span>Page size</span>
+          <select name="page_size">
+            <option
+              :for={page_size <- @page_sizes}
+              value={page_size}
+              selected={page_size == @page_size}
+            >
+              {page_size}
+            </option>
+          </select>
+        </label>
         <button
           type="button"
           phx-click="paginate"
@@ -214,7 +273,7 @@ defmodule SquidSonarWeb.CoreComponents do
           <h3>Diagnosis</h3>
           <.detail_item label="Reason" value={explanation_reason(@detail.explanation)} />
           <.detail_item label="Suggested actions" value={next_actions(@detail.explanation)} />
-          <.detail_item label="Last error" value={last_error(@detail.last_error)} />
+          <.detail_item label="Last error" value={last_error(@detail.last_error)} variant={:code} />
         </section>
 
         <section class="squid-sonar-detail-panel">
@@ -243,12 +302,17 @@ defmodule SquidSonarWeb.CoreComponents do
 
   attr :label, :string, required: true
   attr :value, :any, required: true
+  attr :variant, :atom, default: :strong
 
   def detail_item(assigns) do
     ~H"""
     <div class="squid-sonar-detail-item">
       <span>{@label}</span>
-      <strong>{@value}</strong>
+      <%= if @variant == :code do %>
+        <code>{@value}</code>
+      <% else %>
+        <strong>{@value}</strong>
+      <% end %>
     </div>
     """
   end

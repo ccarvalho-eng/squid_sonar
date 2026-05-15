@@ -8,6 +8,7 @@ defmodule SquidSonarWeb.PageLive do
     socket =
       socket
       |> assign_new(:prefix, fn -> "" end)
+      |> assign(:page_title, "SquidSonar Runtime")
       |> assign(:theme, :system)
       |> assign_dashboard()
 
@@ -37,13 +38,14 @@ defmodule SquidSonarWeb.PageLive do
   end
 
   @impl true
-  def handle_event("paginate", %{"page" => page}, socket) do
+  def handle_event("paginate", %{"page" => page} = params, socket) do
     dashboard = socket.assigns.dashboard
 
     {:noreply,
      assign_dashboard(socket,
        filters: dashboard.filters,
-       page_size: dashboard.page_size,
+       page_size:
+         Map.get(params, "page_size") || Map.get(params, "page-size") || dashboard.page_size,
        page: page
      )}
   end
@@ -106,41 +108,6 @@ defmodule SquidSonarWeb.PageLive do
           </section>
 
           <form phx-change="filter" phx-submit="filter">
-            <section class="squid-sonar-toolbar" aria-label="Filter runs">
-              <div class="squid-sonar-filter-row">
-                <div class="squid-sonar-filter-group">
-                  <span class="squid-sonar-toolbar-label">Inspect runs</span>
-                  <strong>{@dashboard.filtered_count} matching</strong>
-                </div>
-
-                <div class="squid-sonar-toolbar-controls">
-                  <label class="squid-sonar-page-size">
-                    <span>Page size</span>
-                    <select name="page_size">
-                      <option
-                        :for={page_size <- @dashboard.page_sizes}
-                        value={page_size}
-                        selected={page_size == @dashboard.page_size}
-                      >
-                        {page_size}
-                      </option>
-                    </select>
-                  </label>
-
-                  <label class="squid-sonar-search">
-                    <span>Search</span>
-                    <input
-                      type="search"
-                      name="filters[query]"
-                      value={@dashboard.filters.query}
-                      placeholder="Workflow, trigger, step, run ID"
-                      phx-debounce="250"
-                    />
-                  </label>
-                </div>
-              </div>
-            </section>
-
             <section class="squid-sonar-workspace">
               <aside class="squid-sonar-sidebar" aria-label="Status inventory">
                 <.status_nav_item
@@ -156,31 +123,7 @@ defmodule SquidSonarWeb.PageLive do
                 />
               </aside>
 
-              <section class="squid-sonar-panel">
-                <div class="squid-sonar-panel-heading">
-                  <div>
-                    <h2>Recent runs</h2>
-                    <p>
-                      Sorted by latest update. Last updated
-                      <.timestamp value={@dashboard.loaded_at} />
-                    </p>
-                  </div>
-                  <span class="squid-sonar-run-total">
-                    Page {@dashboard.page} of {@dashboard.total_pages}
-                  </span>
-                </div>
-
-                <%= if @dashboard.runs == [] do %>
-                  <.empty_runs />
-                <% else %>
-                  <.runs_table runs={@dashboard.runs} prefix={@prefix} />
-                  <.pagination
-                    page={@dashboard.page}
-                    total_pages={@dashboard.total_pages}
-                    filtered_count={@dashboard.filtered_count}
-                  />
-                <% end %>
-              </section>
+              <.runs_panel dashboard={@dashboard} prefix={@prefix} />
             </section>
           </form>
         </div>

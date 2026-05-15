@@ -8,6 +8,7 @@ defmodule SquidSonarWeb.RunLive do
     {:ok,
      socket
      |> assign_new(:prefix, fn -> "" end)
+     |> assign(:page_title, "SquidSonar Run")
      |> assign(:theme, :system)}
   end
 

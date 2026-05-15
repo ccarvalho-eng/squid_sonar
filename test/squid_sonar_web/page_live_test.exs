@@ -35,7 +35,8 @@ defmodule SquidSonarWeb.PageLiveTest do
     html = render_page()
 
     assert html =~ "Runtime dashboard"
-    assert html =~ "Filter runs"
+    assert html =~ "Search"
+    assert html =~ "Page size"
     assert html =~ "Failed"
     assert html =~ "Completed"
     assert html =~ "Retrying"
