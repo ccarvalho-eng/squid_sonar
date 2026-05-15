@@ -728,9 +728,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-workflow-node-shell {
   --squid-sonar-node-color: var(--squid-sonar-border-strong);
   --squid-sonar-node-connector-center: calc(var(--squid-sonar-node-height) / 2);
+  --squid-sonar-node-connector-width: 34px;
   --squid-sonar-node-height: 58px;
   flex: 0 0 220px;
-  padding-right: 34px;
+  padding-right: var(--squid-sonar-node-connector-width);
   position: relative;
 }
 
@@ -738,10 +739,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-node-color);
   content: "";
   height: 2px;
-  left: calc(100% - 34px);
+  left: calc(100% - var(--squid-sonar-node-connector-width));
   position: absolute;
   top: calc(var(--squid-sonar-node-connector-center) - 1px);
-  width: 34px;
+  width: var(--squid-sonar-node-connector-width);
 }
 
 .squid-sonar-workflow-node-connected::before {
@@ -749,7 +750,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-top: 2px solid var(--squid-sonar-node-color);
   content: "";
   height: 8px;
-  left: calc(100% - 11px);
+  left: calc(100% - 9.5px);
   position: absolute;
   top: calc(var(--squid-sonar-node-connector-center) - 4px);
   transform: rotate(45deg);
