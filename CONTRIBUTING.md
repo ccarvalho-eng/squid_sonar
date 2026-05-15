@@ -14,11 +14,11 @@ mix precommit
 
 `mix precommit` runs compile, format checks, and tests.
 
-## Feature Rule
+## Example App Coverage
 
-Every user-facing feature must include matching example-app coverage in the same
-slice. The example app is the QA harness for real Squid Mesh workflows and
-should make each feature inspectable in a running Phoenix app.
+Every user-facing feature should include matching example-app coverage when the
+behavior can be demonstrated in a running Phoenix app. The example app should
+make new dashboard behavior visible with real Squid Mesh workflow data.
 
 ## Pull Requests
 
@@ -27,4 +27,3 @@ should make each feature inspectable in a running Phoenix app.
 - Include the exact verification commands you ran.
 - Include screenshots or video for UI changes when practical.
 - Do not include secrets, local paths, hostnames, or machine-specific metadata.
-

@@ -1,20 +1,40 @@
 # SquidSonar Example App
 
-This Phoenix app is the QA and demo harness for SquidSonar.
+This Phoenix app demonstrates SquidSonar mounted inside a real host
+application. It installs Squid Mesh, defines a small set of workflow examples,
+and exposes the embedded dashboard at `/sonar`.
 
-It mounts the embeddable UI at `/sonar` and will grow a set of real Squid Mesh
-workflow scenarios as each product feature lands.
+Use it to try SquidSonar locally with realistic runtime data.
+
+## Run Locally
 
 ```bash
 mix deps.get
 mix ecto.create
 mix ecto.migrate
 mix example.seed
-mix precommit
 mix phx.server
 ```
 
-Visit `/sonar` to inspect the embedded UI.
+Open `http://localhost:4010/sonar`.
 
-The seed task starts real Squid Mesh workflows that cover completed, failed,
-retrying, and paused manual-review runs.
+## Included Workflow Runs
+
+The seed task creates several Squid Mesh runs so the dashboard has useful data
+immediately:
+
+- Completed checkout
+- Failed checkout
+- Retrying checkout
+- Manual review checkout paused for approval
+
+Each run can be opened from the dashboard to inspect status, current step,
+diagnosis, history counts, last error metadata, and the workflow graph.
+
+## Verification
+
+Run the example app test suite with:
+
+```bash
+mix precommit
+```

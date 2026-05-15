@@ -28,8 +28,13 @@ defmodule SquidSonar.Router do
         squid_sonar "/sonar", otp_app: :my_app
       end
 
-  Options are reserved for the full v1 integration surface. The scaffold keeps
-  them accepted so host routes do not need to change as features fill in.
+  Supported options:
+
+    * `:as` - route helper name for the mounted LiveView session.
+    * `:socket_path` - LiveView socket path used by the host application.
+      Defaults to `"/live"`.
+    * `:transport` - LiveView client transport. Use `"websocket"` or
+      `"longpoll"`. Defaults to `"websocket"`.
   """
   defmacro squid_sonar(path, opts \\ []) do
     quote bind_quoted: [path: path, opts: opts] do
