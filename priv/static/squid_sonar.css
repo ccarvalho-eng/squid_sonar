@@ -1,0 +1,70 @@
+:root {
+  --squid-sonar-bg: #f5f7f8;
+  --squid-sonar-surface: #ffffff;
+  --squid-sonar-border: #d8dee4;
+  --squid-sonar-text: #18222c;
+  --squid-sonar-muted: #65717d;
+  --squid-sonar-accent: #0e7490;
+}
+
+.squid-sonar-shell {
+  color: var(--squid-sonar-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  max-width: 1200px;
+  padding: 24px;
+}
+
+.squid-sonar-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.squid-sonar-header h1 {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.squid-sonar-eyebrow {
+  color: var(--squid-sonar-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.squid-sonar-panel {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.squid-sonar-panel h2 {
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+
+.squid-sonar-panel p {
+  color: var(--squid-sonar-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.squid-sonar-badge {
+  border: 1px solid color-mix(in srgb, var(--squid-sonar-accent) 35%, transparent);
+  border-radius: 999px;
+  color: var(--squid-sonar-accent);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+}

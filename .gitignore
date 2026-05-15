@@ -1,0 +1,21 @@
+# The directory Mix will write compiled artifacts to.
+/_build/
+
+# Dependency artifacts.
+/deps/
+
+# Generated documentation.
+/doc/
+
+# Mix archives and local package state.
+/.fetch
+
+# Temporary files.
+/tmp/
+
+# Crash dumps.
+erl_crash.dump
+
+# Local environment.
+.env
+.env.*

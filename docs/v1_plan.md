@@ -8,9 +8,9 @@ execute workflows. The first version should mount inside a host Phoenix
 application and make existing Squid Mesh runs easier to inspect, explain, and
 eventually operate.
 
-## Design Reference
+## Design Direction
 
-Use Aludel as the primary design reference for:
+Use this direction for the embedded UI:
 
 - dense dashboard layout
 - compact cards and tables
@@ -19,14 +19,21 @@ Use Aludel as the primary design reference for:
 - run detail pages with structured metadata panels
 - small chart and copy/export interactions
 
-Do not carry over Aludel's domain model, daisyUI dependency, provider branding,
-or eval-specific navigation.
+Do not add unrelated domain concepts, heavy UI frameworks, or navigation that
+does not serve workflow runtime inspection.
 
 ## V1 Stop Line
 
 V1 is done when a host Phoenix app can mount Sonar and inspect Squid Mesh runs
 without Sonar owning persistence, runtime execution, endpoint supervision, or
 application deployment.
+
+The repository must also include an example Phoenix app. That app can run
+standalone, but it is the demo and QA smoke harness that mounts Sonar, runs real
+Squid Mesh workflows, and gives us live data to monitor.
+
+Every new Sonar feature must add or update the example app in the same slice so
+the feature has a real Squid Mesh scenario to inspect during QA.
 
 Required v1 behavior:
 
@@ -40,10 +47,11 @@ Required v1 behavior:
 - read-only graph or ordered step-state visualization
 - test coverage against fake/public Squid Mesh data
 - example integration against Squid Mesh's minimal host app or a temporary host
+- example app with sample Squid Mesh workflows and runs
 
 Explicitly out of v1:
 
-- standalone server as the primary distribution shape
+- standalone server as the primary distribution shape for the library itself
 - editing workflow definitions
 - starting arbitrary runs from the UI
 - secrets management
@@ -88,8 +96,8 @@ Verification:
 - Build a mountable LiveView for recent runs.
 - Include status summary counts, status filters, workflow/trigger labels, and
   updated timestamp.
-- Use Aludel-inspired dense cards/table layout, but with Sonar naming and
-  workflow operations language.
+- Use a dense cards/table layout with Sonar naming and workflow operations
+  language.
 
 Verification:
 
@@ -128,11 +136,15 @@ Verification:
 - Run smoke tests against real Squid Mesh persistence and runtime paths.
 - Ensure Sonar does not require owning the host endpoint, repo, supervision tree,
   authentication system, or deployment topology.
+- Add an example app in this repo that depends on Squid Mesh and SquidSonar,
+  mounts the UI, and ships small workflows that produce running, completed,
+  failed, retrying, and paused runs for monitoring.
 
 Verification:
 
 - Host app boots with Sonar mounted.
 - Smoke creates or loads runs and renders index/detail pages.
+- Example app boots and renders monitorable example runs.
 
 ### Slice 7: Optional Guarded Operations
 
@@ -152,6 +164,8 @@ and include audit/terminal-state review before merge.
 Before considering v1 complete:
 
 - architecture boundary review: Sonar remains UI/control-plane only
+- example app review: every feature has a matching monitorable scenario or
+  fixture in the example app
 - correctness review: no stale reads before unsafe mutations
 - security review: no secrets or payload leakage assumptions
 - maintainability review: LiveViews remain thin and data shaping stays in the

@@ -1,0 +1,84 @@
+defmodule SquidSonar.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :squid_sonar,
+      version: "0.1.0",
+      elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      description: description(),
+      source_url: "https://github.com/ccarvalho-eng/squid_sonar",
+      homepage_url: "https://github.com/ccarvalho-eng/squid_sonar",
+      package: package(),
+      docs: docs(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.json": :test
+      ],
+      deps: deps(),
+      aliases: aliases()
+    ]
+  end
+
+  def application do
+    [
+      extra_applications: [:logger]
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [precommit: :test]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  defp description do
+    "Embeddable runtime UI for Squid Mesh."
+  end
+
+  defp package do
+    [
+      name: "squid_sonar",
+      maintainers: ["Cristiano Carvalho"],
+      licenses: ["Apache-2.0"],
+      files: ~w(lib priv docs .formatter.exs mix.exs README* CHANGELOG* LICENSE* CONTRIBUTING*)
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "docs/v1_plan.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE"]
+    ]
+  end
+
+  defp deps do
+    [
+      {:phoenix, "~> 1.8.1"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 1.1"},
+      {:squid_mesh, path: "../squid_mesh"},
+      {:lazy_html, ">= 0.1.0", only: :test},
+      {:excoveralls, "~> 0.18", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      precommit: [
+        "compile --warnings-as-errors",
+        "format --check-formatted",
+        "test"
+      ]
+    ]
+  end
+end
