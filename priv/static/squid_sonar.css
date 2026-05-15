@@ -232,6 +232,20 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-accent);
 }
 
+.squid-sonar-refresh.phx-click-loading {
+  cursor: progress;
+}
+
+.squid-sonar-refresh.phx-click-loading svg {
+  animation: squid-sonar-spin 700ms linear infinite;
+}
+
+@keyframes squid-sonar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .squid-sonar-content {
   margin: 0 auto;
   max-width: 1400px;
