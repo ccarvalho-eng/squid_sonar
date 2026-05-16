@@ -265,6 +265,49 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   padding: 16px 20px 40px;
 }
 
+.squid-sonar-filter-toggle-input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.squid-sonar-filter-toggle {
+  align-items: center;
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  color: var(--squid-sonar-text);
+  cursor: pointer;
+  display: none;
+  font-size: 13px;
+  font-weight: 650;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 11px;
+  width: 100%;
+}
+
+.squid-sonar-filter-toggle-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 14px;
+}
+
+.squid-sonar-filter-toggle-icon span {
+  background: var(--squid-sonar-muted);
+  border-radius: 999px;
+  display: block;
+  height: 2px;
+  width: 14px;
+}
+
+.squid-sonar-filter-toggle:hover,
+.squid-sonar-filter-toggle-input:focus-visible + form .squid-sonar-filter-toggle {
+  background: var(--squid-sonar-surface-muted);
+  border-color: var(--squid-sonar-border-strong);
+}
+
 .squid-sonar-search span,
 .squid-sonar-page-size span,
 .squid-sonar-section-label,
@@ -1060,23 +1103,27 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     grid-template-columns: 1fr;
   }
 
+  .squid-sonar-filter-toggle {
+    display: inline-flex;
+    margin-bottom: 10px;
+  }
+
   .squid-sonar-sidebar {
-    align-items: center;
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
+    display: none;
+    margin-bottom: 0;
     position: static;
   }
 
+  .squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar {
+    display: flex;
+  }
+
   .squid-sonar-sidebar-heading {
-    flex: 0 0 auto;
-    min-height: 34px;
+    display: flex;
   }
 
   .squid-sonar-nav-item {
-    flex: 0 0 auto;
-    gap: 16px;
-    min-width: 118px;
+    width: 100%;
   }
 
   .squid-sonar-panel-heading {

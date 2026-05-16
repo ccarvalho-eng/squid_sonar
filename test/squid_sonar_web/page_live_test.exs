@@ -38,6 +38,8 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "Runtime dashboard"
     assert html =~ "phx-hook=\"SquidSonarTheme\""
     assert html =~ "Workflow runs"
+    assert html =~ "squid-sonar-filter-toggle"
+    assert html =~ "Filters"
     refute html =~ "squid-sonar-overview"
     refute html =~ "squid-sonar-status-chart"
     refute html =~ "Status distribution"
