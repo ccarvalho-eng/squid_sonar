@@ -2,6 +2,12 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.3 - 2026-05-16
+
+- Refined status badge styling with rectangular labels.
+- Aligned status filter hover and focus states with the runs table interaction.
+- Removed the redundant matching-run summary from the status filter sidebar.
+
 ## 0.1.2 - 2026-05-16
 
 - Refined the embedded dashboard with a cleaner, flatter visual system.
