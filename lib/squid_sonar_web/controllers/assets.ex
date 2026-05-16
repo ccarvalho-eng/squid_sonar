@@ -69,11 +69,184 @@ defmodule SquidSonarWeb.Assets do
   const initialTheme = storedTheme();
   if (initialTheme) applyTheme(initialTheme);
 
+  const chartValue = (value) => {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return null;
+    return Number(value);
+  };
+
+  const chartMax = (series) => {
+    const values = series
+      .flatMap((item) => item.values || [])
+      .map(chartValue)
+      .filter((value) => value !== null);
+
+    return Math.max(1, ...values);
+  };
+
+  const formatChartValue = (value, unit) => {
+    if (value === null || value === undefined) return "";
+    if (unit !== "seconds") return String(Math.round(value));
+    if (value >= 3600) return Math.round(value / 360) / 10 + "h";
+    if (value >= 60) return Math.round(value / 6) / 10 + "m";
+    return Math.round(value) + "s";
+  };
+
+  const chartColor = (label, index, styles) => {
+    const normalizedLabel = String(label || "").toLowerCase();
+    if (normalizedLabel.includes("failed") || normalizedLabel.includes("p95")) {
+      return styles.getPropertyValue("--squid-sonar-danger").trim() || "#8f3d39";
+    }
+    if (normalizedLabel.includes("running")) {
+      return styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
+    }
+    if (index > 0) {
+      return styles.getPropertyValue("--squid-sonar-border-strong").trim() || "#aaa1b8";
+    }
+    return styles.getPropertyValue("--squid-sonar-accent").trim() || "#8061d8";
+  };
+
+  const drawChart = (container) => {
+    const canvas = container.querySelector("canvas");
+    if (!canvas) return;
+
+    let data = {};
+    try {
+      data = JSON.parse(container.dataset.chart || "{}");
+    } catch (_error) {
+      return;
+    }
+
+    const labels = data.labels || [];
+    const series = data.series || [];
+    if (labels.length === 0 || series.length === 0) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const width = Math.max(280, Math.floor(rect.width || container.clientWidth || 280));
+    const height = Math.max(176, Math.floor(rect.height || 176));
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+
+    const shell = container.closest(".squid-sonar-shell") || document.documentElement;
+    const styles = getComputedStyle(shell);
+    const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
+    const gridColor = styles.getPropertyValue("--squid-sonar-border").trim() || "#ddd7e5";
+    const plot = { left: 42, top: 10, right: 10, bottom: 28 };
+    const plotWidth = width - plot.left - plot.right;
+    const plotHeight = height - plot.top - plot.bottom;
+    const maxValue = chartMax(series);
+
+    context.font = "11px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif";
+    context.lineWidth = 1;
+    context.strokeStyle = gridColor;
+    context.fillStyle = textColor;
+
+    [0, 0.5, 1].forEach((step) => {
+      const y = plot.top + plotHeight * step;
+      context.beginPath();
+      context.moveTo(plot.left, y);
+      context.lineTo(width - plot.right, y);
+      context.stroke();
+
+      const value = maxValue * (1 - step);
+      context.fillText(formatChartValue(value, data.unit), 4, y + 4);
+    });
+
+    labels.forEach((label, index) => {
+      const x = plot.left + (plotWidth / Math.max(1, labels.length - 1)) * index;
+      context.fillText(label, Math.min(x, width - plot.right - 42), height - 8);
+    });
+
+    if (data.kind === "bar") {
+      const groupWidth = plotWidth / labels.length;
+      const barWidth = Math.max(3, Math.min(16, (groupWidth - 10) / series.length));
+      const totalWidth = barWidth * series.length;
+
+      series.forEach((item, seriesIndex) => {
+        context.fillStyle = chartColor(item.label, seriesIndex, styles);
+
+        labels.forEach((_label, labelIndex) => {
+          const value = chartValue((item.values || [])[labelIndex]);
+          if (value === null) return;
+
+          const barHeight = Math.max(1, (value / maxValue) * plotHeight);
+          const x =
+            plot.left +
+            labelIndex * groupWidth +
+            groupWidth / 2 -
+            totalWidth / 2 +
+            seriesIndex * barWidth;
+          const y = plot.top + plotHeight - barHeight;
+
+          context.fillRect(x, y, barWidth - 1, barHeight);
+        });
+      });
+
+      return;
+    }
+
+    series.forEach((item, seriesIndex) => {
+      const color = chartColor(item.label, seriesIndex, styles);
+      context.strokeStyle = color;
+      context.fillStyle = color;
+      context.lineWidth = seriesIndex === 0 ? 2 : 1.5;
+      context.beginPath();
+
+      let started = false;
+      labels.forEach((_label, labelIndex) => {
+        const value = chartValue((item.values || [])[labelIndex]);
+        if (value === null) return;
+
+        const x = plot.left + (plotWidth / Math.max(1, labels.length - 1)) * labelIndex;
+        const y = plot.top + plotHeight - (value / maxValue) * plotHeight;
+
+        if (started) {
+          context.lineTo(x, y);
+        } else {
+          context.moveTo(x, y);
+          started = true;
+        }
+      });
+
+      context.stroke();
+
+      labels.forEach((_label, labelIndex) => {
+        const value = chartValue((item.values || [])[labelIndex]);
+        if (value === null) return;
+
+        const x = plot.left + (plotWidth / Math.max(1, labels.length - 1)) * labelIndex;
+        const y = plot.top + plotHeight - (value / maxValue) * plotHeight;
+        context.beginPath();
+        context.arc(x, y, 2.5, 0, Math.PI * 2);
+        context.fill();
+      });
+    });
+  };
+
   const Hooks = {
     SquidSonarTheme: {
       mounted() {
         const theme = storedTheme();
         if (theme) this.pushEvent("set_theme", { theme });
+      }
+    },
+    SquidSonarChart: {
+      mounted() {
+        this.chartResizeHandler = () => drawChart(this.el);
+        drawChart(this.el);
+        window.addEventListener("resize", this.chartResizeHandler);
+      },
+      updated() {
+        drawChart(this.el);
+      },
+      destroyed() {
+        window.removeEventListener("resize", this.chartResizeHandler);
       }
     }
   };

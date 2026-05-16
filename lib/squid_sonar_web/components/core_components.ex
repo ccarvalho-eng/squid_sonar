@@ -136,6 +136,42 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  attr :charts, :map, required: true
+
+  def dashboard_charts(assigns) do
+    ~H"""
+    <section class="squid-sonar-charts" aria-label="Operational charts">
+      <.chart_panel chart={@charts.activity} id="squid-sonar-activity-chart" />
+      <.chart_panel chart={@charts.latency} id="squid-sonar-latency-chart" />
+    </section>
+    """
+  end
+
+  attr :chart, :map, required: true
+  attr :id, :string, required: true
+
+  def chart_panel(assigns) do
+    ~H"""
+    <article
+      id={@id}
+      class="squid-sonar-chart"
+      phx-hook="SquidSonarChart"
+      data-chart={chart_payload(@chart)}
+    >
+      <div class="squid-sonar-chart-heading">
+        <h2>{@chart.title}</h2>
+        <div class="squid-sonar-chart-legend" aria-hidden="true">
+          <span :for={series <- @chart.series}>
+            <i></i>
+            {series.label}
+          </span>
+        </div>
+      </div>
+      <canvas aria-label={@chart.title} role="img"></canvas>
+    </article>
+    """
+  end
+
   attr :dashboard, :map, required: true
   attr :prefix, :string, default: ""
 
@@ -442,6 +478,8 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_time(value), do: to_string(value)
 
   defp run_path(prefix, run_id), do: "#{prefix}/runs/#{run_id}"
+
+  defp chart_payload(chart), do: Phoenix.json_library().encode!(chart)
 
   defp explanation_reason(nil), do: "Unknown"
   defp explanation_reason(%{reason: reason}), do: format_value(reason)

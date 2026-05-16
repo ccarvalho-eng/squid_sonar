@@ -32,6 +32,64 @@ defmodule SquidSonar.DashboardTest do
     assert dashboard.status_counts.running == 1
     assert dashboard.loaded_count == 6
     assert dashboard.filtered_count == 6
+    assert dashboard.charts.activity.title == "Run activity"
+    assert dashboard.charts.latency.title == "Runtime latency"
+  end
+
+  test "builds operational chart data from recent runs" do
+    FakeSquidMeshClient.put_list_runs(
+      {:ok,
+       [
+         run(:completed,
+           id: "completed-fast",
+           inserted_at: ~U[2026-05-15 10:00:00Z],
+           updated_at: ~U[2026-05-15 10:01:00Z]
+         ),
+         run(:completed,
+           id: "completed-slow",
+           inserted_at: ~U[2026-05-15 10:00:00Z],
+           updated_at: ~U[2026-05-15 10:03:00Z]
+         ),
+         run(:failed,
+           id: "failed-run",
+           inserted_at: ~U[2026-05-14 10:00:00Z],
+           updated_at: ~U[2026-05-14 10:02:00Z]
+         ),
+         run(:running,
+           id: "running-run",
+           inserted_at: ~U[2026-05-15 10:00:00Z],
+           updated_at: ~U[2026-05-15 10:04:00Z]
+         )
+       ]}
+    )
+
+    dashboard = Dashboard.load(client: FakeSquidMeshClient, loaded_at: @loaded_at)
+
+    assert dashboard.charts.activity.kind == :bar
+
+    assert dashboard.charts.activity.labels == [
+             "May 09",
+             "May 10",
+             "May 11",
+             "May 12",
+             "May 13",
+             "May 14",
+             "May 15"
+           ]
+
+    assert dashboard.charts.activity.series == [
+             %{label: "Completed", values: [0, 0, 0, 0, 0, 0, 2]},
+             %{label: "Failed", values: [0, 0, 0, 0, 0, 1, 0]},
+             %{label: "Running", values: [0, 0, 0, 0, 0, 0, 1]}
+           ]
+
+    assert dashboard.charts.latency.kind == :line
+    assert dashboard.charts.latency.labels == dashboard.charts.activity.labels
+
+    assert dashboard.charts.latency.series == [
+             %{label: "Median", values: [nil, nil, nil, nil, nil, 120, 60]},
+             %{label: "P95", values: [nil, nil, nil, nil, nil, 120, 180]}
+           ]
   end
 
   test "filters runs by status while preserving date order" do

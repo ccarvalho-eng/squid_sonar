@@ -51,6 +51,8 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ "new LiveSocket"
     assert conn.resp_body =~ "squid-sonar-theme"
     assert conn.resp_body =~ "SquidSonarTheme"
+    assert conn.resp_body =~ "SquidSonarChart"
+    assert conn.resp_body =~ "drawChart"
   end
 
   test "serves packaged LiveView client dependencies" do

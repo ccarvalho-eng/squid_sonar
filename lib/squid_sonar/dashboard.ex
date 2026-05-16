@@ -6,14 +6,18 @@ defmodule SquidSonar.Dashboard do
   alias SquidSonar.Runs
 
   @statuses [:completed, :failed, :retrying, :paused, :running]
+  @activity_statuses [:completed, :failed, :running]
+  @latency_statuses [:completed, :failed]
   @default_limit 250
   @default_page_size 10
   @page_sizes [10, 25, 50]
+  @chart_days 7
 
   @type t :: %__MODULE__{
           runs: [SquidSonar.Runs.RunSummary.t()],
           statuses: [atom()],
           status_counts: %{atom() => non_neg_integer()},
+          charts: map(),
           filters: map(),
           loaded_count: non_neg_integer(),
           filtered_count: non_neg_integer(),
@@ -35,6 +39,7 @@ defmodule SquidSonar.Dashboard do
     page_size: @default_page_size,
     page_sizes: @page_sizes,
     runs: [],
+    charts: %{},
     statuses: @statuses,
     status_counts: %{},
     total_pages: 1
@@ -62,6 +67,7 @@ defmodule SquidSonar.Dashboard do
           runs: paginate(filtered_runs, page, page_size),
           statuses: @statuses,
           status_counts: status_counts(runs),
+          charts: charts(runs, loaded_at),
           filters: filters,
           loaded_count: length(runs),
           filtered_count: length(filtered_runs),
@@ -78,6 +84,7 @@ defmodule SquidSonar.Dashboard do
           runs: [],
           statuses: @statuses,
           status_counts: status_counts([]),
+          charts: charts([], loaded_at),
           filters: filters,
           loaded_count: 0,
           filtered_count: 0,
@@ -97,6 +104,134 @@ defmodule SquidSonar.Dashboard do
     Enum.reduce(runs, base, fn run, counts ->
       Map.update(counts, run.status, 1, &(&1 + 1))
     end)
+  end
+
+  defp charts(runs, loaded_at) do
+    dates = chart_dates(loaded_at)
+    labels = Enum.map(dates, &format_chart_date/1)
+
+    %{
+      activity: %{
+        title: "Run activity",
+        kind: :bar,
+        unit: :count,
+        labels: labels,
+        series: activity_series(runs, dates)
+      },
+      latency: %{
+        title: "Runtime latency",
+        kind: :line,
+        unit: :seconds,
+        labels: labels,
+        series: latency_series(runs, dates)
+      }
+    }
+  end
+
+  defp chart_dates(loaded_at) do
+    end_date =
+      loaded_at
+      |> sort_value()
+      |> DateTime.to_date()
+
+    end_date
+    |> Date.add(-(@chart_days - 1))
+    |> Date.range(end_date)
+    |> Enum.to_list()
+  end
+
+  defp format_chart_date(date), do: Calendar.strftime(date, "%b %d")
+
+  defp activity_series(runs, dates) do
+    counts =
+      runs
+      |> Enum.filter(&(&1.status in @activity_statuses))
+      |> Enum.group_by(&{run_date(&1), &1.status})
+      |> Map.new(fn {key, bucket_runs} -> {key, length(bucket_runs)} end)
+
+    Enum.map(@activity_statuses, fn status ->
+      %{
+        label: human_status(status),
+        values: Enum.map(dates, &Map.get(counts, {&1, status}, 0))
+      }
+    end)
+  end
+
+  defp latency_series(runs, dates) do
+    durations_by_date =
+      runs
+      |> Enum.filter(&(&1.status in @latency_statuses))
+      |> Enum.reduce(%{}, fn run, durations ->
+        case run_duration_seconds(run) do
+          nil -> durations
+          duration -> Map.update(durations, run_date(run), [duration], &[duration | &1])
+        end
+      end)
+
+    [
+      %{
+        label: "Median",
+        values: Enum.map(dates, &percentile(Map.get(durations_by_date, &1, []), 50))
+      },
+      %{
+        label: "P95",
+        values: Enum.map(dates, &percentile(Map.get(durations_by_date, &1, []), 95))
+      }
+    ]
+  end
+
+  defp run_date(run) do
+    run.updated_at
+    |> sort_value()
+    |> DateTime.to_date()
+  end
+
+  defp run_duration_seconds(run) do
+    inserted_at = datetime_value(run.inserted_at)
+    updated_at = datetime_value(run.updated_at)
+
+    with %DateTime{} <- inserted_at,
+         %DateTime{} <- updated_at do
+      diff = DateTime.diff(updated_at, inserted_at, :second)
+      if diff >= 0, do: diff
+    else
+      _invalid -> nil
+    end
+  end
+
+  defp datetime_value(nil), do: nil
+  defp datetime_value(%DateTime{} = datetime), do: datetime
+  defp datetime_value(%NaiveDateTime{} = datetime), do: DateTime.from_naive!(datetime, "Etc/UTC")
+  defp datetime_value(_value), do: nil
+
+  defp percentile([], _percentile), do: nil
+
+  defp percentile(values, percentile) do
+    sorted_values = Enum.sort(values)
+
+    index =
+      sorted_values
+      |> length()
+      |> Kernel.*(percentile)
+      |> Kernel./(100)
+      |> Float.ceil()
+      |> trunc()
+      |> max(1)
+
+    sorted_values
+    |> Stream.drop(index - 1)
+    |> Enum.take(1)
+    |> case do
+      [value] -> value
+      [] -> nil
+    end
+  end
+
+  defp human_status(status) do
+    status
+    |> to_string()
+    |> String.replace("_", " ")
+    |> String.capitalize()
   end
 
   defp normalize_filters(filters) do
