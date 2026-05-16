@@ -202,7 +202,6 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-icon-button:focus-visible,
-.squid-sonar-nav-item:focus-within,
 .squid-sonar-run-link:focus-visible,
 .squid-sonar-pagination button:focus-visible,
 .squid-sonar-page-size select:focus-visible,
@@ -404,6 +403,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-nav-item:hover {
   background: var(--squid-sonar-surface-muted);
   color: var(--squid-sonar-text);
+}
+
+.squid-sonar-nav-item:focus-within {
+  background: var(--squid-sonar-surface-muted);
+  border-color: var(--squid-sonar-border-strong);
+  color: var(--squid-sonar-text);
+  outline: none;
 }
 
 .squid-sonar-nav-item.is-active {
