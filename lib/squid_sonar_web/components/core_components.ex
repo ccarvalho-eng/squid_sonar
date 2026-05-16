@@ -168,6 +168,7 @@ defmodule SquidSonarWeb.CoreComponents do
         </div>
       </div>
       <canvas aria-label={@chart.title} role="img"></canvas>
+      <div class="squid-sonar-chart-tooltip" hidden></div>
     </article>
     """
   end

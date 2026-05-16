@@ -497,6 +497,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-radius: 8px;
   min-width: 0;
   padding: 12px 13px 10px;
+  position: relative;
 }
 
 .squid-sonar-chart-heading {
@@ -552,6 +553,52 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: block;
   height: 176px;
   width: 100%;
+}
+
+.squid-sonar-chart-tooltip {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border-strong);
+  border-radius: 6px;
+  color: var(--squid-sonar-text);
+  display: grid;
+  font-size: 11px;
+  gap: 5px;
+  min-width: 132px;
+  padding: 8px 9px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  z-index: 4;
+}
+
+.squid-sonar-chart-tooltip[hidden] {
+  display: none;
+}
+
+.squid-sonar-chart-tooltip strong {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.squid-sonar-chart-tooltip > span {
+  align-items: center;
+  color: var(--squid-sonar-muted);
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 6px minmax(0, 1fr) auto;
+}
+
+.squid-sonar-chart-tooltip i {
+  border-radius: 999px;
+  height: 6px;
+  width: 6px;
+}
+
+.squid-sonar-chart-tooltip b {
+  color: var(--squid-sonar-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
 }
 
 .squid-sonar-panel {
