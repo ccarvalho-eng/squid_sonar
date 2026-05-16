@@ -6,6 +6,8 @@
     <title>{assigns[:page_title] || "SquidSonar"}</title>
     <meta name="csrf-token" content={Phoenix.Controller.get_csrf_token()} />
     <link rel="stylesheet" href={"#{@prefix}/css-#{SquidSonarWeb.Assets.digest()}"} />
+    <script defer src={"#{@prefix}/vendor/chart-#{SquidSonarWeb.Assets.chart_digest()}"}>
+    </script>
     <script
       type="module"
       defer

@@ -22,6 +22,10 @@ defmodule SquidSonarWeb.Assets do
   @live_view_digest Base.encode16(:crypto.hash(:md5, @live_view_js), case: :lower)
                     |> String.slice(0, 8)
 
+  @external_resource chart_path = Path.join(@static_path, "vendor/chart.umd.min.js")
+  @chart_js File.read!(chart_path)
+  @chart_digest Base.encode16(:crypto.hash(:md5, @chart_js), case: :lower) |> String.slice(0, 8)
+
   @js """
   import { Socket, LongPoll } from "./vendor/phoenix-#{@phoenix_digest}";
   import { LiveSocket } from "./vendor/live-view-#{@live_view_digest}";
@@ -74,21 +78,6 @@ defmodule SquidSonarWeb.Assets do
     return Number(value);
   };
 
-  const chartMax = (series) => {
-    const values = series
-      .flatMap((item) => item.values || [])
-      .map(chartValue)
-      .filter((value) => value !== null);
-
-    return Math.max(1, ...values);
-  };
-
-  const niceChartMax = (value) => {
-    if (value <= 5) return Math.ceil(value);
-    const scale = Math.pow(10, Math.floor(Math.log10(value)));
-    return Math.ceil(value / scale) * scale;
-  };
-
   const formatChartValue = (value, unit) => {
     if (value === null || value === undefined) return "";
     if (unit !== "seconds") return String(Math.round(value));
@@ -111,211 +100,123 @@ defmodule SquidSonarWeb.Assets do
     return styles.getPropertyValue("--squid-sonar-accent").trim() || "#8061d8";
   };
 
-  const tooltipRows = (data, labelIndex) => {
-    return (data.series || [])
-      .map((item, index) => ({
-        label: item.label,
-        value: chartValue((item.values || [])[labelIndex]),
-        index
-      }))
-      .filter((item) => item.value !== null);
+  const dashboardChartData = (container) => {
+    try {
+      return JSON.parse(container.dataset.chart || "{}");
+    } catch (_error) {
+      return {};
+    }
   };
 
-  const showChartTooltip = (container, canvas, point, data, styles) => {
-    const tooltip = container.querySelector(".squid-sonar-chart-tooltip");
-    if (!tooltip || !point) return;
-
-    const title = document.createElement("strong");
-    title.textContent = point.label;
-
-    const rows = tooltipRows(data, point.index).map((item) => {
-      const row = document.createElement("span");
-      const marker = document.createElement("i");
-      const label = document.createElement("span");
-      const value = document.createElement("b");
-
-      marker.style.background = chartColor(item.label, item.index, styles);
-      label.textContent = item.label;
-      value.textContent = formatChartValue(item.value, data.unit);
-
-      row.append(marker, label, value);
-      return row;
-    });
-
-    tooltip.replaceChildren(title, ...rows);
-    tooltip.hidden = false;
-    tooltip.style.left =
-      Math.min(Math.max(point.x + canvas.offsetLeft, 74), container.clientWidth - 74) + "px";
-    tooltip.style.top = point.y + canvas.offsetTop + "px";
+  const dashboardChartStyles = (container) => {
+    const shell = container.closest(".squid-sonar-shell") || document.documentElement;
+    const styles = getComputedStyle(shell);
+    return {
+      border: styles.getPropertyValue("--squid-sonar-border").trim() || "#d8d8de",
+      danger: styles.getPropertyValue("--squid-sonar-danger").trim() || "#a0443f",
+      grid: styles.getPropertyValue("--squid-sonar-chart-grid").trim() || "#ececf0",
+      muted: styles.getPropertyValue("--squid-sonar-muted").trim() || "#6e6e73",
+      text: styles.getPropertyValue("--squid-sonar-text").trim() || "#1d1d1f",
+      accent: styles.getPropertyValue("--squid-sonar-accent").trim() || "#8061d8",
+      strong: styles.getPropertyValue("--squid-sonar-border-strong").trim() || "#a7a7b0"
+    };
   };
 
-  const hideChartTooltip = (container) => {
-    const tooltip = container.querySelector(".squid-sonar-chart-tooltip");
-    if (tooltip) tooltip.hidden = true;
-  };
-
-  const nearestChartPoint = (points, event, canvas) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-
-    return points.reduce((nearest, point) => {
-      const distance = Math.abs(point.x - x);
-      if (!nearest || distance < nearest.distance) return { ...point, distance };
-      return nearest;
-    }, null);
-  };
-
-  const chartBars = (labels, series, plot, plotWidth, plotHeight, maxValue, styles) => {
-    const groupWidth = plotWidth / Math.max(1, labels.length);
-    const groupGap = Math.min(16, groupWidth * 0.3);
-    const innerWidth = Math.max(4, groupWidth - groupGap);
-    const barGap = series.length > 1 ? Math.min(3, innerWidth * 0.1) : 0;
-    const availableBarWidth =
-      (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length;
-    const barWidth = Math.max(
-      3,
-      Math.min(series.length > 1 ? 17 : 22, availableBarWidth)
-    );
-    const barsWidth = barWidth * series.length + barGap * Math.max(0, series.length - 1);
-
-    return labels.map((label, index) => {
-      const groupLeft = plot.left + groupWidth * index + (groupWidth - barsWidth) / 2;
-      const baseline = plot.top + plotHeight;
-      const bars = series
-        .map((item, seriesIndex) => {
-          const value = chartValue((item.values || [])[index]);
-          if (value === null) return null;
-
-          const height = value <= 0 ? 0 : Math.max(2, (value / maxValue) * plotHeight);
-          return {
-            value,
-            color: chartColor(item.label, seriesIndex, styles),
-            x: groupLeft + seriesIndex * (barWidth + barGap),
-            y: baseline - height,
-            width: barWidth,
-            height
+  const chartDatasets = (data, styles) => {
+    return (data.series || []).map((item, index) => {
+      const color = chartColor(item.label, index, {
+        getPropertyValue(name) {
+          const values = {
+            "--squid-sonar-accent": styles.accent,
+            "--squid-sonar-border-strong": styles.strong,
+            "--squid-sonar-danger": styles.danger,
+            "--squid-sonar-muted": styles.muted
           };
-        })
-        .filter(Boolean);
+          return values[name] || "";
+        }
+      });
 
       return {
-        index,
-        label,
-        bars,
-        x: plot.left + groupWidth * (index + 0.5),
-        y: bars.reduce((top, bar) => Math.min(top, bar.y), baseline)
+        label: item.label,
+        data: (item.values || []).map(chartValue),
+        backgroundColor: color,
+        borderColor: color,
+        borderSkipped: false,
+        borderRadius: 3,
+        barThickness: 18,
+        maxBarThickness: 20,
+        minBarLength: 2
       };
     });
   };
 
-  const drawRoundedBar = (context, bar) => {
-    if (bar.height <= 0) return;
-
-    const radius = Math.min(3, bar.width / 2, bar.height / 2);
-    context.beginPath();
-    if (context.roundRect) {
-      context.roundRect(bar.x, bar.y, bar.width, bar.height, radius);
-    } else {
-      context.rect(bar.x, bar.y, bar.width, bar.height);
+  const chartOptions = (data, styles) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
+    datasets: {
+      bar: {
+        categoryPercentage: 0.64,
+        barPercentage: 0.82
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        mode: "index",
+        intersect: false,
+        backgroundColor: styles.text,
+        borderColor: styles.border,
+        borderWidth: 1,
+        displayColors: true,
+        titleColor: "#ffffff",
+        bodyColor: "#ffffff",
+        padding: 10,
+        callbacks: {
+          label(context) {
+            return `${context.dataset.label}: ${formatChartValue(context.parsed.y, data.unit)}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        border: { display: false },
+        grid: { display: false },
+        ticks: {
+          color: styles.muted,
+          font: { size: 11, weight: 600 },
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 5
+        }
+      },
+      y: {
+        beginAtZero: true,
+        border: { display: false },
+        grid: {
+          color: styles.grid,
+          lineWidth: 1,
+          drawTicks: false
+        },
+        ticks: {
+          color: styles.muted,
+          font: { size: 11, weight: 600 },
+          padding: 8,
+          precision: data.unit === "seconds" ? 0 : undefined,
+          callback(value) {
+            return formatChartValue(value, data.unit);
+          }
+        }
+      }
     }
-    context.fill();
-  };
-
-  const drawSeriesBars = (context, groups) => {
-    groups.forEach((group) => {
-      group.bars.forEach((bar) => {
-        context.fillStyle = bar.color;
-        drawRoundedBar(context, bar);
-      });
-    });
-  };
-
-  const chartPixel = (value) => Math.round(value) + 0.5;
-
-  const drawChart = (container) => {
-    const canvas = container.querySelector("canvas");
-    if (!canvas) return;
-
-    let data = {};
-    try {
-      data = JSON.parse(container.dataset.chart || "{}");
-    } catch (_error) {
-      return;
-    }
-
-    const labels = data.labels || [];
-    const series = data.series || [];
-    if (labels.length === 0 || series.length === 0) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const width = Math.max(280, Math.floor(rect.width || container.clientWidth || 280));
-    const height = Math.max(150, Math.floor(rect.height || 150));
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-
-    const context = canvas.getContext("2d");
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    context.globalAlpha = 1;
-    context.globalCompositeOperation = "source-over";
-    context.setLineDash([]);
-    context.lineCap = "butt";
-    context.lineJoin = "miter";
-    context.clearRect(0, 0, width, height);
-
-    const shell = container.closest(".squid-sonar-shell") || document.documentElement;
-    const styles = getComputedStyle(shell);
-    const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
-    const gridColor =
-      styles.getPropertyValue("--squid-sonar-chart-grid").trim() || "#ececf0";
-    const baselineColor =
-      styles.getPropertyValue("--squid-sonar-chart-baseline").trim() || "#dedee4";
-    const plot = { left: 14, top: 8, right: 14, bottom: 24 };
-    const plotWidth = width - plot.left - plot.right;
-    const plotHeight = height - plot.top - plot.bottom;
-    const maxValue = niceChartMax(chartMax(series));
-    const points = [];
-
-    context.font = "11px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif";
-    context.lineWidth = 1;
-    context.fillStyle = textColor;
-    context.textBaseline = "middle";
-
-    [0, 0.25, 0.5, 0.75, 1].forEach((step) => {
-      const y = chartPixel(plot.top + plotHeight * step);
-      context.strokeStyle = step === 1 ? baselineColor : gridColor;
-      context.beginPath();
-      context.moveTo(plot.left, y);
-      context.lineTo(width - plot.right, y);
-      context.stroke();
-    });
-
-    context.textBaseline = "alphabetic";
-    labels.forEach((label, index) => {
-      if (labels.length > 4 && index % 2 !== 0 && index !== labels.length - 1) return;
-
-      const x = plot.left + (plotWidth / Math.max(1, labels.length)) * (index + 0.5);
-      context.textAlign = index === labels.length - 1 ? "right" : "center";
-      context.fillText(label, Math.min(x, width - plot.right), height - 8);
-    });
-
-    const bars = chartBars(labels, series, plot, plotWidth, plotHeight, maxValue, styles);
-    drawSeriesBars(context, bars);
-    points.push(...bars);
-
-    container.__squidSonarChart = { data, points, styles };
-  };
-
-  const scheduleChartDraw = (hook) => {
-    if (hook.chartDrawFrame) window.cancelAnimationFrame(hook.chartDrawFrame);
-
-    hook.chartDrawFrame = window.requestAnimationFrame(() => {
-      hook.chartDrawFrame = null;
-      drawChart(hook.el);
-    });
-  };
+  });
 
   const Hooks = {
     SquidSonarTheme: {
@@ -326,29 +227,60 @@ defmodule SquidSonarWeb.Assets do
     },
     SquidSonarChart: {
       mounted() {
-        this.chartResizeHandler = () => scheduleChartDraw(this);
-        this.chartPointerHandler = (event) => {
-          const canvas = this.el.querySelector("canvas");
-          const state = this.el.__squidSonarChart;
-          if (!canvas || !state) return;
-
-          const point = nearestChartPoint(state.points, event, canvas);
-          showChartTooltip(this.el, canvas, point, state.data, state.styles);
-        };
-        this.chartLeaveHandler = () => hideChartTooltip(this.el);
-        scheduleChartDraw(this);
-        window.addEventListener("resize", this.chartResizeHandler);
-        this.el.addEventListener("pointermove", this.chartPointerHandler);
-        this.el.addEventListener("pointerleave", this.chartLeaveHandler);
+        this.charts = {};
+        this.createCharts();
+        this.updateCharts();
       },
       updated() {
-        scheduleChartDraw(this);
+        this.updateCharts();
+      },
+      createCharts() {
+        const Chart = window.Chart;
+        const canvas = this.el.querySelector("canvas");
+
+        if (!Chart) {
+          if (!this.chartRetryFrame) {
+            this.chartRetryFrame = window.requestAnimationFrame(() => {
+              this.chartRetryFrame = null;
+              this.createCharts();
+              this.updateCharts();
+            });
+          }
+          return;
+        }
+
+        if (!canvas) return;
+
+        this.charts.dashboard = new Chart(canvas, {
+          type: "bar",
+          data: { labels: [], datasets: [] },
+          options: chartOptions({ unit: "count" }, dashboardChartStyles(this.el))
+        });
+      },
+      updateCharts() {
+        const chart = this.charts.dashboard;
+        if (!chart) {
+          this.createCharts();
+          return;
+        }
+
+        const data = dashboardChartData(this.el);
+        const labels = data.labels || [];
+        const series = data.series || [];
+        if (labels.length === 0 || series.length === 0) return;
+
+        const styles = dashboardChartStyles(this.el);
+        chart.data.labels = labels;
+        chart.data.datasets = chartDatasets(data, styles);
+        chart.options = chartOptions(data, styles);
+        chart.update("none");
       },
       destroyed() {
-        if (this.chartDrawFrame) window.cancelAnimationFrame(this.chartDrawFrame);
-        window.removeEventListener("resize", this.chartResizeHandler);
-        this.el.removeEventListener("pointermove", this.chartPointerHandler);
-        this.el.removeEventListener("pointerleave", this.chartLeaveHandler);
+        if (this.chartRetryFrame) window.cancelAnimationFrame(this.chartRetryFrame);
+        Object.values(this.charts || {}).forEach((chart) => {
+          if (chart) chart.destroy();
+        });
+        this.charts = {};
       }
     }
   };
@@ -380,6 +312,9 @@ defmodule SquidSonarWeb.Assets do
 
   @doc false
   def js_digest, do: @js_digest
+
+  @doc false
+  def chart_digest, do: @chart_digest
 
   @doc false
   def phoenix_digest, do: @phoenix_digest
@@ -425,6 +360,15 @@ defmodule SquidSonarWeb.Assets do
   end
 
   def live_view(conn, _params) do
+    send_resp(conn, 404, "Not Found")
+  end
+
+  @doc false
+  def chart(%{params: %{"digest" => digest}} = conn, _params) when digest == @chart_digest do
+    send_js(conn, @chart_js)
+  end
+
+  def chart(conn, _params) do
     send_resp(conn, 404, "Not Found")
   end
 
