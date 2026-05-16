@@ -1,8 +1,8 @@
 :root {
   --squid-sonar-bg: #f6f8fa;
   --squid-sonar-surface: #ffffff;
-  --squid-sonar-surface-muted: #f6f8fa;
-  --squid-sonar-surface-raised: #f0f3f6;
+  --squid-sonar-surface-muted: #f5f6f8;
+  --squid-sonar-surface-raised: #eef1f4;
   --squid-sonar-border: #d0d7de;
   --squid-sonar-border-strong: #8c959f;
   --squid-sonar-text: #24292f;
@@ -55,7 +55,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
   min-height: 100dvh;
   padding: 0;
 }
@@ -123,7 +123,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  min-height: 56px;
+  min-height: 54px;
   padding: 0 max(20px, calc((100vw - 1360px) / 2 + 20px));
   position: sticky;
   top: 0;
@@ -160,7 +160,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-topbar h1 {
   font-size: 15px;
-  font-weight: 650;
+  font-weight: 680;
   line-height: 1.25;
   margin: 0;
 }
@@ -191,14 +191,14 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-muted);
   cursor: pointer;
   display: inline-flex;
-  height: 32px;
+  height: 30px;
   justify-content: center;
   padding: 0;
   transition:
     background-color 120ms ease,
     border-color 120ms ease,
     color 120ms ease;
-  width: 32px;
+  width: 30px;
 }
 
 .squid-sonar-icon-button:focus-visible,
@@ -231,8 +231,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-theme-switcher .squid-sonar-icon-button {
   background: transparent;
   border-color: transparent;
-  height: 28px;
-  width: 28px;
+  height: 26px;
+  width: 26px;
 }
 
 .squid-sonar-theme-switcher .squid-sonar-icon-button:hover,
@@ -263,7 +263,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-content {
   margin: 0 auto;
   max-width: 1360px;
-  padding: 18px 20px 40px;
+  padding: 16px 20px 40px;
 }
 
 .squid-sonar-search span,
@@ -299,7 +299,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-text);
   font: inherit;
   font-size: 13px;
-  height: 34px;
+  height: 32px;
   padding: 0 10px;
 }
 
@@ -322,8 +322,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-workspace {
   display: grid;
-  gap: 16px;
-  grid-template-columns: 204px minmax(0, 1fr);
+  gap: 14px;
+  grid-template-columns: 196px minmax(0, 1fr);
   margin-top: 0;
   padding-bottom: 20px;
 }
@@ -333,16 +333,21 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
-  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
   position: sticky;
-  top: 74px;
+  top: 70px;
 }
 
 .squid-sonar-sidebar-heading {
   align-items: center;
+  border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
-  min-height: 32px;
-  padding: 0 10px;
+  margin: 0 2px 4px;
+  min-height: 30px;
+  padding: 0 8px;
 }
 
 .squid-sonar-nav-item {
@@ -356,8 +361,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-weight: 600;
   gap: 10px;
   justify-content: space-between;
-  min-height: 34px;
-  padding: 0 9px;
+  min-height: 32px;
+  padding: 0 8px 0 11px;
   position: relative;
   transition:
     background-color 120ms ease,
@@ -383,17 +388,17 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-nav-item strong {
   align-items: center;
-  background: var(--squid-sonar-surface-muted);
-  border: 1px solid var(--squid-sonar-border);
-  border-radius: 999px;
-  color: inherit;
+  background: transparent;
+  border: 0;
+  color: var(--squid-sonar-muted);
   display: inline-flex;
   font-size: 12px;
-  font-weight: 650;
-  height: 22px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  height: 20px;
   justify-content: center;
-  min-width: 30px;
-  padding: 0 8px;
+  min-width: 24px;
+  padding: 0;
 }
 
 .squid-sonar-nav-item:hover {
@@ -402,20 +407,20 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-nav-item.is-active {
-  background: var(--squid-sonar-surface);
-  border-color: var(--squid-sonar-border);
+  background: var(--squid-sonar-surface-muted);
+  border-color: transparent;
   color: var(--squid-sonar-text);
 }
 
 .squid-sonar-nav-item.is-active::before {
   background: var(--squid-sonar-accent);
   border-radius: 999px;
-  bottom: 6px;
+  bottom: 7px;
   content: "";
-  left: 0;
+  left: 3px;
   position: absolute;
-  top: 6px;
-  width: 3px;
+  top: 7px;
+  width: 2px;
 }
 
 .squid-sonar-nav-item.is-active strong {
@@ -439,13 +444,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  min-height: 68px;
-  padding: 14px 16px;
+  min-height: 64px;
+  padding: 12px 14px;
 }
 
 .squid-sonar-panel-title {
   flex: 0 0 auto;
-  min-width: 172px;
+  min-width: 168px;
 }
 
 .squid-sonar-panel-actions {
@@ -487,6 +492,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-table {
   border-collapse: collapse;
   min-width: 820px;
+  table-layout: fixed;
   width: 100%;
 }
 
@@ -494,7 +500,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-table td {
   border-bottom: 1px solid var(--squid-sonar-border);
   font-size: 13px;
-  padding: 12px 16px;
+  padding: 11px 14px;
   text-align: left;
   vertical-align: middle;
 }
@@ -504,7 +510,35 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-muted);
   font-size: 11px;
   font-weight: 700;
+  line-height: 1.2;
+  padding-bottom: 10px;
+  padding-top: 10px;
   text-transform: uppercase;
+}
+
+.squid-sonar-table th:first-child,
+.squid-sonar-table td:first-child {
+  width: 34%;
+}
+
+.squid-sonar-table th:nth-child(2),
+.squid-sonar-table td:nth-child(2) {
+  width: 15%;
+}
+
+.squid-sonar-table th:nth-child(3),
+.squid-sonar-table td:nth-child(3) {
+  width: 14%;
+}
+
+.squid-sonar-table th:nth-child(4),
+.squid-sonar-table td:nth-child(4) {
+  width: 18%;
+}
+
+.squid-sonar-table th:nth-child(5),
+.squid-sonar-table td:nth-child(5) {
+  width: 19%;
 }
 
 .squid-sonar-table tbody tr {
@@ -570,13 +604,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-badge {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 999px;
+  border-radius: 5px;
   color: var(--squid-sonar-muted);
   display: inline-flex;
   font-size: 11px;
   font-weight: 650;
   line-height: 1;
-  padding: 5px 8px;
+  padding: 4px 7px;
   text-transform: uppercase;
 }
 
@@ -619,7 +653,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-size: 12px;
   font-weight: 600;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 14px;
 }
 
 .squid-sonar-pagination-summary {
@@ -662,7 +696,20 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   cursor: pointer;
   font: inherit;
   font-weight: 600;
-  padding: 7px 10px;
+  min-height: 30px;
+  padding: 5px 9px;
+}
+
+.squid-sonar-pagination-controls > strong {
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 5px;
+  color: var(--squid-sonar-text);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 650;
+  min-height: 30px;
+  padding: 5px 9px;
 }
 
 .squid-sonar-pagination button:not(:disabled):hover {
@@ -693,7 +740,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 18px;
   justify-content: space-between;
-  padding: 18px 20px;
+  padding: 16px 18px;
 }
 
 .squid-sonar-back-link {
@@ -736,7 +783,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-detail-item {
-  padding: 13px 14px;
+  padding: 12px 13px;
 }
 
 .squid-sonar-detail-item span {
@@ -776,7 +823,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-detail-panel {
-  padding: 16px;
+  padding: 14px;
 }
 
 .squid-sonar-detail-columns + .squid-sonar-detail-panel {
@@ -793,22 +840,30 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   margin: 0 0 12px;
 }
 
+.squid-sonar-detail-panel .squid-sonar-detail-item {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 0;
+}
+
+.squid-sonar-detail-panel .squid-sonar-detail-item + .squid-sonar-detail-item {
+  border-top: 1px solid var(--squid-sonar-border);
+  margin-top: 0;
+}
+
 .squid-sonar-detail-panel > .squid-sonar-muted-line {
   margin-top: 8px;
 }
 
-.squid-sonar-detail-panel .squid-sonar-detail-item + .squid-sonar-detail-item {
-  margin-top: 8px;
-}
-
 .squid-sonar-workflow-graph {
-  background: var(--squid-sonar-surface-muted);
+  background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
   margin-top: 12px;
   min-height: 190px;
   overflow: auto;
-  padding: 18px 20px 22px;
+  padding: 16px 18px 20px;
 }
 
 .squid-sonar-workflow-graph-heading {
@@ -843,7 +898,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-workflow-edge-segment {
-  background: var(--squid-sonar-border-strong);
+  background: var(--squid-sonar-border);
   position: absolute;
   z-index: 1;
 }
