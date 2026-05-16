@@ -16,6 +16,10 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ ".squid-sonar-refresh.phx-click-loading"
     assert conn.resp_body =~ "--squid-sonar-accent: #8061d8;"
     assert conn.resp_body =~ ".squid-sonar-nav-item.is-active::before"
+    assert conn.resp_body =~ ".squid-sonar-nav-item:hover::before"
+    assert conn.resp_body =~ ".squid-sonar-nav-item:hover strong"
+    assert conn.resp_body =~ ".squid-sonar-badge"
+    assert conn.resp_body =~ "border-radius: 0;"
 
     assert conn.resp_body =~
              ".squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar"
