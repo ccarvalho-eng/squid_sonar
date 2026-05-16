@@ -43,6 +43,7 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "Runtime latency"
     assert html =~ "runs in 7 days"
     assert html =~ "p95 runtime"
+    assert html =~ "matching runs"
     assert html =~ "Workflow runs"
     assert html =~ "squid-sonar-filter-toggle"
     assert html =~ "Filters"

@@ -1,15 +1,15 @@
 :root {
-  --squid-sonar-bg: #f5f4f8;
+  --squid-sonar-bg: #f6f7f8;
   --squid-sonar-surface: #ffffff;
-  --squid-sonar-surface-muted: #f8f7fb;
-  --squid-sonar-surface-raised: #efedf5;
-  --squid-sonar-border: #d7d2df;
-  --squid-sonar-border-strong: #9b91aa;
-  --squid-sonar-text: #26222d;
-  --squid-sonar-muted: #5f586b;
-  --squid-sonar-subtle: #7c7489;
+  --squid-sonar-surface-muted: #f8f9fa;
+  --squid-sonar-surface-raised: #eef0f2;
+  --squid-sonar-border: #d7dce1;
+  --squid-sonar-border-strong: #8d959e;
+  --squid-sonar-text: #24292f;
+  --squid-sonar-muted: #57606a;
+  --squid-sonar-subtle: #6e7781;
   --squid-sonar-accent: #8061d8;
-  --squid-sonar-accent-muted: #f1edfb;
+  --squid-sonar-accent-muted: #f2effb;
   --squid-sonar-danger: #8f3d39;
   --squid-sonar-danger-muted: #f7eeee;
   --squid-sonar-warning: #7b5a20;
@@ -19,7 +19,7 @@
   --squid-sonar-waiting: #625a70;
   --squid-sonar-waiting-muted: #f0eef4;
   --squid-sonar-running: #8061d8;
-  --squid-sonar-running-muted: #f1edfb;
+  --squid-sonar-running-muted: #f2effb;
   --squid-sonar-focus: #8061d8;
   --squid-sonar-alert-bg: #fff8f0;
   --squid-sonar-alert-border: #d8b986;
@@ -27,7 +27,7 @@
 
 html.squid-sonar-document,
 body.squid-sonar-document {
-  background: #f5f4f8;
+  background: #f6f7f8;
   margin: 0;
   min-height: 100%;
 }
@@ -395,8 +395,34 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
   margin: 0 -6px 6px;
-  min-height: 38px;
-  padding: 0 12px;
+  min-height: 58px;
+  padding: 10px 12px;
+}
+
+.squid-sonar-sidebar-heading h2 {
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.squid-sonar-sidebar-heading p {
+  align-items: baseline;
+  color: var(--squid-sonar-muted);
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.squid-sonar-sidebar-heading p strong {
+  color: var(--squid-sonar-text);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.squid-sonar-sidebar-heading p span {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .squid-sonar-nav-item {
@@ -506,7 +532,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 12px;
   justify-content: space-between;
-  min-height: 38px;
+  min-height: 58px;
   padding: 10px 12px;
 }
 
