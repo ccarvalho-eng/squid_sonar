@@ -167,13 +167,19 @@ defmodule SquidSonarWeb.Assets do
 
   const chartBars = (labels, series, plot, plotWidth, plotHeight, maxValue, styles) => {
     const groupWidth = plotWidth / Math.max(1, labels.length);
-    const groupGap = Math.min(14, groupWidth * 0.28);
+    const groupGap = Math.min(22, groupWidth * 0.46);
     const innerWidth = Math.max(4, groupWidth - groupGap);
     const barGap = series.length > 1 ? Math.min(5, innerWidth * 0.14) : 0;
-    const barWidth = Math.max(3, (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length);
+    const availableBarWidth =
+      (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length;
+    const barWidth = Math.max(
+      3,
+      Math.min(series.length > 1 ? 10 : 14, availableBarWidth)
+    );
+    const barsWidth = barWidth * series.length + barGap * Math.max(0, series.length - 1);
 
     return labels.map((label, index) => {
-      const groupLeft = plot.left + groupWidth * index + groupGap / 2;
+      const groupLeft = plot.left + groupWidth * index + (groupWidth - barsWidth) / 2;
       const baseline = plot.top + plotHeight;
       const bars = series
         .map((item, seriesIndex) => {
@@ -196,7 +202,7 @@ defmodule SquidSonarWeb.Assets do
         index,
         label,
         bars,
-        x: groupLeft + innerWidth / 2,
+        x: plot.left + groupWidth * (index + 0.5),
         y: bars.reduce((top, bar) => Math.min(top, bar.y), baseline)
       };
     });
@@ -241,7 +247,7 @@ defmodule SquidSonarWeb.Assets do
 
     const rect = canvas.getBoundingClientRect();
     const width = Math.max(280, Math.floor(rect.width || container.clientWidth || 280));
-    const height = Math.max(164, Math.floor(rect.height || 164));
+    const height = Math.max(150, Math.floor(rect.height || 150));
     const ratio = window.devicePixelRatio || 1;
     canvas.width = width * ratio;
     canvas.height = height * ratio;
@@ -256,7 +262,7 @@ defmodule SquidSonarWeb.Assets do
     const styles = getComputedStyle(shell);
     const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
     const gridColor = styles.getPropertyValue("--squid-sonar-border").trim() || "#ddd7e5";
-    const plot = { left: 12, top: 10, right: 12, bottom: 26 };
+    const plot = { left: 14, top: 8, right: 14, bottom: 24 };
     const plotWidth = width - plot.left - plot.right;
     const plotHeight = height - plot.top - plot.bottom;
     const maxValue = niceChartMax(chartMax(series));
