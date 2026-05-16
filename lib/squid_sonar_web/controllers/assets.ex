@@ -201,8 +201,7 @@ defmodule SquidSonarWeb.Assets do
         beginAtZero: true,
         border: { display: false },
         grid: {
-          color: styles.grid,
-          lineWidth: 1,
+          display: false,
           drawTicks: false
         },
         ticks: {

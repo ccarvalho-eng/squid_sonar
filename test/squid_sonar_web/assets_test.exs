@@ -15,6 +15,7 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ ".squid-sonar-shell"
     assert conn.resp_body =~ ".squid-sonar-refresh.phx-click-loading"
     assert conn.resp_body =~ ".squid-sonar-chart-canvas"
+    assert conn.resp_body =~ ".squid-sonar-chart-gridline"
     assert conn.resp_body =~ "--squid-sonar-accent: #8061d8;"
     assert conn.resp_body =~ ".squid-sonar-nav-item.is-active::before"
 
@@ -57,6 +58,8 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ "createCharts"
     assert conn.resp_body =~ "updateCharts"
     assert conn.resp_body =~ "chartDatasets"
+    assert conn.resp_body =~ "grid: {"
+    assert conn.resp_body =~ "display: false"
     assert conn.resp_body =~ "--squid-sonar-chart-grid"
     refute conn.resp_body =~ "drawChart"
     refute conn.resp_body =~ "step === 1 ? 0."

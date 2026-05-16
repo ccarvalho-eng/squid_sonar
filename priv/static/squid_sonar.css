@@ -653,10 +653,38 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   width: calc(100% - 40px);
 }
 
+.squid-sonar-chart-gridline {
+  border-top: 1px solid var(--squid-sonar-chart-grid);
+  display: block;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 0;
+}
+
+.squid-sonar-chart-gridline:nth-child(1) {
+  top: 0;
+}
+
+.squid-sonar-chart-gridline:nth-child(2) {
+  top: 33.333%;
+}
+
+.squid-sonar-chart-gridline:nth-child(3) {
+  top: 66.666%;
+}
+
+.squid-sonar-chart-gridline:nth-child(4) {
+  bottom: 0;
+}
+
 .squid-sonar-chart canvas {
   display: block;
   height: 100%;
+  position: relative;
   width: 100%;
+  z-index: 1;
 }
 
 .squid-sonar-chart-tooltip {
