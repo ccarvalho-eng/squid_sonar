@@ -120,7 +120,6 @@ defmodule SquidSonarWeb.PageLive do
               </aside>
 
               <div class="squid-sonar-main-column">
-                <.dashboard_charts charts={@dashboard.charts} />
                 <.runs_panel dashboard={@dashboard} prefix={@prefix} />
               </div>
             </section>

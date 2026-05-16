@@ -30,11 +30,6 @@ defmodule SquidSonar.RouterTest do
 
     assert Enum.any?(
              routes,
-             &(&1.path == "/sonar/vendor/chart-:digest" and &1.plug == SquidSonarWeb.Assets)
-           )
-
-    assert Enum.any?(
-             routes,
              &(&1.path == "/sonar/vendor/phoenix-:digest" and &1.plug == SquidSonarWeb.Assets)
            )
 

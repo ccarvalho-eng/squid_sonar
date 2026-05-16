@@ -136,83 +136,6 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
-  attr :charts, :map, required: true
-  attr :active_chart, :atom, default: :activity
-
-  def dashboard_charts(assigns) do
-    assigns = assign(assigns, :chart, Map.fetch!(assigns.charts, assigns.active_chart))
-
-    ~H"""
-    <section class="squid-sonar-charts" aria-label="Operational charts">
-      <.chart_panel
-        charts={@charts}
-        chart={@chart}
-        active_chart={@active_chart}
-        id="squid-sonar-dashboard-chart"
-      />
-    </section>
-    """
-  end
-
-  attr :charts, :map, required: true
-  attr :chart, :map, required: true
-  attr :active_chart, :atom, required: true
-  attr :id, :string, required: true
-
-  def chart_panel(assigns) do
-    ~H"""
-    <article
-      id={@id}
-      class="squid-sonar-chart"
-      phx-hook="SquidSonarChart"
-      data-active-chart={@active_chart}
-      data-charts={chart_payload(@charts)}
-    >
-      <div class="squid-sonar-chart-heading">
-        <div>
-          <h2 data-squid-sonar-chart-title>{@chart.title}</h2>
-          <p>
-            <strong data-squid-sonar-chart-summary-value>
-              {format_chart_summary_value(@chart.summary, @chart.unit)}
-            </strong>
-            <span data-squid-sonar-chart-summary-label>
-              {format_chart_summary_label(@chart.summary)}
-            </span>
-          </p>
-        </div>
-        <div class="squid-sonar-chart-actions">
-          <div class="squid-sonar-chart-switcher" aria-label="Chart metric">
-            <button
-              type="button"
-              class={[@active_chart == :activity && "is-active"]}
-              data-squid-sonar-chart-toggle="activity"
-            >
-              Runs
-            </button>
-            <button
-              type="button"
-              class={[@active_chart == :latency && "is-active"]}
-              data-squid-sonar-chart-toggle="latency"
-            >
-              Latency
-            </button>
-          </div>
-          <div class="squid-sonar-chart-legend" aria-hidden="true" data-squid-sonar-chart-legend>
-            <span :for={series <- @chart.series}>
-              <i></i>
-              {series.label}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div id={"#{@id}-canvas"} class="squid-sonar-chart-canvas" phx-update="ignore">
-        <canvas aria-label={@chart.title} role="img"></canvas>
-      </div>
-      <div class="squid-sonar-chart-tooltip" hidden></div>
-    </article>
-    """
-  end
-
   attr :dashboard, :map, required: true
   attr :prefix, :string, default: ""
 
@@ -519,26 +442,6 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_time(value), do: to_string(value)
 
   defp run_path(prefix, run_id), do: "#{prefix}/runs/#{run_id}"
-
-  defp chart_payload(chart), do: Phoenix.json_library().encode!(chart)
-
-  defp format_chart_summary_label(%{label: label}), do: label
-  defp format_chart_summary_label(_summary), do: "current window"
-
-  defp format_chart_summary_value(%{value: nil}, _unit), do: "None"
-  defp format_chart_summary_value(%{value: value}, :seconds), do: format_duration(value)
-  defp format_chart_summary_value(%{value: value}, _unit), do: to_string(value)
-  defp format_chart_summary_value(_summary, _unit), do: "None"
-
-  defp format_duration(value) when is_number(value) and value >= 3600 do
-    "#{Float.round(value / 3600, 1)}h"
-  end
-
-  defp format_duration(value) when is_number(value) and value >= 60 do
-    "#{Float.round(value / 60, 1)}m"
-  end
-
-  defp format_duration(value) when is_number(value), do: "#{round(value)}s"
 
   defp explanation_reason(nil), do: "Unknown"
   defp explanation_reason(%{reason: reason}), do: format_value(reason)

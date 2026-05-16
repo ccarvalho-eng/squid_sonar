@@ -14,7 +14,6 @@ defmodule SquidSonarWeb.AssetsTest do
     assert Plug.Conn.get_resp_header(conn, "content-type") == ["text/css; charset=utf-8"]
     assert conn.resp_body =~ ".squid-sonar-shell"
     assert conn.resp_body =~ ".squid-sonar-refresh.phx-click-loading"
-    assert conn.resp_body =~ ".squid-sonar-chart-canvas"
     assert conn.resp_body =~ "--squid-sonar-accent: #8061d8;"
     assert conn.resp_body =~ ".squid-sonar-nav-item.is-active::before"
 
@@ -52,23 +51,9 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ "new LiveSocket"
     assert conn.resp_body =~ "squid-sonar-theme"
     assert conn.resp_body =~ "SquidSonarTheme"
-    assert conn.resp_body =~ "SquidSonarChart"
-    assert conn.resp_body =~ "new Chart"
-    assert conn.resp_body =~ "createCharts"
-    assert conn.resp_body =~ "updateCharts"
-    assert conn.resp_body =~ "dashboardChartsData"
-    assert conn.resp_body =~ "chartToggleHandler"
-    assert conn.resp_body =~ "chartDatasets"
-    assert conn.resp_body =~ "grid: {"
-    assert conn.resp_body =~ "color: styles.grid"
-    assert conn.resp_body =~ "lineWidth: 1"
-    assert conn.resp_body =~ "--squid-sonar-chart-grid"
-    refute conn.resp_body =~ "drawChart"
-    refute conn.resp_body =~ "step === 1 ? 0."
   end
 
   test "serves packaged LiveView client dependencies" do
-    assert_asset_response(:chart, "Chart.js")
     assert_asset_response(:phoenix, "Socket")
     assert_asset_response(:live_view, "LiveSocket")
   end
