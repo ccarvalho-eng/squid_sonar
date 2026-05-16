@@ -906,7 +906,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-workflow-graph {
-  background: var(--squid-sonar-surface);
+  background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
   margin-top: 12px;
