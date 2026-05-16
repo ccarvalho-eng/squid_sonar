@@ -211,11 +211,13 @@ defmodule SquidSonarWeb.Assets do
     const styles = getComputedStyle(shell);
     const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
     const gridColor = styles.getPropertyValue("--squid-sonar-border").trim() || "#ddd7e5";
-    const plot = { left: 44, top: 12, right: 14, bottom: 30 };
+    const isBarChart = data.kind === "bar";
+    const plot = isBarChart
+      ? { left: 10, top: 10, right: 10, bottom: 26 }
+      : { left: 44, top: 12, right: 14, bottom: 30 };
     const plotWidth = width - plot.left - plot.right;
     const plotHeight = height - plot.top - plot.bottom;
     const maxValue = niceChartMax(chartMax(series));
-    const isBarChart = data.kind === "bar";
     const points = [];
 
     context.font = "11px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif";
@@ -227,21 +229,20 @@ defmodule SquidSonarWeb.Assets do
     [0, 0.25, 0.5, 0.75, 1].forEach((step) => {
       const y = plot.top + plotHeight * step;
       context.save();
-      context.globalAlpha = isBarChart ? 0.36 : 0.72;
-      context.setLineDash(isBarChart && step !== 1 ? [2, 7] : []);
+      context.globalAlpha = isBarChart ? 0.2 : 0.72;
       context.beginPath();
       context.moveTo(plot.left, y);
       context.lineTo(width - plot.right, y);
       context.stroke();
       context.restore();
 
-      if (step === 0 || step === 0.5 || step === 1) {
+      if (!isBarChart && (step === 0 || step === 0.5 || step === 1)) {
         const value = maxValue * (1 - step);
         context.fillText(formatChartValue(value, data.unit), 4, y);
       }
     });
 
-    const labelStep = labels.length > 4 ? 2 : 1;
+    const labelStep = isBarChart ? Math.max(1, labels.length - 1) : labels.length > 4 ? 2 : 1;
     context.textBaseline = "alphabetic";
     labels.forEach((label, index) => {
       if (index !== 0 && index !== labels.length - 1 && index % labelStep !== 0) return;
@@ -254,6 +255,20 @@ defmodule SquidSonarWeb.Assets do
       const groupWidth = plotWidth / labels.length;
       const barWidth = Math.max(3, Math.min(16, (groupWidth - 10) / series.length));
       const totalWidth = barWidth * series.length;
+
+      labels.forEach((label, labelIndex) => {
+        const groupMax = Math.max(
+          0,
+          ...series.map((item) => chartValue((item.values || [])[labelIndex]) || 0)
+        );
+
+        points.push({
+          index: labelIndex,
+          label,
+          x: plot.left + labelIndex * groupWidth + groupWidth / 2,
+          y: Math.max(plot.top + 12, plot.top + plotHeight - (groupMax / maxValue) * plotHeight)
+        });
+      });
 
       series.forEach((item, seriesIndex) => {
         context.fillStyle = chartColor(item.label, seriesIndex, styles);
@@ -274,15 +289,6 @@ defmodule SquidSonarWeb.Assets do
           if (barHeight > 0) {
             roundRect(context, x, y, barWidth - 1, barHeight, 3);
             context.fill();
-          }
-
-          if (seriesIndex === 0) {
-            points.push({
-              index: labelIndex,
-              label,
-              x: plot.left + labelIndex * groupWidth + groupWidth / 2,
-              y: Math.max(plot.top + 12, y)
-            });
           }
         });
       });
