@@ -144,11 +144,17 @@ defmodule SquidSonarWeb.CoreComponents do
 
     ~H"""
     <section class="squid-sonar-charts" aria-label="Operational charts">
-      <.chart_panel chart={@chart} active_chart={@active_chart} id="squid-sonar-dashboard-chart" />
+      <.chart_panel
+        charts={@charts}
+        chart={@chart}
+        active_chart={@active_chart}
+        id="squid-sonar-dashboard-chart"
+      />
     </section>
     """
   end
 
+  attr :charts, :map, required: true
   attr :chart, :map, required: true
   attr :active_chart, :atom, required: true
   attr :id, :string, required: true
@@ -159,14 +165,19 @@ defmodule SquidSonarWeb.CoreComponents do
       id={@id}
       class="squid-sonar-chart"
       phx-hook="SquidSonarChart"
-      data-chart={chart_payload(@chart)}
+      data-active-chart={@active_chart}
+      data-charts={chart_payload(@charts)}
     >
       <div class="squid-sonar-chart-heading">
         <div>
-          <h2>{@chart.title}</h2>
+          <h2 data-squid-sonar-chart-title>{@chart.title}</h2>
           <p>
-            <strong>{format_chart_summary_value(@chart.summary, @chart.unit)}</strong>
-            <span>{format_chart_summary_label(@chart.summary)}</span>
+            <strong data-squid-sonar-chart-summary-value>
+              {format_chart_summary_value(@chart.summary, @chart.unit)}
+            </strong>
+            <span data-squid-sonar-chart-summary-label>
+              {format_chart_summary_label(@chart.summary)}
+            </span>
           </p>
         </div>
         <div class="squid-sonar-chart-actions">
@@ -174,21 +185,19 @@ defmodule SquidSonarWeb.CoreComponents do
             <button
               type="button"
               class={[@active_chart == :activity && "is-active"]}
-              phx-click="set_chart"
-              phx-value-chart="activity"
+              data-squid-sonar-chart-toggle="activity"
             >
               Runs
             </button>
             <button
               type="button"
               class={[@active_chart == :latency && "is-active"]}
-              phx-click="set_chart"
-              phx-value-chart="latency"
+              data-squid-sonar-chart-toggle="latency"
             >
               Latency
             </button>
           </div>
-          <div class="squid-sonar-chart-legend" aria-hidden="true">
+          <div class="squid-sonar-chart-legend" aria-hidden="true" data-squid-sonar-chart-legend>
             <span :for={series <- @chart.series}>
               <i></i>
               {series.label}
@@ -197,7 +206,6 @@ defmodule SquidSonarWeb.CoreComponents do
         </div>
       </div>
       <div id={"#{@id}-canvas"} class="squid-sonar-chart-canvas" phx-update="ignore">
-        <span :for={_line <- 1..6} class="squid-sonar-chart-gridline"></span>
         <canvas aria-label={@chart.title} role="img"></canvas>
       </div>
       <div class="squid-sonar-chart-tooltip" hidden></div>

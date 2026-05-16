@@ -100,12 +100,29 @@ defmodule SquidSonarWeb.Assets do
     return styles.getPropertyValue("--squid-sonar-accent").trim() || "#8061d8";
   };
 
-  const dashboardChartData = (container) => {
+  const dashboardChartsData = (container) => {
     try {
-      return JSON.parse(container.dataset.chart || "{}");
+      return JSON.parse(container.dataset.charts || "{}");
     } catch (_error) {
       return {};
     }
+  };
+
+  const dashboardChartData = (hook) => {
+    const charts = dashboardChartsData(hook.el);
+    const requestedChart = hook.activeChart || hook.el.dataset.activeChart || "activity";
+    const activeChart = charts[requestedChart] ? requestedChart : "activity";
+    hook.activeChart = activeChart;
+    return charts[activeChart] || {};
+  };
+
+  const formatChartSummaryValue = (summary, unit) => {
+    if (!summary || summary.value === null || summary.value === undefined) return "None";
+    return formatChartValue(summary.value, unit);
+  };
+
+  const formatChartSummaryLabel = (summary) => {
+    return summary?.label || "current window";
   };
 
   const dashboardChartStyles = (container) => {
@@ -201,7 +218,8 @@ defmodule SquidSonarWeb.Assets do
         beginAtZero: true,
         border: { display: false },
         grid: {
-          display: false,
+          color: styles.grid,
+          lineWidth: 1,
           drawTicks: false
         },
         ticks: {
@@ -217,6 +235,35 @@ defmodule SquidSonarWeb.Assets do
     }
   });
 
+  const updateChartChrome = (hook, data) => {
+    hook.el.dataset.activeChart = hook.activeChart;
+
+    const title = hook.el.querySelector("[data-squid-sonar-chart-title]");
+    if (title) title.textContent = data.title || "";
+
+    const summaryValue = hook.el.querySelector("[data-squid-sonar-chart-summary-value]");
+    if (summaryValue) summaryValue.textContent = formatChartSummaryValue(data.summary, data.unit);
+
+    const summaryLabel = hook.el.querySelector("[data-squid-sonar-chart-summary-label]");
+    if (summaryLabel) summaryLabel.textContent = formatChartSummaryLabel(data.summary);
+
+    hook.el.querySelectorAll("[data-squid-sonar-chart-toggle]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.squidSonarChartToggle === hook.activeChart);
+    });
+
+    const legend = hook.el.querySelector("[data-squid-sonar-chart-legend]");
+    if (legend) {
+      legend.replaceChildren(
+        ...(data.series || []).map((series) => {
+          const item = document.createElement("span");
+          const marker = document.createElement("i");
+          item.append(marker, document.createTextNode(series.label));
+          return item;
+        })
+      );
+    }
+  };
+
   const Hooks = {
     SquidSonarTheme: {
       mounted() {
@@ -227,6 +274,15 @@ defmodule SquidSonarWeb.Assets do
     SquidSonarChart: {
       mounted() {
         this.charts = {};
+        this.activeChart = this.el.dataset.activeChart || "activity";
+        this.chartToggleHandler = (event) => {
+          const button = event.target.closest("[data-squid-sonar-chart-toggle]");
+          if (!button || !this.el.contains(button)) return;
+
+          this.activeChart = button.dataset.squidSonarChartToggle || "activity";
+          this.updateCharts();
+        };
+        this.el.addEventListener("click", this.chartToggleHandler);
         this.createCharts();
         this.updateCharts();
       },
@@ -263,12 +319,13 @@ defmodule SquidSonarWeb.Assets do
           return;
         }
 
-        const data = dashboardChartData(this.el);
+        const data = dashboardChartData(this);
         const labels = data.labels || [];
         const series = data.series || [];
         if (labels.length === 0 || series.length === 0) return;
 
         const styles = dashboardChartStyles(this.el);
+        updateChartChrome(this, data);
         chart.data.labels = labels;
         chart.data.datasets = chartDatasets(data, styles);
         chart.options = chartOptions(data, styles);
@@ -276,6 +333,7 @@ defmodule SquidSonarWeb.Assets do
       },
       destroyed() {
         if (this.chartRetryFrame) window.cancelAnimationFrame(this.chartRetryFrame);
+        this.el.removeEventListener("click", this.chartToggleHandler);
         Object.values(this.charts || {}).forEach((chart) => {
           if (chart) chart.destroy();
         });

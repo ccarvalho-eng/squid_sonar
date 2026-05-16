@@ -39,8 +39,9 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "phx-hook=\"SquidSonarTheme\""
     assert html =~ "phx-hook=\"SquidSonarChart\""
     assert html =~ "phx-update=\"ignore\""
-    assert html =~ "squid-sonar-chart-gridline"
-    assert html |> String.split("squid-sonar-chart-gridline") |> length() == 7
+    assert html =~ "data-charts="
+    assert html =~ "data-squid-sonar-chart-toggle=\"activity\""
+    assert html =~ "data-squid-sonar-chart-toggle=\"latency\""
     assert html =~ "squid-sonar-chart-tooltip"
     assert html =~ "Run activity"
     assert html =~ "Latency"
@@ -107,20 +108,17 @@ defmodule SquidSonarWeb.PageLiveTest do
     refute html =~ "completed_checkout"
   end
 
-  test "toggles the dashboard chart through the LiveView boundary" do
+  test "renders both chart payloads for the client-owned chart toggle" do
     FakeSquidMeshClient.put_list_runs({:ok, [run(:completed, :completed_checkout, nil)]})
 
-    {:ok, socket} = PageLive.mount(%{}, %{}, %Socket{})
-    {:noreply, socket} = PageLive.handle_event("set_chart", %{"chart" => "latency"}, socket)
+    html = render_page()
 
-    html =
-      socket.assigns
-      |> PageLive.render()
-      |> rendered_to_string()
-
+    assert html =~ "Run activity"
     assert html =~ "Runtime latency"
+    assert html =~ "runs in 7 days"
     assert html =~ "p95 runtime"
     assert html =~ "is-active"
+    refute html =~ "phx-click=\"set_chart\""
   end
 
   test "paginates runs through the dashboard boundary" do
