@@ -98,13 +98,7 @@ defmodule SquidSonarWeb.PageLive do
             <section class="squid-sonar-workspace">
               <aside class="squid-sonar-sidebar" aria-label="Status inventory">
                 <div class="squid-sonar-sidebar-heading">
-                  <div>
-                    <h2>Status</h2>
-                    <p>
-                      <strong>{@dashboard.filtered_count}</strong>
-                      <span>matching runs</span>
-                    </p>
-                  </div>
+                  <h2>Status</h2>
                 </div>
                 <.status_nav_item
                   status={:all}

@@ -405,7 +405,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
   margin: 0 calc(var(--squid-sonar-space-2) * -1) var(--squid-sonar-space-2);
-  min-height: 60px;
+  min-height: 42px;
   padding: var(--squid-sonar-space-3) var(--squid-sonar-space-4);
 }
 
@@ -413,26 +413,6 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-size: 11px;
   line-height: 1.35;
   margin: 0;
-}
-
-.squid-sonar-sidebar-heading p {
-  align-items: baseline;
-  color: var(--squid-sonar-muted);
-  display: flex;
-  gap: 6px;
-  margin: 2px 0 0;
-}
-
-.squid-sonar-sidebar-heading p strong {
-  color: var(--squid-sonar-text);
-  font-size: 20px;
-  font-weight: 460;
-  line-height: 1;
-}
-
-.squid-sonar-sidebar-heading p span {
-  font-size: 11px;
-  font-weight: 600;
 }
 
 .squid-sonar-nav-item {
@@ -488,13 +468,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-nav-item:hover {
   background: var(--squid-sonar-surface-muted);
-  color: var(--squid-sonar-text);
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-nav-item:focus-within {
   background: var(--squid-sonar-surface-muted);
-  border-color: var(--squid-sonar-border-strong);
-  color: var(--squid-sonar-text);
+  border-color: transparent;
+  color: var(--squid-sonar-accent);
   outline: none;
 }
 
@@ -504,6 +484,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-text);
 }
 
+.squid-sonar-nav-item:hover::before,
+.squid-sonar-nav-item:focus-within::before,
 .squid-sonar-nav-item.is-active::before {
   background: var(--squid-sonar-accent);
   border-radius: 999px;
@@ -513,6 +495,11 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   position: absolute;
   top: 7px;
   width: 2px;
+}
+
+.squid-sonar-nav-item:hover strong,
+.squid-sonar-nav-item:focus-within strong {
+  color: var(--squid-sonar-accent);
 }
 
 .squid-sonar-nav-item.is-active strong {
@@ -705,7 +692,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-badge {
   background: transparent;
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 999px;
+  border-radius: 0;
   color: var(--squid-sonar-muted);
   display: inline-flex;
   font-size: 11px;
