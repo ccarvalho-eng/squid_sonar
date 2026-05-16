@@ -197,7 +197,7 @@ defmodule SquidSonarWeb.CoreComponents do
         </div>
       </div>
       <div id={"#{@id}-canvas"} class="squid-sonar-chart-canvas" phx-update="ignore">
-        <span :for={_line <- 1..4} class="squid-sonar-chart-gridline"></span>
+        <span :for={_line <- 1..6} class="squid-sonar-chart-gridline"></span>
         <canvas aria-label={@chart.title} role="img"></canvas>
       </div>
       <div class="squid-sonar-chart-tooltip" hidden></div>

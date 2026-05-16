@@ -668,14 +668,22 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-chart-gridline:nth-child(2) {
-  top: 33.333%;
+  top: 20%;
 }
 
 .squid-sonar-chart-gridline:nth-child(3) {
-  top: 66.666%;
+  top: 40%;
 }
 
 .squid-sonar-chart-gridline:nth-child(4) {
+  top: 60%;
+}
+
+.squid-sonar-chart-gridline:nth-child(5) {
+  top: 80%;
+}
+
+.squid-sonar-chart-gridline:nth-child(6) {
   bottom: 0;
 }
 

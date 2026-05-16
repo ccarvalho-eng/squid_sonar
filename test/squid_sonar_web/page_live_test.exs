@@ -40,6 +40,7 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "phx-hook=\"SquidSonarChart\""
     assert html =~ "phx-update=\"ignore\""
     assert html =~ "squid-sonar-chart-gridline"
+    assert html |> String.split("squid-sonar-chart-gridline") |> length() == 7
     assert html =~ "squid-sonar-chart-tooltip"
     assert html =~ "Run activity"
     assert html =~ "Latency"
