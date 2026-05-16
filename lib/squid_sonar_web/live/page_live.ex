@@ -85,17 +85,6 @@ defmodule SquidSonarWeb.PageLive do
         <.dashboard_error error={@dashboard.load_error} />
       <% else %>
         <div class="squid-sonar-content">
-          <section class="squid-sonar-page-header">
-            <div>
-              <p class="squid-sonar-section-label">Runtime dashboard</p>
-              <h2>Dashboard</h2>
-            </div>
-            <p>
-              <span>Last refresh</span>
-              <strong>{Calendar.strftime(@dashboard.loaded_at, "%b %d at %I:%M %p")}</strong>
-            </p>
-          </section>
-
           <input
             id="squid-sonar-filter-toggle"
             class="squid-sonar-filter-toggle-input"
