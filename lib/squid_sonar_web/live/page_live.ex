@@ -79,11 +79,32 @@ defmodule SquidSonarWeb.PageLive do
         <.dashboard_error error={@dashboard.load_error} />
       <% else %>
         <div class="squid-sonar-content">
+          <input
+            id="squid-sonar-filter-toggle"
+            class="squid-sonar-filter-toggle-input"
+            type="checkbox"
+          />
+
           <form phx-change="filter" phx-submit="filter">
+            <label class="squid-sonar-filter-toggle" for="squid-sonar-filter-toggle">
+              <span class="squid-sonar-filter-toggle-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+              <span>Filters</span>
+            </label>
+
             <section class="squid-sonar-workspace">
               <aside class="squid-sonar-sidebar" aria-label="Status inventory">
                 <div class="squid-sonar-sidebar-heading">
-                  <h2>Status</h2>
+                  <div>
+                    <h2>Status</h2>
+                    <p>
+                      <strong>{@dashboard.filtered_count}</strong>
+                      <span>matching runs</span>
+                    </p>
+                  </div>
                 </div>
                 <.status_nav_item
                   status={:all}
@@ -98,7 +119,9 @@ defmodule SquidSonarWeb.PageLive do
                 />
               </aside>
 
-              <.runs_panel dashboard={@dashboard} prefix={@prefix} />
+              <div class="squid-sonar-main-column">
+                <.runs_panel dashboard={@dashboard} prefix={@prefix} />
+              </div>
             </section>
           </form>
         </div>

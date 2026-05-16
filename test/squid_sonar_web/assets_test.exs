@@ -14,6 +14,17 @@ defmodule SquidSonarWeb.AssetsTest do
     assert Plug.Conn.get_resp_header(conn, "content-type") == ["text/css; charset=utf-8"]
     assert conn.resp_body =~ ".squid-sonar-shell"
     assert conn.resp_body =~ ".squid-sonar-refresh.phx-click-loading"
+    assert conn.resp_body =~ "--squid-sonar-accent: #8061d8;"
+    assert conn.resp_body =~ ".squid-sonar-nav-item.is-active::before"
+
+    assert conn.resp_body =~
+             ".squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar"
+
+    refute conn.resp_body =~ "gradient"
+    refute conn.resp_body =~ "box-shadow"
+    refute conn.resp_body =~ "text-shadow"
+    refute conn.resp_body =~ "#315f8f"
+    refute conn.resp_body =~ "#8aa4c8"
   end
 
   test "rejects stale CSS digests" do

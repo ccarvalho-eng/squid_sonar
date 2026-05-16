@@ -143,6 +143,11 @@ defmodule SquidSonarWeb.CoreComponents do
     ~H"""
     <section class="squid-sonar-panel">
       <div class="squid-sonar-panel-heading">
+        <div class="squid-sonar-panel-title">
+          <h2>Workflow runs</h2>
+          <p>Recent execution activity across the host runtime.</p>
+        </div>
+
         <div class="squid-sonar-panel-actions">
           <label class="squid-sonar-search">
             <span>Search</span>
@@ -279,6 +284,7 @@ defmodule SquidSonarWeb.CoreComponents do
       <header class="squid-sonar-detail-header">
         <div>
           <.link navigate={@prefix <> "/"} class="squid-sonar-back-link">Back to runs</.link>
+          <span class="squid-sonar-section-label">Run summary</span>
           <h2>{format_workflow(@detail.summary.workflow)}</h2>
           <p>{@detail.summary.id}</p>
         </div>
