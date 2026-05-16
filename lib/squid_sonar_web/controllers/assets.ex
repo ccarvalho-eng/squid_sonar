@@ -256,6 +256,7 @@ defmodule SquidSonarWeb.Assets do
 
     const context = canvas.getContext("2d");
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.globalAlpha = 1;
     context.clearRect(0, 0, width, height);
 
     const shell = container.closest(".squid-sonar-shell") || document.documentElement;
@@ -285,6 +286,7 @@ defmodule SquidSonarWeb.Assets do
       context.restore();
     });
 
+    context.globalAlpha = 1;
     context.textBaseline = "alphabetic";
     labels.forEach((label, index) => {
       if (labels.length > 4 && index % 2 !== 0 && index !== labels.length - 1) return;
@@ -301,6 +303,15 @@ defmodule SquidSonarWeb.Assets do
     container.__squidSonarChart = { data, points, styles };
   };
 
+  const scheduleChartDraw = (hook) => {
+    if (hook.chartDrawFrame) window.cancelAnimationFrame(hook.chartDrawFrame);
+
+    hook.chartDrawFrame = window.requestAnimationFrame(() => {
+      hook.chartDrawFrame = null;
+      drawChart(hook.el);
+    });
+  };
+
   const Hooks = {
     SquidSonarTheme: {
       mounted() {
@@ -310,7 +321,7 @@ defmodule SquidSonarWeb.Assets do
     },
     SquidSonarChart: {
       mounted() {
-        this.chartResizeHandler = () => drawChart(this.el);
+        this.chartResizeHandler = () => scheduleChartDraw(this);
         this.chartPointerHandler = (event) => {
           const canvas = this.el.querySelector("canvas");
           const state = this.el.__squidSonarChart;
@@ -320,15 +331,16 @@ defmodule SquidSonarWeb.Assets do
           showChartTooltip(this.el, canvas, point, state.data, state.styles);
         };
         this.chartLeaveHandler = () => hideChartTooltip(this.el);
-        drawChart(this.el);
+        scheduleChartDraw(this);
         window.addEventListener("resize", this.chartResizeHandler);
         this.el.addEventListener("pointermove", this.chartPointerHandler);
         this.el.addEventListener("pointerleave", this.chartLeaveHandler);
       },
       updated() {
-        drawChart(this.el);
+        scheduleChartDraw(this);
       },
       destroyed() {
+        if (this.chartDrawFrame) window.cancelAnimationFrame(this.chartDrawFrame);
         window.removeEventListener("resize", this.chartResizeHandler);
         this.el.removeEventListener("pointermove", this.chartPointerHandler);
         this.el.removeEventListener("pointerleave", this.chartLeaveHandler);

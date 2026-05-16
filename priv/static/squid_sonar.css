@@ -1,13 +1,19 @@
 :root {
-  --squid-sonar-bg: #f5f6f7;
+  --squid-sonar-space-1: 4px;
+  --squid-sonar-space-2: 8px;
+  --squid-sonar-space-3: 12px;
+  --squid-sonar-space-4: 16px;
+  --squid-sonar-space-5: 20px;
+  --squid-sonar-space-6: 24px;
+  --squid-sonar-bg: #f5f5f7;
   --squid-sonar-surface: #ffffff;
-  --squid-sonar-surface-muted: #f7f8f9;
-  --squid-sonar-surface-raised: #eef0f2;
-  --squid-sonar-border: #dfe3e7;
-  --squid-sonar-border-strong: #a8b0b9;
-  --squid-sonar-text: #1f2328;
-  --squid-sonar-muted: #5f6872;
-  --squid-sonar-subtle: #7b838c;
+  --squid-sonar-surface-muted: #f5f5f7;
+  --squid-sonar-surface-raised: #eeeeef;
+  --squid-sonar-border: #d8d8de;
+  --squid-sonar-border-strong: #a7a7b0;
+  --squid-sonar-text: #1d1d1f;
+  --squid-sonar-muted: #6e6e73;
+  --squid-sonar-subtle: #8e8e93;
   --squid-sonar-accent: #8061d8;
   --squid-sonar-accent-muted: #f1f2f4;
   --squid-sonar-danger: #a0443f;
@@ -27,18 +33,18 @@
 
 html.squid-sonar-document,
 body.squid-sonar-document {
-  background: #f5f6f7;
+  background: #f5f5f7;
   margin: 0;
   min-height: 100%;
 }
 
 body.squid-sonar-document:has(.squid-sonar-theme-dark) {
-  background: #16181d;
+  background: #282c34;
 }
 
 @media (prefers-color-scheme: dark) {
   body.squid-sonar-document:has(.squid-sonar-theme-system) {
-    background: #16181d;
+    background: #282c34;
   }
 }
 
@@ -53,23 +59,27 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   box-sizing: border-box;
   color: var(--squid-sonar-text);
   font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Inter",
+    "Noto Sans", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   min-height: 100dvh;
   padding: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .squid-sonar-shell.squid-sonar-theme-dark {
-  --squid-sonar-bg: #16181d;
-  --squid-sonar-surface: #1d2027;
-  --squid-sonar-surface-muted: #20242c;
-  --squid-sonar-surface-raised: #282d36;
-  --squid-sonar-border: #323844;
-  --squid-sonar-border-strong: #596170;
-  --squid-sonar-text: #eef0f3;
-  --squid-sonar-muted: #a9b0ba;
-  --squid-sonar-subtle: #858e9a;
+  --squid-sonar-bg: #282c34;
+  --squid-sonar-surface: #21252b;
+  --squid-sonar-surface-muted: #2c313a;
+  --squid-sonar-surface-raised: #343a45;
+  --squid-sonar-border: #3e4451;
+  --squid-sonar-border-strong: #5c6370;
+  --squid-sonar-text: #e6e6e8;
+  --squid-sonar-muted: #abb2bf;
+  --squid-sonar-subtle: #828997;
   --squid-sonar-accent: #8061d8;
   --squid-sonar-accent-muted: #282d36;
   --squid-sonar-danger: #d28b86;
@@ -89,15 +99,15 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 @media (prefers-color-scheme: dark) {
   .squid-sonar-shell.squid-sonar-theme-system {
-    --squid-sonar-bg: #16181d;
-    --squid-sonar-surface: #1d2027;
-    --squid-sonar-surface-muted: #20242c;
-    --squid-sonar-surface-raised: #282d36;
-    --squid-sonar-border: #323844;
-    --squid-sonar-border-strong: #596170;
-    --squid-sonar-text: #eef0f3;
-    --squid-sonar-muted: #a9b0ba;
-    --squid-sonar-subtle: #858e9a;
+    --squid-sonar-bg: #282c34;
+    --squid-sonar-surface: #21252b;
+    --squid-sonar-surface-muted: #2c313a;
+    --squid-sonar-surface-raised: #343a45;
+    --squid-sonar-border: #3e4451;
+    --squid-sonar-border-strong: #5c6370;
+    --squid-sonar-text: #e6e6e8;
+    --squid-sonar-muted: #abb2bf;
+    --squid-sonar-subtle: #828997;
     --squid-sonar-accent: #8061d8;
     --squid-sonar-accent-muted: #282d36;
     --squid-sonar-danger: #d28b86;
@@ -123,8 +133,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  min-height: 54px;
-  padding: 0 max(18px, calc((100vw - 1360px) / 2 + 18px));
+  min-height: 56px;
+  padding: 0 max(var(--squid-sonar-space-6), calc((100vw - 1400px) / 2 + var(--squid-sonar-space-6)));
   position: sticky;
   top: 0;
   z-index: 10;
@@ -177,7 +187,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-theme-switcher {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   display: inline-flex;
   gap: 1px;
   padding: 2px;
@@ -187,7 +197,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   background: transparent;
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--squid-sonar-muted);
   cursor: pointer;
   display: inline-flex;
@@ -261,8 +271,44 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-content {
   margin: 0 auto;
-  max-width: 1360px;
-  padding: 18px 18px 44px;
+  max-width: 1400px;
+  padding: var(--squid-sonar-space-6) var(--squid-sonar-space-6) 48px;
+}
+
+.squid-sonar-page-header {
+  align-items: flex-end;
+  display: flex;
+  gap: var(--squid-sonar-space-4);
+  justify-content: space-between;
+  margin-bottom: var(--squid-sonar-space-4);
+}
+
+.squid-sonar-page-header h2 {
+  color: var(--squid-sonar-text);
+  font-size: 24px;
+  font-weight: 520;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.squid-sonar-page-header p {
+  color: var(--squid-sonar-muted);
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+  margin: 0;
+}
+
+.squid-sonar-page-header p span {
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.squid-sonar-page-header p strong {
+  color: var(--squid-sonar-text);
+  font-size: 13px;
+  font-weight: 560;
 }
 
 .squid-sonar-filter-toggle-input {
@@ -275,7 +321,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--squid-sonar-text);
   cursor: pointer;
   display: none;
@@ -336,13 +382,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-search input {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 5px;
+  border-radius: 6px;
   box-sizing: border-box;
   color: var(--squid-sonar-text);
   font: inherit;
   font-size: 13px;
-  height: 32px;
-  padding: 0 10px;
+  height: 36px;
+  padding: 0 12px;
 }
 
 .squid-sonar-page-size select {
@@ -365,15 +411,15 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-workspace {
   display: grid;
-  gap: 12px;
-  grid-template-columns: 188px minmax(0, 1fr);
+  gap: var(--squid-sonar-space-4);
+  grid-template-columns: 204px minmax(0, 1fr);
   margin-top: 0;
   padding-bottom: 20px;
 }
 
 .squid-sonar-main-column {
   display: grid;
-  gap: 12px;
+  gap: var(--squid-sonar-space-4);
   min-width: 0;
 }
 
@@ -381,11 +427,11 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-self: start;
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 6px 6px;
+  gap: 3px;
+  padding: 0 var(--squid-sonar-space-2) var(--squid-sonar-space-2);
   position: sticky;
   top: 72px;
 }
@@ -394,13 +440,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
-  margin: 0 -6px 7px;
-  min-height: 58px;
-  padding: 10px 13px;
+  margin: 0 calc(var(--squid-sonar-space-2) * -1) var(--squid-sonar-space-2);
+  min-height: 60px;
+  padding: var(--squid-sonar-space-3) var(--squid-sonar-space-4);
 }
 
 .squid-sonar-sidebar-heading h2 {
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.35;
   margin: 0;
 }
@@ -415,8 +461,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-sidebar-heading p strong {
   color: var(--squid-sonar-text);
-  font-size: 17px;
-  font-weight: 650;
+  font-size: 20px;
+  font-weight: 460;
   line-height: 1;
 }
 
@@ -428,16 +474,16 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-nav-item {
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--squid-sonar-muted);
   cursor: pointer;
   display: flex;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 540;
   gap: 10px;
   justify-content: space-between;
-  min-height: 31px;
-  padding: 0 9px 0 13px;
+  min-height: 34px;
+  padding: 0 10px 0 14px;
   position: relative;
   transition:
     background-color 120ms ease,
@@ -469,7 +515,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: inline-flex;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 560;
   height: 20px;
   justify-content: center;
   min-width: 24px;
@@ -519,7 +565,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-chart {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   min-width: 0;
   padding: 0;
   position: relative;
@@ -529,15 +575,15 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
-  gap: 16px;
+  gap: var(--squid-sonar-space-4);
   justify-content: space-between;
-  min-height: 58px;
-  padding: 10px 14px;
+  min-height: 64px;
+  padding: var(--squid-sonar-space-3) var(--squid-sonar-space-5);
 }
 
 .squid-sonar-chart h2 {
-  font-size: 13px;
-  font-weight: 660;
+  font-size: 14px;
+  font-weight: 560;
   line-height: 1.35;
   margin: 0;
 }
@@ -552,8 +598,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-chart-heading p strong {
   color: var(--squid-sonar-text);
-  font-size: 17px;
-  font-weight: 650;
+  font-size: 22px;
+  font-weight: 420;
   line-height: 1;
 }
 
@@ -572,7 +618,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-chart-switcher {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   display: inline-flex;
   padding: 2px;
 }
@@ -580,14 +626,14 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-chart-switcher button {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--squid-sonar-muted);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
-  font-weight: 650;
-  min-height: 26px;
-  padding: 0 10px;
+  font-weight: 560;
+  min-height: 28px;
+  padding: 0 12px;
 }
 
 .squid-sonar-chart-switcher button:hover {
@@ -636,8 +682,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-chart canvas {
   display: block;
   height: 176px;
-  margin: 10px 14px 12px;
-  width: calc(100% - 28px);
+  margin: var(--squid-sonar-space-3) var(--squid-sonar-space-5) var(--squid-sonar-space-4);
+  width: calc(100% - 40px);
 }
 
 .squid-sonar-chart-tooltip {
@@ -689,7 +735,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-panel {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
   min-width: 0;
   overflow: hidden;
 }
@@ -699,10 +745,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-surface);
   border-bottom: 1px solid var(--squid-sonar-border);
   display: flex;
-  gap: 16px;
+  gap: var(--squid-sonar-space-4);
   justify-content: space-between;
-  min-height: 64px;
-  padding: 12px 14px;
+  min-height: 68px;
+  padding: var(--squid-sonar-space-4) var(--squid-sonar-space-5);
 }
 
 .squid-sonar-panel-title {
@@ -728,8 +774,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-panel h2,
 .squid-sonar-empty h3,
 .squid-sonar-alert h2 {
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 15px;
+  font-weight: 560;
   line-height: 1.35;
   margin: 0;
 }
@@ -739,7 +785,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-muted);
   font-size: 12px;
   line-height: 1.5;
-  margin: 2px 0 0;
+  margin: var(--squid-sonar-space-1) 0 0;
 }
 
 .squid-sonar-table-wrap {
@@ -757,7 +803,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-table td {
   border-bottom: 1px solid var(--squid-sonar-border);
   font-size: 13px;
-  padding: 10px 14px;
+  padding: 12px var(--squid-sonar-space-5);
   text-align: left;
   vertical-align: middle;
 }
@@ -766,7 +812,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-surface);
   color: var(--squid-sonar-muted);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 620;
   line-height: 1.2;
   padding-bottom: 10px;
   padding-top: 10px;
@@ -808,7 +854,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-table tbody td:first-child {
   border-left: 2px solid transparent;
-  padding-left: 10px;
+  padding-left: 18px;
 }
 
 .squid-sonar-table tbody tr:hover td:first-child {
@@ -829,14 +875,14 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-primary {
-  font-weight: 600;
+  font-weight: 560;
 }
 
 .squid-sonar-secondary {
   color: var(--squid-sonar-muted);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 12px;
-  margin-top: 3px;
+  margin-top: var(--squid-sonar-space-1);
 }
 
 .squid-sonar-run-link {
@@ -863,7 +909,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-alert {
   background: var(--squid-sonar-alert-bg);
   border: 1px solid var(--squid-sonar-alert-border);
-  border-radius: 6px;
+  border-radius: 8px;
   margin: 20px;
 }
 
@@ -874,9 +920,9 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-muted);
   display: inline-flex;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 560;
   line-height: 1;
-  padding: 4px 7px;
+  padding: 4px 8px;
   text-transform: uppercase;
 }
 
@@ -919,7 +965,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-size: 12px;
   font-weight: 600;
   justify-content: space-between;
-  padding: 10px 13px;
+  padding: 12px var(--squid-sonar-space-5);
 }
 
 .squid-sonar-pagination-summary {
@@ -957,7 +1003,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-pagination button {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--squid-sonar-text);
   cursor: pointer;
   font: inherit;
@@ -969,7 +1015,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-pagination-controls > strong {
   background: var(--squid-sonar-surface-raised);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--squid-sonar-text);
   display: inline-flex;
   font-size: 12px;
@@ -998,7 +1044,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-detail-item {
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .squid-sonar-detail-header {
@@ -1006,7 +1052,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   display: flex;
   gap: 18px;
   justify-content: space-between;
-  padding: 16px 18px;
+  padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6);
 }
 
 .squid-sonar-back-link {
@@ -1027,8 +1073,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-detail-header h2 {
-  font-size: 20px;
-  font-weight: 650;
+  font-size: 24px;
+  font-weight: 520;
   line-height: 1.25;
   margin: 0;
   overflow-wrap: anywhere;
@@ -1043,13 +1089,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-detail-grid {
   display: grid;
-  gap: 10px;
+  gap: var(--squid-sonar-space-4);
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 12px;
+  margin-top: var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-item {
-  padding: 12px 13px;
+  padding: var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-item span {
@@ -1073,9 +1119,9 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-detail-columns {
   align-items: stretch;
   display: grid;
-  gap: 12px;
+  gap: var(--squid-sonar-space-4);
   grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
-  margin-top: 12px;
+  margin-top: var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-columns > .squid-sonar-detail-panel {
@@ -1089,21 +1135,21 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-detail-panel {
-  padding: 13px;
+  padding: var(--squid-sonar-space-5);
 }
 
 .squid-sonar-detail-columns + .squid-sonar-detail-panel {
-  margin-top: 12px;
+  margin-top: var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-panel + .squid-sonar-detail-panel {
-  margin-top: 12px;
+  margin-top: var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-panel h3 {
-  font-size: 14px;
-  font-weight: 650;
-  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 560;
+  margin: 0 0 var(--squid-sonar-space-4);
 }
 
 .squid-sonar-detail-panel .squid-sonar-detail-item {
@@ -1125,11 +1171,11 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-workflow-graph {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 6px;
-  margin-top: 12px;
+  border-radius: 8px;
+  margin-top: var(--squid-sonar-space-4);
   min-height: 190px;
   overflow: auto;
-  padding: 16px 18px 20px;
+  padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6) var(--squid-sonar-space-6);
 }
 
 .squid-sonar-workflow-graph-heading {
@@ -1190,7 +1236,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 5px;
+  border-radius: 6px;
   box-sizing: border-box;
   display: flex;
   gap: 10px;
@@ -1316,6 +1362,15 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 @media (max-width: 980px) {
+  .squid-sonar-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .squid-sonar-page-header p {
+    justify-items: start;
+  }
+
   .squid-sonar-workspace {
     grid-template-columns: 1fr;
   }
@@ -1393,8 +1448,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   }
 
   .squid-sonar-content {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: var(--squid-sonar-space-3);
+    padding-right: var(--squid-sonar-space-3);
   }
 
   .squid-sonar-sidebar-heading {

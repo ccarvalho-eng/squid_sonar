@@ -36,6 +36,7 @@ defmodule SquidSonarWeb.PageLiveTest do
 
     assert html =~ "SquidSonar"
     assert html =~ "Runtime dashboard"
+    assert html =~ "Last refresh"
     assert html =~ "phx-hook=\"SquidSonarTheme\""
     assert html =~ "phx-hook=\"SquidSonarChart\""
     assert html =~ "squid-sonar-chart-tooltip"
