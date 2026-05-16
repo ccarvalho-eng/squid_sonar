@@ -159,7 +159,13 @@ defmodule SquidSonarWeb.CoreComponents do
       data-chart={chart_payload(@chart)}
     >
       <div class="squid-sonar-chart-heading">
-        <h2>{@chart.title}</h2>
+        <div>
+          <h2>{@chart.title}</h2>
+          <p>
+            <strong>{format_chart_summary_value(@chart.summary, @chart.unit)}</strong>
+            <span>{format_chart_summary_label(@chart.summary)}</span>
+          </p>
+        </div>
         <div class="squid-sonar-chart-legend" aria-hidden="true">
           <span :for={series <- @chart.series}>
             <i></i>
@@ -481,6 +487,24 @@ defmodule SquidSonarWeb.CoreComponents do
   defp run_path(prefix, run_id), do: "#{prefix}/runs/#{run_id}"
 
   defp chart_payload(chart), do: Phoenix.json_library().encode!(chart)
+
+  defp format_chart_summary_label(%{label: label}), do: label
+  defp format_chart_summary_label(_summary), do: "current window"
+
+  defp format_chart_summary_value(%{value: nil}, _unit), do: "None"
+  defp format_chart_summary_value(%{value: value}, :seconds), do: format_duration(value)
+  defp format_chart_summary_value(%{value: value}, _unit), do: to_string(value)
+  defp format_chart_summary_value(_summary, _unit), do: "None"
+
+  defp format_duration(value) when is_number(value) and value >= 3600 do
+    "#{Float.round(value / 3600, 1)}h"
+  end
+
+  defp format_duration(value) when is_number(value) and value >= 60 do
+    "#{Float.round(value / 60, 1)}m"
+  end
+
+  defp format_duration(value) when is_number(value), do: "#{round(value)}s"
 
   defp explanation_reason(nil), do: "Unknown"
   defp explanation_reason(%{reason: reason}), do: format_value(reason)

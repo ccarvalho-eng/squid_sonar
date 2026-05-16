@@ -65,7 +65,8 @@ defmodule SquidSonar.DashboardTest do
 
     dashboard = Dashboard.load(client: FakeSquidMeshClient, loaded_at: @loaded_at)
 
-    assert dashboard.charts.activity.kind == :bar
+    assert dashboard.charts.activity.kind == :area
+    assert dashboard.charts.activity.summary == %{value: 4, label: "runs in 7 days"}
 
     assert dashboard.charts.activity.labels == [
              "May 09",
@@ -78,18 +79,53 @@ defmodule SquidSonar.DashboardTest do
            ]
 
     assert dashboard.charts.activity.series == [
-             %{label: "Completed", values: [0, 0, 0, 0, 0, 0, 2]},
-             %{label: "Failed", values: [0, 0, 0, 0, 0, 1, 0]},
-             %{label: "Running", values: [0, 0, 0, 0, 0, 0, 1]}
+             %{label: "Total", values: [0, 0, 0, 0, 0, 1, 3]},
+             %{label: "Failed", values: [0, 0, 0, 0, 0, 1, 0]}
            ]
 
     assert dashboard.charts.latency.kind == :line
+    assert dashboard.charts.latency.summary == %{value: 180, label: "p95 runtime"}
     assert dashboard.charts.latency.labels == dashboard.charts.activity.labels
 
     assert dashboard.charts.latency.series == [
              %{label: "Median", values: [nil, nil, nil, nil, nil, 120, 60]},
              %{label: "P95", values: [nil, nil, nil, nil, nil, 120, 180]}
            ]
+  end
+
+  test "builds chart data from the filtered run set" do
+    FakeSquidMeshClient.put_list_runs(
+      {:ok,
+       [
+         run(:completed,
+           id: "completed-run",
+           inserted_at: ~U[2026-05-15 10:00:00Z],
+           updated_at: ~U[2026-05-15 10:01:00Z]
+         ),
+         run(:failed,
+           id: "failed-run",
+           inserted_at: ~U[2026-05-15 10:00:00Z],
+           updated_at: ~U[2026-05-15 10:02:00Z]
+         )
+       ]}
+    )
+
+    dashboard =
+      Dashboard.load(
+        client: FakeSquidMeshClient,
+        loaded_at: @loaded_at,
+        filters: %{"status" => "failed"}
+      )
+
+    assert dashboard.filtered_count == 1
+    assert dashboard.charts.activity.summary == %{value: 1, label: "runs in 7 days"}
+
+    assert [
+             %{label: "Total", values: [0, 0, 0, 0, 0, 0, 1]},
+             %{label: "Failed", values: [0, 0, 0, 0, 0, 0, 1]}
+           ] = dashboard.charts.activity.series
+
+    assert dashboard.charts.latency.summary == %{value: 120, label: "p95 runtime"}
   end
 
   test "filters runs by status while preserving date order" do

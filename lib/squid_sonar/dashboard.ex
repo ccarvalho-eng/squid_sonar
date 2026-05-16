@@ -6,7 +6,6 @@ defmodule SquidSonar.Dashboard do
   alias SquidSonar.Runs
 
   @statuses [:completed, :failed, :retrying, :paused, :running]
-  @activity_statuses [:completed, :failed, :running]
   @latency_statuses [:completed, :failed]
   @default_limit 250
   @default_page_size 10
@@ -67,7 +66,7 @@ defmodule SquidSonar.Dashboard do
           runs: paginate(filtered_runs, page, page_size),
           statuses: @statuses,
           status_counts: status_counts(runs),
-          charts: charts(runs, loaded_at),
+          charts: charts(filtered_runs, loaded_at),
           filters: filters,
           loaded_count: length(runs),
           filtered_count: length(filtered_runs),
@@ -113,9 +112,10 @@ defmodule SquidSonar.Dashboard do
     %{
       activity: %{
         title: "Run activity",
-        kind: :bar,
+        kind: :area,
         unit: :count,
         labels: labels,
+        summary: activity_summary(runs, dates),
         series: activity_series(runs, dates)
       },
       latency: %{
@@ -123,6 +123,7 @@ defmodule SquidSonar.Dashboard do
         kind: :line,
         unit: :seconds,
         labels: labels,
+        summary: latency_summary(runs, dates),
         series: latency_series(runs, dates)
       }
     }
@@ -145,16 +146,32 @@ defmodule SquidSonar.Dashboard do
   defp activity_series(runs, dates) do
     counts =
       runs
-      |> Enum.filter(&(&1.status in @activity_statuses))
-      |> Enum.group_by(&{run_date(&1), &1.status})
-      |> Map.new(fn {key, bucket_runs} -> {key, length(bucket_runs)} end)
+      |> Enum.group_by(&run_date/1)
+      |> Map.new(fn {date, bucket_runs} -> {date, length(bucket_runs)} end)
 
-    Enum.map(@activity_statuses, fn status ->
+    failures =
+      runs
+      |> Enum.filter(&(&1.status == :failed))
+      |> Enum.group_by(&run_date/1)
+      |> Map.new(fn {date, bucket_runs} -> {date, length(bucket_runs)} end)
+
+    [
       %{
-        label: human_status(status),
-        values: Enum.map(dates, &Map.get(counts, {&1, status}, 0))
+        label: "Total",
+        values: Enum.map(dates, &Map.get(counts, &1, 0))
+      },
+      %{
+        label: "Failed",
+        values: Enum.map(dates, &Map.get(failures, &1, 0))
       }
-    end)
+    ]
+  end
+
+  defp activity_summary(runs, dates) do
+    date_set = MapSet.new(dates)
+    total = Enum.count(runs, &(run_date(&1) in date_set))
+
+    %{value: total, label: "runs in 7 days"}
   end
 
   defp latency_series(runs, dates) do
@@ -178,6 +195,18 @@ defmodule SquidSonar.Dashboard do
         values: Enum.map(dates, &percentile(Map.get(durations_by_date, &1, []), 95))
       }
     ]
+  end
+
+  defp latency_summary(runs, dates) do
+    date_set = MapSet.new(dates)
+
+    durations =
+      runs
+      |> Enum.filter(&(&1.status in @latency_statuses and run_date(&1) in date_set))
+      |> Enum.map(&run_duration_seconds/1)
+      |> Enum.reject(&is_nil/1)
+
+    %{value: percentile(durations, 95), label: "p95 runtime"}
   end
 
   defp run_date(run) do
@@ -225,13 +254,6 @@ defmodule SquidSonar.Dashboard do
       [value] -> value
       [] -> nil
     end
-  end
-
-  defp human_status(status) do
-    status
-    |> to_string()
-    |> String.replace("_", " ")
-    |> String.capitalize()
   end
 
   defp normalize_filters(filters) do
