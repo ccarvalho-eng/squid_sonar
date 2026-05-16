@@ -21,6 +21,8 @@ defmodule SquidSonarWeb.AssetsTest do
              ".squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar"
 
     refute conn.resp_body =~ "gradient"
+    refute conn.resp_body =~ "box-shadow"
+    refute conn.resp_body =~ "text-shadow"
     refute conn.resp_body =~ "#315f8f"
     refute conn.resp_body =~ "#8aa4c8"
   end
