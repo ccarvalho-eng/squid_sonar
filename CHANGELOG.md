@@ -2,6 +2,13 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.2 - 2026-05-16
+
+- Refined the embedded dashboard with a cleaner, flatter visual system.
+- Added a responsive filter menu for smaller screens.
+- Improved status filter active states, table controls, run detail surfaces, and
+  workflow canvas contrast.
+
 ## 0.1.1 - 2026-05-15
 
 - Added visible refresh feedback while dashboard runs reload.

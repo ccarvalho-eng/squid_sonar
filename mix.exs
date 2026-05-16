@@ -4,7 +4,7 @@ defmodule SquidSonar.MixProject do
   def project do
     [
       app: :squid_sonar,
-      version: "0.1.1",
+      version: "0.1.2",
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -51,7 +51,7 @@ defmodule SquidSonar.MixProject do
       maintainers: ["Cristiano Carvalho"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/ccarvalho-eng/squid_sonar"},
-      files: ~w(lib priv docs .formatter.exs mix.exs README* CHANGELOG* LICENSE* CONTRIBUTING*)
+      files: ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* LICENSE* CONTRIBUTING*)
     ]
   end
 
