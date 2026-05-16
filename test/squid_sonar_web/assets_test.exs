@@ -57,6 +57,10 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ "chartBars"
     assert conn.resp_body =~ "drawSeriesBars"
     assert conn.resp_body =~ "scheduleChartDraw"
+    assert conn.resp_body =~ "chartPixel"
+    assert conn.resp_body =~ "globalCompositeOperation"
+    assert conn.resp_body =~ "--squid-sonar-chart-grid"
+    refute conn.resp_body =~ "step === 1 ? 0."
   end
 
   test "serves packaged LiveView client dependencies" do

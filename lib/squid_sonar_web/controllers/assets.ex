@@ -167,14 +167,14 @@ defmodule SquidSonarWeb.Assets do
 
   const chartBars = (labels, series, plot, plotWidth, plotHeight, maxValue, styles) => {
     const groupWidth = plotWidth / Math.max(1, labels.length);
-    const groupGap = Math.min(18, groupWidth * 0.36);
+    const groupGap = Math.min(16, groupWidth * 0.3);
     const innerWidth = Math.max(4, groupWidth - groupGap);
-    const barGap = series.length > 1 ? Math.min(4, innerWidth * 0.12) : 0;
+    const barGap = series.length > 1 ? Math.min(3, innerWidth * 0.1) : 0;
     const availableBarWidth =
       (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length;
     const barWidth = Math.max(
       3,
-      Math.min(series.length > 1 ? 14 : 18, availableBarWidth)
+      Math.min(series.length > 1 ? 17 : 22, availableBarWidth)
     );
     const barsWidth = barWidth * series.length + barGap * Math.max(0, series.length - 1);
 
@@ -230,6 +230,8 @@ defmodule SquidSonarWeb.Assets do
     });
   };
 
+  const chartPixel = (value) => Math.round(value) + 0.5;
+
   const drawChart = (container) => {
     const canvas = container.querySelector("canvas");
     if (!canvas) return;
@@ -257,12 +259,19 @@ defmodule SquidSonarWeb.Assets do
     const context = canvas.getContext("2d");
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-over";
+    context.setLineDash([]);
+    context.lineCap = "butt";
+    context.lineJoin = "miter";
     context.clearRect(0, 0, width, height);
 
     const shell = container.closest(".squid-sonar-shell") || document.documentElement;
     const styles = getComputedStyle(shell);
     const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
-    const gridColor = styles.getPropertyValue("--squid-sonar-border").trim() || "#ddd7e5";
+    const gridColor =
+      styles.getPropertyValue("--squid-sonar-chart-grid").trim() || "#ececf0";
+    const baselineColor =
+      styles.getPropertyValue("--squid-sonar-chart-baseline").trim() || "#dedee4";
     const plot = { left: 14, top: 8, right: 14, bottom: 24 };
     const plotWidth = width - plot.left - plot.right;
     const plotHeight = height - plot.top - plot.bottom;
@@ -271,22 +280,18 @@ defmodule SquidSonarWeb.Assets do
 
     context.font = "11px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif";
     context.lineWidth = 1;
-    context.strokeStyle = gridColor;
     context.fillStyle = textColor;
     context.textBaseline = "middle";
 
     [0, 0.25, 0.5, 0.75, 1].forEach((step) => {
-      const y = plot.top + plotHeight * step;
-      context.save();
-      context.globalAlpha = step === 1 ? 0.32 : 0.12;
+      const y = chartPixel(plot.top + plotHeight * step);
+      context.strokeStyle = step === 1 ? baselineColor : gridColor;
       context.beginPath();
       context.moveTo(plot.left, y);
       context.lineTo(width - plot.right, y);
       context.stroke();
-      context.restore();
     });
 
-    context.globalAlpha = 1;
     context.textBaseline = "alphabetic";
     labels.forEach((label, index) => {
       if (labels.length > 4 && index % 2 !== 0 && index !== labels.length - 1) return;

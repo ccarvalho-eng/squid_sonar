@@ -11,6 +11,8 @@
   --squid-sonar-surface-raised: #eeeeef;
   --squid-sonar-border: #d8d8de;
   --squid-sonar-border-strong: #a7a7b0;
+  --squid-sonar-chart-grid: #ececf0;
+  --squid-sonar-chart-baseline: #dedee4;
   --squid-sonar-text: #1d1d1f;
   --squid-sonar-muted: #6e6e73;
   --squid-sonar-subtle: #8e8e93;
@@ -77,6 +79,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   --squid-sonar-surface-raised: #343a45;
   --squid-sonar-border: #3e4451;
   --squid-sonar-border-strong: #5c6370;
+  --squid-sonar-chart-grid: #343a45;
+  --squid-sonar-chart-baseline: #464c59;
   --squid-sonar-text: #e6e6e8;
   --squid-sonar-muted: #abb2bf;
   --squid-sonar-subtle: #828997;
@@ -105,6 +109,8 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     --squid-sonar-surface-raised: #343a45;
     --squid-sonar-border: #3e4451;
     --squid-sonar-border-strong: #5c6370;
+    --squid-sonar-chart-grid: #343a45;
+    --squid-sonar-chart-baseline: #464c59;
     --squid-sonar-text: #e6e6e8;
     --squid-sonar-muted: #abb2bf;
     --squid-sonar-subtle: #828997;
