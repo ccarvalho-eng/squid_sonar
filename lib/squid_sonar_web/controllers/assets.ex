@@ -215,6 +215,7 @@ defmodule SquidSonarWeb.Assets do
     const plotWidth = width - plot.left - plot.right;
     const plotHeight = height - plot.top - plot.bottom;
     const maxValue = niceChartMax(chartMax(series));
+    const isBarChart = data.kind === "bar";
     const points = [];
 
     context.font = "11px -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif";
@@ -225,10 +226,14 @@ defmodule SquidSonarWeb.Assets do
 
     [0, 0.25, 0.5, 0.75, 1].forEach((step) => {
       const y = plot.top + plotHeight * step;
+      context.save();
+      context.globalAlpha = isBarChart ? 0.36 : 0.72;
+      context.setLineDash(isBarChart && step !== 1 ? [2, 7] : []);
       context.beginPath();
       context.moveTo(plot.left, y);
       context.lineTo(width - plot.right, y);
       context.stroke();
+      context.restore();
 
       if (step === 0 || step === 0.5 || step === 1) {
         const value = maxValue * (1 - step);
@@ -245,7 +250,7 @@ defmodule SquidSonarWeb.Assets do
       context.fillText(label, Math.min(x, width - plot.right - 42), height - 8);
     });
 
-    if (data.kind === "bar") {
+    if (isBarChart) {
       const groupWidth = plotWidth / labels.length;
       const barWidth = Math.max(3, Math.min(16, (groupWidth - 10) / series.length));
       const totalWidth = barWidth * series.length;
