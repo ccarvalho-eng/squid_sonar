@@ -277,7 +277,7 @@ defmodule SquidSonarWeb.Assets do
     [0, 0.25, 0.5, 0.75, 1].forEach((step) => {
       const y = plot.top + plotHeight * step;
       context.save();
-      context.globalAlpha = step === 1 ? 0.26 : 0.08;
+      context.globalAlpha = step === 1 ? 0.32 : 0.12;
       context.beginPath();
       context.moveTo(plot.left, y);
       context.lineTo(width - plot.right, y);
