@@ -10,6 +10,7 @@ defmodule SquidSonarWeb.PageLive do
       |> assign_new(:prefix, fn -> "" end)
       |> assign(:page_title, "SquidSonar Runtime")
       |> assign(:theme, :system)
+      |> assign(:active_chart, :activity)
       |> assign_dashboard()
 
     {:ok, socket}
@@ -53,6 +54,11 @@ defmodule SquidSonarWeb.PageLive do
   @impl true
   def handle_event("set_theme", %{"theme" => theme}, socket) do
     {:noreply, assign(socket, :theme, normalize_theme(theme))}
+  end
+
+  @impl true
+  def handle_event("set_chart", %{"chart" => chart}, socket) do
+    {:noreply, assign(socket, :active_chart, normalize_chart(chart))}
   end
 
   @impl true
@@ -120,7 +126,7 @@ defmodule SquidSonarWeb.PageLive do
               </aside>
 
               <div class="squid-sonar-main-column">
-                <.dashboard_charts charts={@dashboard.charts} />
+                <.dashboard_charts charts={@dashboard.charts} active_chart={@active_chart} />
                 <.runs_panel dashboard={@dashboard} prefix={@prefix} />
               </div>
             </section>
@@ -139,4 +145,7 @@ defmodule SquidSonarWeb.PageLive do
   defp normalize_theme("light"), do: :light
   defp normalize_theme("dark"), do: :dark
   defp normalize_theme(_theme), do: :system
+
+  defp normalize_chart("latency"), do: :latency
+  defp normalize_chart(_chart), do: :activity
 end

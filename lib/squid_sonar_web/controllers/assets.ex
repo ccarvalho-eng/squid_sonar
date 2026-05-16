@@ -165,53 +165,63 @@ defmodule SquidSonarWeb.Assets do
     }, null);
   };
 
-  const chartPoints = (labels, values, plot, plotWidth, plotHeight, maxValue) => {
-    return labels
-      .map((label, index) => {
-        const value = chartValue(values[index]);
-        if (value === null) return null;
+  const chartBars = (labels, series, plot, plotWidth, plotHeight, maxValue, styles) => {
+    const groupWidth = plotWidth / Math.max(1, labels.length);
+    const groupGap = Math.min(14, groupWidth * 0.28);
+    const innerWidth = Math.max(4, groupWidth - groupGap);
+    const barGap = series.length > 1 ? Math.min(5, innerWidth * 0.14) : 0;
+    const barWidth = Math.max(3, (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length);
 
-        return {
-          index,
-          label,
-          x: plot.left + (plotWidth / Math.max(1, labels.length - 1)) * index,
-          y: plot.top + plotHeight - (value / maxValue) * plotHeight
-        };
-      })
-      .filter(Boolean);
-  };
+    return labels.map((label, index) => {
+      const groupLeft = plot.left + groupWidth * index + groupGap / 2;
+      const baseline = plot.top + plotHeight;
+      const bars = series
+        .map((item, seriesIndex) => {
+          const value = chartValue((item.values || [])[index]);
+          if (value === null) return null;
 
-  const drawSeriesLine = (context, points, color, width) => {
-    if (points.length === 0) return;
+          const height = value <= 0 ? 0 : Math.max(2, (value / maxValue) * plotHeight);
+          return {
+            value,
+            color: chartColor(item.label, seriesIndex, styles),
+            x: groupLeft + seriesIndex * (barWidth + barGap),
+            y: baseline - height,
+            width: barWidth,
+            height
+          };
+        })
+        .filter(Boolean);
 
-    context.strokeStyle = color;
-    context.lineWidth = width;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.beginPath();
-    points.forEach((point, index) => {
-      if (index === 0) {
-        context.moveTo(point.x, point.y);
-      } else {
-        context.lineTo(point.x, point.y);
-      }
+      return {
+        index,
+        label,
+        bars,
+        x: groupLeft + innerWidth / 2,
+        y: bars.reduce((top, bar) => Math.min(top, bar.y), baseline)
+      };
     });
-    context.stroke();
   };
 
-  const fillSeriesArea = (context, points, plot, plotHeight, color) => {
-    if (points.length < 2) return;
+  const drawRoundedBar = (context, bar) => {
+    if (bar.height <= 0) return;
 
-    context.save();
-    context.fillStyle = color;
-    context.globalAlpha = 0.1;
+    const radius = Math.min(3, bar.width / 2, bar.height / 2);
     context.beginPath();
-    context.moveTo(points[0].x, plot.top + plotHeight);
-    points.forEach((point) => context.lineTo(point.x, point.y));
-    context.lineTo(points[points.length - 1].x, plot.top + plotHeight);
-    context.closePath();
+    if (context.roundRect) {
+      context.roundRect(bar.x, bar.y, bar.width, bar.height, radius);
+    } else {
+      context.rect(bar.x, bar.y, bar.width, bar.height);
+    }
     context.fill();
-    context.restore();
+  };
+
+  const drawSeriesBars = (context, groups) => {
+    groups.forEach((group) => {
+      group.bars.forEach((bar) => {
+        context.fillStyle = bar.color;
+        drawRoundedBar(context, bar);
+      });
+    });
   };
 
   const drawChart = (container) => {
@@ -246,7 +256,7 @@ defmodule SquidSonarWeb.Assets do
     const styles = getComputedStyle(shell);
     const textColor = styles.getPropertyValue("--squid-sonar-muted").trim() || "#675f72";
     const gridColor = styles.getPropertyValue("--squid-sonar-border").trim() || "#ddd7e5";
-    const plot = { left: 10, top: 10, right: 10, bottom: 26 };
+    const plot = { left: 12, top: 10, right: 12, bottom: 26 };
     const plotWidth = width - plot.left - plot.right;
     const plotHeight = height - plot.top - plot.bottom;
     const maxValue = niceChartMax(chartMax(series));
@@ -271,24 +281,16 @@ defmodule SquidSonarWeb.Assets do
 
     context.textBaseline = "alphabetic";
     labels.forEach((label, index) => {
-      if (index !== 0 && index !== labels.length - 1) return;
+      if (labels.length > 4 && index % 2 !== 0 && index !== labels.length - 1) return;
 
-      const x = plot.left + (plotWidth / Math.max(1, labels.length - 1)) * index;
-      context.fillText(label, Math.min(x, width - plot.right - 42), height - 8);
+      const x = plot.left + (plotWidth / Math.max(1, labels.length)) * (index + 0.5);
+      context.textAlign = index === labels.length - 1 ? "right" : "center";
+      context.fillText(label, Math.min(x, width - plot.right), height - 8);
     });
 
-    series.forEach((item, seriesIndex) => {
-      const color = chartColor(item.label, seriesIndex, styles);
-      const linePoints = chartPoints(labels, item.values || [], plot, plotWidth, plotHeight, maxValue);
-
-      if (seriesIndex === 0 && data.kind === "area") {
-        fillSeriesArea(context, linePoints, plot, plotHeight, color);
-      }
-
-      drawSeriesLine(context, linePoints, color, seriesIndex === 0 ? 2 : 1.5);
-
-      if (seriesIndex === 0) points.push(...linePoints);
-    });
+    const bars = chartBars(labels, series, plot, plotWidth, plotHeight, maxValue, styles);
+    drawSeriesBars(context, bars);
+    points.push(...bars);
 
     container.__squidSonarChart = { data, points, styles };
   };

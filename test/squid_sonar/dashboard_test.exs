@@ -65,7 +65,7 @@ defmodule SquidSonar.DashboardTest do
 
     dashboard = Dashboard.load(client: FakeSquidMeshClient, loaded_at: @loaded_at)
 
-    assert dashboard.charts.activity.kind == :area
+    assert dashboard.charts.activity.kind == :bar
     assert dashboard.charts.activity.summary == %{value: 4, label: "runs in 7 days"}
 
     assert dashboard.charts.activity.labels == [
@@ -83,7 +83,7 @@ defmodule SquidSonar.DashboardTest do
              %{label: "Failed", values: [0, 0, 0, 0, 0, 1, 0]}
            ]
 
-    assert dashboard.charts.latency.kind == :line
+    assert dashboard.charts.latency.kind == :bar
     assert dashboard.charts.latency.summary == %{value: 180, label: "p95 runtime"}
     assert dashboard.charts.latency.labels == dashboard.charts.activity.labels
 

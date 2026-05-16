@@ -112,7 +112,7 @@ defmodule SquidSonar.Dashboard do
     %{
       activity: %{
         title: "Run activity",
-        kind: :area,
+        kind: :bar,
         unit: :count,
         labels: labels,
         summary: activity_summary(runs, dates),
@@ -120,7 +120,7 @@ defmodule SquidSonar.Dashboard do
       },
       latency: %{
         title: "Runtime latency",
-        kind: :line,
+        kind: :bar,
         unit: :seconds,
         labels: labels,
         summary: latency_summary(runs, dates),

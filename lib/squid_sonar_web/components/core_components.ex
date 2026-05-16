@@ -137,17 +137,20 @@ defmodule SquidSonarWeb.CoreComponents do
   end
 
   attr :charts, :map, required: true
+  attr :active_chart, :atom, default: :activity
 
   def dashboard_charts(assigns) do
+    assigns = assign(assigns, :chart, Map.fetch!(assigns.charts, assigns.active_chart))
+
     ~H"""
     <section class="squid-sonar-charts" aria-label="Operational charts">
-      <.chart_panel chart={@charts.activity} id="squid-sonar-activity-chart" />
-      <.chart_panel chart={@charts.latency} id="squid-sonar-latency-chart" />
+      <.chart_panel chart={@chart} active_chart={@active_chart} id="squid-sonar-dashboard-chart" />
     </section>
     """
   end
 
   attr :chart, :map, required: true
+  attr :active_chart, :atom, required: true
   attr :id, :string, required: true
 
   def chart_panel(assigns) do
@@ -166,11 +169,31 @@ defmodule SquidSonarWeb.CoreComponents do
             <span>{format_chart_summary_label(@chart.summary)}</span>
           </p>
         </div>
-        <div class="squid-sonar-chart-legend" aria-hidden="true">
-          <span :for={series <- @chart.series}>
-            <i></i>
-            {series.label}
-          </span>
+        <div class="squid-sonar-chart-actions">
+          <div class="squid-sonar-chart-switcher" aria-label="Chart metric">
+            <button
+              type="button"
+              class={[@active_chart == :activity && "is-active"]}
+              phx-click="set_chart"
+              phx-value-chart="activity"
+            >
+              Runs
+            </button>
+            <button
+              type="button"
+              class={[@active_chart == :latency && "is-active"]}
+              phx-click="set_chart"
+              phx-value-chart="latency"
+            >
+              Latency
+            </button>
+          </div>
+          <div class="squid-sonar-chart-legend" aria-hidden="true">
+            <span :for={series <- @chart.series}>
+              <i></i>
+              {series.label}
+            </span>
+          </div>
         </div>
       </div>
       <canvas aria-label={@chart.title} role="img"></canvas>
