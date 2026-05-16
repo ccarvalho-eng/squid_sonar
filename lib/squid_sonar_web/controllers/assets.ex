@@ -167,14 +167,14 @@ defmodule SquidSonarWeb.Assets do
 
   const chartBars = (labels, series, plot, plotWidth, plotHeight, maxValue, styles) => {
     const groupWidth = plotWidth / Math.max(1, labels.length);
-    const groupGap = Math.min(22, groupWidth * 0.46);
+    const groupGap = Math.min(18, groupWidth * 0.36);
     const innerWidth = Math.max(4, groupWidth - groupGap);
-    const barGap = series.length > 1 ? Math.min(5, innerWidth * 0.14) : 0;
+    const barGap = series.length > 1 ? Math.min(4, innerWidth * 0.12) : 0;
     const availableBarWidth =
       (innerWidth - barGap * Math.max(0, series.length - 1)) / series.length;
     const barWidth = Math.max(
       3,
-      Math.min(series.length > 1 ? 10 : 14, availableBarWidth)
+      Math.min(series.length > 1 ? 14 : 18, availableBarWidth)
     );
     const barsWidth = barWidth * series.length + barGap * Math.max(0, series.length - 1);
 
