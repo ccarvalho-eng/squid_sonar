@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="350" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
+  <img width="400" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
   <h2>An embeddable runtime dashboard for Squid Mesh.</h2>
 
