@@ -4,8 +4,8 @@
   <img width="400" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
   <p>
-    <a href="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml">
-      <img alt="CI" src="https://github.com/ccarvalho-eng/squid_sonar/actions/workflows/ci.yml/badge.svg" />
+    <a href="https://github.com/dark-trench/squid_sonar/actions/workflows/ci.yml">
+      <img alt="CI" src="https://github.com/dark-trench/squid_sonar/actions/workflows/ci.yml/badge.svg" />
     </a>
     <a href="https://hex.pm/packages/squid_sonar">
       <img alt="Hex" src="https://img.shields.io/hexpm/v/squid_sonar" />
@@ -19,7 +19,7 @@
     <a href="https://discord.com/channels/1323353012235796550/1504122798027571331">
       <img alt="Discord" src="https://img.shields.io/badge/Discord-Join_Channel-5865F2?logo=discord&logoColor=white" />
     </a>
-    <a href="https://github.com/ccarvalho-eng/squid_sonar/blob/main/LICENSE">
+    <a href="https://github.com/dark-trench/squid_sonar/blob/main/LICENSE">
       <img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" />
     </a>
   </p>

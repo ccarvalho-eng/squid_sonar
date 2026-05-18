@@ -9,8 +9,8 @@ defmodule SquidSonar.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       description: description(),
-      source_url: "https://github.com/ccarvalho-eng/squid_sonar",
-      homepage_url: "https://github.com/ccarvalho-eng/squid_sonar",
+      source_url: "https://github.com/dark-trench/squid_sonar",
+      homepage_url: "https://github.com/dark-trench/squid_sonar",
       package: package(),
       docs: docs(),
       test_coverage: [tool: ExCoveralls],
@@ -50,7 +50,7 @@ defmodule SquidSonar.MixProject do
       name: "squid_sonar",
       maintainers: ["Cristiano Carvalho"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/ccarvalho-eng/squid_sonar"},
+      links: %{"GitHub" => "https://github.com/dark-trench/squid_sonar"},
       files: ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* LICENSE* CONTRIBUTING*)
     ]
   end
