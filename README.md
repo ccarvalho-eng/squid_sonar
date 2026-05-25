@@ -68,7 +68,7 @@ Add SquidSonar to the host application's dependencies:
 ```elixir
 def deps do
   [
-    {:squid_sonar, "~> 0.1.0"}
+    {:squid_sonar, "~> 0.1.4"}
   ]
 end
 ```

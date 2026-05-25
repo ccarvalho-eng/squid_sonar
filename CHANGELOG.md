@@ -2,6 +2,13 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.4 - 2026-05-24
+
+- Aligned the example app seed with the journal-backed runtime so the seeded
+  demo shows completed, failed, retrying, and paused runs.
+- Kept the release focused on the journal runtime contract and example
+  coverage.
+
 ## 0.1.3 - 2026-05-16
 
 - Refined status badge styling with rectangular labels.
