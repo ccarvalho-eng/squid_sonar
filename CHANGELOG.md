@@ -2,6 +2,14 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.6 - 2026-05-25
+
+- Added regression coverage for Discord notification payload formatting.
+- Fixed Discord notification workflow output so multiline messages use real
+  newlines instead of escaped newline text.
+- Moved README community links into a dedicated Community section.
+- Updated install snippets to reference `0.1.6`.
+
 ## 0.1.5 - 2026-05-24
 
 - Added the journal-aware workflow graph header status and shared read-model
