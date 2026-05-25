@@ -1,0 +1,111 @@
+defmodule SquidSonar.ReadModelFixtures do
+  alias SquidMesh.ReadModel.Explanation.Diagnostic
+  alias SquidMesh.ReadModel.Inspection.Snapshot
+  alias SquidMesh.Runs.GraphInspection
+  alias SquidMesh.Runs.GraphInspection.Edge
+  alias SquidMesh.Runs.GraphInspection.Node
+
+  def snapshot(status, attrs) do
+    workflow = Keyword.fetch!(attrs, :workflow)
+
+    %Snapshot{
+      run_id: Keyword.get(attrs, :run_id, "run-#{status}"),
+      workflow: workflow,
+      trigger: "manual",
+      input: Keyword.get(attrs, :input, %{"order_id" => "order-1"}),
+      context: Keyword.get(attrs, :context, %{"attempted" => true}),
+      queue: Keyword.get(attrs, :queue, "default"),
+      status: status,
+      reason: Keyword.get(attrs, :reason, :attempt_visible),
+      terminal?: Keyword.get(attrs, :terminal?, status in [:completed, :failed, :cancelled]),
+      terminal_status:
+        Keyword.get(attrs, :terminal_status, if(status == :completed, do: :completed, else: nil)),
+      thread_revisions: Keyword.get(attrs, :thread_revisions, %{run: 3, dispatch: 4}),
+      planned_runnables: Keyword.get(attrs, :planned_runnables, []),
+      planned_runnable_keys: Keyword.get(attrs, :planned_runnable_keys, []),
+      applied_runnable_keys: Keyword.get(attrs, :applied_runnable_keys, []),
+      pending_dispatches: Keyword.get(attrs, :pending_dispatches, []),
+      pending_results: Keyword.get(attrs, :pending_results, []),
+      visible_attempts: Keyword.get(attrs, :visible_attempts, []),
+      scheduled_attempts: Keyword.get(attrs, :scheduled_attempts, []),
+      next_visible_at: Keyword.get(attrs, :next_visible_at),
+      expired_claims: Keyword.get(attrs, :expired_claims, []),
+      attempts: Keyword.get(attrs, :attempts, []),
+      anomalies: Keyword.get(attrs, :anomalies, [])
+    }
+  end
+
+  def diagnostic(status, attrs) do
+    workflow = Keyword.fetch!(attrs, :workflow)
+
+    %Diagnostic{
+      run_id: Keyword.get(attrs, :run_id, "run-#{status}"),
+      workflow: workflow,
+      queue: "default",
+      status: status,
+      reason: Keyword.get(attrs, :reason, :attempt_visible),
+      step: Keyword.get(attrs, :step),
+      summary: Keyword.get(attrs, :summary, "summary"),
+      details: Keyword.get(attrs, :details, %{}),
+      next_actions: Keyword.get(attrs, :next_actions, []),
+      evidence: Keyword.get(attrs, :evidence, %{})
+    }
+  end
+
+  def graph_inspection(status, attrs) do
+    workflow = Keyword.fetch!(attrs, :workflow)
+
+    %GraphInspection{
+      run_id: Keyword.get(attrs, :run_id, "run-#{status}"),
+      workflow: workflow,
+      source: :read_model,
+      status: status,
+      current_node_id: Keyword.get(attrs, :current_node_id),
+      current_node_ids: List.wrap(Keyword.get(attrs, :current_node_id)),
+      terminal?: Keyword.get(attrs, :terminal?, status in [:completed, :failed, :cancelled]),
+      nodes: Keyword.get(attrs, :nodes, []),
+      edges: Keyword.get(attrs, :edges, []),
+      anomalies: []
+    }
+  end
+
+  def graph_node(id, status, current?) do
+    %Node{
+      id: id,
+      status: status,
+      current?: current?,
+      input: nil,
+      output: nil,
+      error: nil,
+      recovery: nil,
+      transition: nil,
+      manual_state: nil,
+      attempts: []
+    }
+  end
+
+  def graph_edge(from, to, outcome) do
+    %Edge{
+      id: "#{from}:#{outcome}:#{to}",
+      from: from,
+      to: to,
+      type: edge_type(outcome),
+      status: :pending,
+      outcome: outcome,
+      condition: nil,
+      recovery: nil
+    }
+  end
+
+  def edge_type(:ready), do: :dependency
+  def edge_type(_outcome), do: :transition
+
+  def attempt(step, status, attempt_number, error) do
+    %{
+      step: step,
+      status: status,
+      attempt_number: attempt_number,
+      error: error
+    }
+  end
+end

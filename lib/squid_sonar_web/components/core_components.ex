@@ -345,6 +345,7 @@ defmodule SquidSonarWeb.CoreComponents do
                 <div class="squid-sonar-workflow-graph-heading-title">
                   <strong>{graph_mode_title(@detail.workflow_graph.mode)}</strong>
                   <.graph_mode_badge mode={@detail.workflow_graph.mode} />
+                  <.status_badge status={@detail.summary.status} />
                 </div>
                 <span>
                   {format_workflow(@detail.summary.workflow)} · {format_value(@detail.summary.queue)}
