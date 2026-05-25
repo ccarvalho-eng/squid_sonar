@@ -10,12 +10,13 @@ defmodule Mix.Tasks.Example.Seed do
   @impl Mix.Task
   def run(_args) do
     Mix.Task.run("app.start")
+    reset_example_state!()
 
     run_ids =
       scenarios()
       |> Enum.flat_map(&start_scenario/1)
 
-    Process.sleep(250)
+    drain_runtime(run_ids, 12)
 
     runs =
       Enum.map(run_ids, fn run_id ->
@@ -61,10 +62,60 @@ defmodule Mix.Tasks.Example.Seed do
     end
   end
 
+  defp reset_example_state! do
+    {:ok, _result} =
+      SquidSonarExample.Repo.query("""
+      TRUNCATE squid_mesh_journal_entries,
+               squid_mesh_journal_checkpoints,
+               squid_mesh_journal_threads
+      RESTART IDENTITY CASCADE
+      """)
+  end
+
+  defp drain_runtime(_run_ids, 0), do: :ok
+
+  defp drain_runtime(run_ids, attempts_remaining) when attempts_remaining > 0 do
+    runs = inspect_runs(run_ids)
+
+    if Enum.all?(runs, &settled_status?/1) do
+      :ok
+    else
+      case SquidMesh.execute_next(owner_id: "squid-sonar-example-seed") do
+        {:ok, :none} ->
+          Process.sleep(50)
+          drain_runtime(run_ids, attempts_remaining - 1)
+
+        {:ok, _snapshot} ->
+          drain_runtime(run_ids, attempts_remaining - 1)
+
+        {:error, reason} ->
+          raise "example seed runtime drain failed: #{inspect(reason)}"
+      end
+    end
+  end
+
+  defp inspect_runs(run_ids) do
+    Enum.map(run_ids, fn run_id ->
+      {:ok, run} = SquidMesh.inspect_run(run_id)
+      run
+    end)
+  end
+
+  defp settled_status?(%{status: status})
+       when status in [:completed, :failed, :retrying, :paused],
+       do: true
+
+  defp settled_status?(_run), do: false
+
   defp format_runs(runs) do
     runs
     |> Enum.map_join("\n", fn run ->
-      "  * #{inspect(run.workflow)} #{run.status} queue=#{inspect(run.queue)} reason=#{inspect(run.reason)} planned=#{length(run.planned_runnable_keys)}"
+      "  * #{inspect(run.workflow)} #{display_status(run)} queue=#{inspect(run.queue)} reason=#{inspect(run.reason)} planned=#{length(run.planned_runnable_keys)}"
     end)
   end
+
+  defp display_status(%{status: :running, reason: :attempt_scheduled_for_later}),
+    do: :retrying
+
+  defp display_status(%{status: status}), do: status
 end
