@@ -13,12 +13,6 @@
     <a href="https://hexdocs.pm/squid_sonar">
       <img alt="HexDocs" src="https://img.shields.io/badge/docs-hexdocs-purple" />
     </a>
-    <a href="https://elixirforum.com/t/squid-mesh-workflow-automation-runtime-for-elixir-applications/75162">
-      <img alt="Elixir Forum" src="https://img.shields.io/badge/Forum-Discuss-4B275F?logo=elixir&logoColor=white" />
-    </a>
-    <a href="https://discord.com/channels/1323353012235796550/1504122798027571331">
-      <img alt="Discord" src="https://img.shields.io/badge/Discord-Join_Channel-5865F2?logo=discord&logoColor=white" />
-    </a>
     <a href="https://github.com/dark-trench/squid_sonar/blob/main/LICENSE">
       <img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" />
     </a>
@@ -149,6 +143,15 @@ Open `http://localhost:4010/sonar` after the server starts.
   state into a display graph.
 - `SquidSonarWeb.*` contains the embedded LiveViews, components, layout, hooks,
   and asset controller.
+
+## Community
+
+Use the [Squid Mesh Elixir Forum thread](https://elixirforum.com/t/squid-mesh-workflow-automation-runtime-for-elixir-applications/75162)
+for public discussion and design context around the runtime and dashboard. Use
+[GitHub issues](https://github.com/dark-trench/squid_sonar/issues) for
+dashboard bugs, feature requests, and release-tracked work. For informal
+runtime and Jido-adjacent chat, use the
+[Squid Mesh channel on the Jido Discord](https://discord.com/channels/1323353012235796550/1504122798027571331).
 
 ## License
 
