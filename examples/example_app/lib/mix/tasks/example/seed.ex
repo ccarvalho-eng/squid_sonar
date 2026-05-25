@@ -72,7 +72,15 @@ defmodule Mix.Tasks.Example.Seed do
       """)
   end
 
-  defp drain_runtime(_run_ids, 0), do: :ok
+  defp drain_runtime(run_ids, 0) do
+    runs = inspect_runs(run_ids)
+
+    if Enum.all?(runs, &settled_status?/1) do
+      :ok
+    else
+      raise "example seed runtime drain exhausted: unsettled runs: #{inspect(runs)}"
+    end
+  end
 
   defp drain_runtime(run_ids, attempts_remaining) when attempts_remaining > 0 do
     runs = inspect_runs(run_ids)
