@@ -31,8 +31,8 @@ runs, filter by status, search runtime metadata, and open detail pages that show
 the workflow graph, diagnosis, attempt counts, history counts, and last error
 information.
 
-<img width="1674" height="956" alt="Screenshot 2026-05-16 at 06 27 27" src="https://github.com/user-attachments/assets/9fa49925-f129-4f9c-bfce-968fe372a6f7" />
-<img width="1675" height="954" alt="Screenshot 2026-05-16 at 06 27 50" src="https://github.com/user-attachments/assets/8a0e93b9-2f01-4bc3-a972-4a5bfdbc741a" />
+<img width="1377" height="593" alt="Screenshot 2026-05-24 at 22 17 34" src="https://github.com/user-attachments/assets/abad53f5-7155-44c6-b7ed-e9388b9e8e1c" />
+<img width="1319" height="919" alt="Screenshot 2026-05-24 at 22 17 45" src="https://github.com/user-attachments/assets/f27fdea9-74c9-4683-9c37-3939816d4b1e" />
 
 ## Current Shape
 
