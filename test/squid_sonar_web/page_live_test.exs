@@ -4,7 +4,7 @@ defmodule SquidSonarWeb.PageLiveTest do
   import Phoenix.LiveViewTest
 
   alias Phoenix.LiveView.Socket
-  alias SquidMesh.Run
+  alias SquidMesh.ReadModel.Listing.Summary
   alias SquidSonar.FakeSquidMeshClient
   alias SquidSonarWeb.PageLive
 
@@ -25,10 +25,10 @@ defmodule SquidSonarWeb.PageLiveTest do
     FakeSquidMeshClient.put_list_runs(
       {:ok,
        [
-         run(:completed, :completed_checkout, nil),
-         run(:failed, :failing_checkout, :fail_payment),
-         run(:retrying, :retrying_checkout, :retry_once),
-         run(:paused, :manual_review_checkout, :wait_for_review)
+         summary(:completed, "completed_checkout", "default"),
+         summary(:failed, "failing_checkout", "error-queue"),
+         summary(:retrying, "retrying_checkout", "retry-queue"),
+         summary(:paused, "manual_review_checkout", "approval-queue")
        ]}
     )
 
@@ -53,8 +53,8 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "Recent runs"
     assert html =~ "completed_checkout"
     assert html =~ "failing_checkout"
-    assert html =~ "retry_once"
-    assert html =~ "wait_for_review"
+    assert html =~ "retry-queue"
+    assert html =~ "approval-queue"
   end
 
   test "renders an empty state when no runs are available" do
@@ -78,8 +78,8 @@ defmodule SquidSonarWeb.PageLiveTest do
     FakeSquidMeshClient.put_list_runs(
       {:ok,
        [
-         run(:completed, :completed_checkout, nil),
-         run(:failed, :failing_checkout, :fail_payment)
+         summary(:completed, "completed_checkout", "default"),
+         summary(:failed, "failing_checkout", "error-queue")
        ]}
     )
 
@@ -100,15 +100,9 @@ defmodule SquidSonarWeb.PageLiveTest do
   test "paginates runs through the dashboard boundary" do
     runs =
       for index <- 1..12 do
-        %Run{
-          id: "run-#{index}",
-          workflow: SquidSonarExampleWorkflow,
-          trigger: :manual,
-          status: :failed,
-          current_step: :fail_payment,
-          inserted_at: ~U[2026-05-15 10:00:00Z],
-          updated_at: DateTime.add(~U[2026-05-15 10:00:00Z], index, :second)
-        }
+        summary(:failed, "run-#{index}", "error-queue",
+          indexed_at: DateTime.add(~U[2026-05-15 10:00:00Z], index, :second)
+        )
       end
 
     FakeSquidMeshClient.put_list_runs({:ok, runs})
@@ -127,7 +121,9 @@ defmodule SquidSonarWeb.PageLiveTest do
   end
 
   test "sets dashboard theme without reloading run data" do
-    FakeSquidMeshClient.put_list_runs({:ok, [run(:failed, :failing_checkout, :fail_payment)]})
+    FakeSquidMeshClient.put_list_runs(
+      {:ok, [summary(:failed, "failing_checkout", "error-queue")]}
+    )
 
     {:ok, socket} = PageLive.mount(%{}, %{}, %Socket{})
     {:noreply, socket} = PageLive.handle_event("set_theme", %{"theme" => "dark"}, socket)
@@ -149,15 +145,17 @@ defmodule SquidSonarWeb.PageLiveTest do
     |> rendered_to_string()
   end
 
-  defp run(status, trigger, current_step) do
-    %Run{
-      id: "#{trigger}-run",
-      workflow: SquidSonarExampleWorkflow,
-      trigger: trigger,
+  defp summary(status, workflow_name, queue, attrs \\ []) do
+    %Summary{
+      run_id: "#{workflow_name}-run",
+      workflow: workflow_name,
+      queue: queue,
       status: status,
-      current_step: current_step,
-      inserted_at: ~U[2026-05-15 10:00:00Z],
-      updated_at: ~U[2026-05-15 10:01:00Z]
+      terminal?: Keyword.get(attrs, :terminal?, status in [:completed, :failed, :cancelled]),
+      terminal_status: Keyword.get(attrs, :terminal_status, status),
+      indexed_at: Keyword.get(attrs, :indexed_at, ~U[2026-05-15 10:00:00Z]),
+      thread_revision: Keyword.get(attrs, :thread_revision, 7),
+      anomalies: []
     }
   end
 end

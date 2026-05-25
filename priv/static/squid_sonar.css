@@ -733,6 +733,28 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   color: var(--squid-sonar-running);
 }
 
+.squid-sonar-graph-mode-badge {
+  margin-left: auto;
+}
+
+.squid-sonar-graph-mode-badge-transition {
+  background: var(--squid-sonar-running-muted);
+  border-color: var(--squid-sonar-running);
+  color: var(--squid-sonar-running);
+}
+
+.squid-sonar-graph-mode-badge-dependency {
+  background: var(--squid-sonar-warning-muted);
+  border-color: var(--squid-sonar-warning);
+  color: var(--squid-sonar-warning);
+}
+
+.squid-sonar-graph-mode-badge-history {
+  background: var(--squid-sonar-surface);
+  border-color: var(--squid-sonar-border-strong);
+  color: var(--squid-sonar-muted);
+}
+
 .squid-sonar-pagination {
   align-items: center;
   border-top: 1px solid var(--squid-sonar-border);
@@ -958,9 +980,20 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: flex-start;
   color: var(--squid-sonar-text);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-bottom: 22px;
   min-width: max-content;
+}
+
+.squid-sonar-workflow-graph-heading-copy {
+  min-width: 0;
+}
+
+.squid-sonar-workflow-graph-heading-title {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .squid-sonar-workflow-graph-heading strong,
@@ -978,6 +1011,38 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   font-size: 12px;
   font-weight: 600;
   margin-top: 4px;
+}
+
+.squid-sonar-workflow-graph-evidence {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.squid-sonar-workflow-graph-evidence-item {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.squid-sonar-workflow-graph-evidence-item span {
+  color: var(--squid-sonar-muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.squid-sonar-workflow-graph-evidence-item strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
 }
 
 .squid-sonar-workflow-stage {
@@ -1187,6 +1252,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   .squid-sonar-detail-columns > .squid-sonar-detail-panel {
     height: auto;
   }
+
+  .squid-sonar-workflow-graph-evidence {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -1231,5 +1300,9 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
   .squid-sonar-detail-header {
     flex-direction: column;
+  }
+
+  .squid-sonar-workflow-graph-evidence {
+    grid-template-columns: 1fr;
   }
 }

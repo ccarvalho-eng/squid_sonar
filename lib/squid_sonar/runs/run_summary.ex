@@ -3,39 +3,42 @@ defmodule SquidSonar.Runs.RunSummary do
   Compact run projection for list and dashboard views.
   """
 
-  alias SquidMesh.Run
+  alias SquidMesh.ReadModel.Listing.Summary
 
   @type t :: %__MODULE__{
-          id: term(),
-          workflow: module() | String.t() | nil,
-          trigger: atom() | String.t() | nil,
+          id: String.t(),
+          workflow: String.t() | module() | nil,
+          queue: String.t(),
           status: atom() | nil,
-          current_step: atom() | String.t() | nil,
-          inserted_at: DateTime.t() | NaiveDateTime.t() | nil,
-          updated_at: DateTime.t() | NaiveDateTime.t() | nil
+          terminal_status: atom() | nil,
+          indexed_at: DateTime.t() | NaiveDateTime.t() | nil,
+          thread_revision: non_neg_integer() | nil,
+          anomalies: [map()]
         }
 
   defstruct [
     :id,
     :workflow,
-    :trigger,
+    :queue,
     :status,
-    :current_step,
-    :inserted_at,
-    :updated_at
+    :terminal_status,
+    :indexed_at,
+    :thread_revision,
+    anomalies: []
   ]
 
   @doc false
-  @spec from_run(Run.t()) :: t()
-  def from_run(%Run{} = run) do
+  @spec from_summary(Summary.t()) :: t()
+  def from_summary(%Summary{} = summary) do
     %__MODULE__{
-      id: run.id,
-      workflow: run.workflow,
-      trigger: run.trigger,
-      status: run.status,
-      current_step: run.current_step,
-      inserted_at: run.inserted_at,
-      updated_at: run.updated_at
+      id: summary.run_id,
+      workflow: summary.workflow,
+      queue: summary.queue,
+      status: summary.status,
+      terminal_status: summary.terminal_status,
+      indexed_at: summary.indexed_at,
+      thread_revision: summary.thread_revision,
+      anomalies: List.wrap(summary.anomalies)
     }
   end
 end

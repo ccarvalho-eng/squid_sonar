@@ -1,7 +1,7 @@
 defmodule SquidSonar.DashboardTest do
   use ExUnit.Case, async: true
 
-  alias SquidMesh.Run
+  alias SquidMesh.ReadModel.Listing.Summary
   alias SquidSonar.Dashboard
   alias SquidSonar.FakeSquidMeshClient
 
@@ -11,12 +11,12 @@ defmodule SquidSonar.DashboardTest do
     FakeSquidMeshClient.put_list_runs(
       {:ok,
        [
-         run(:completed),
-         run(:failed),
-         run(:failed),
-         run(:retrying),
-         run(:paused),
-         run(:running)
+         summary(:completed),
+         summary(:failed),
+         summary(:failed),
+         summary(:retrying),
+         summary(:paused),
+         summary(:running)
        ]}
     )
 
@@ -38,10 +38,10 @@ defmodule SquidSonar.DashboardTest do
     FakeSquidMeshClient.put_list_runs(
       {:ok,
        [
-         run(:completed, updated_at: ~U[2026-05-15 10:00:00Z]),
-         run(:failed, id: "failed-old", updated_at: ~U[2026-05-15 10:01:00Z]),
-         run(:failed, id: "failed-new", updated_at: ~U[2026-05-15 10:03:00Z]),
-         run(:running, updated_at: ~U[2026-05-15 10:02:00Z])
+         summary(:completed, indexed_at: ~U[2026-05-15 10:00:00Z]),
+         summary(:failed, run_id: "failed-old", indexed_at: ~U[2026-05-15 10:01:00Z]),
+         summary(:failed, run_id: "failed-new", indexed_at: ~U[2026-05-15 10:03:00Z]),
+         summary(:running, indexed_at: ~U[2026-05-15 10:02:00Z])
        ]}
     )
 
@@ -62,9 +62,9 @@ defmodule SquidSonar.DashboardTest do
   test "paginates filtered runs" do
     runs =
       for index <- 1..12 do
-        run(:failed,
-          id: "run-#{index}",
-          updated_at: DateTime.add(@loaded_at, index, :second)
+        summary(:failed,
+          run_id: "run-#{index}",
+          indexed_at: DateTime.add(@loaded_at, index, :second)
         )
       end
 
@@ -90,9 +90,9 @@ defmodule SquidSonar.DashboardTest do
     FakeSquidMeshClient.put_list_runs(
       {:ok,
        [
-         run(:completed),
-         run(:failed),
-         run(:running, current_step: :capture_payment)
+         summary(:completed),
+         summary(:failed),
+         summary(:running, queue: "capture-payment")
        ]}
     )
 
@@ -103,7 +103,7 @@ defmodule SquidSonar.DashboardTest do
         filters: %{"query" => "capture"}
       )
 
-    assert [%{status: :running, current_step: :capture_payment}] = dashboard.runs
+    assert [%{status: :running, queue: "capture-payment"}] = dashboard.runs
   end
 
   test "keeps error state at the dashboard boundary" do
@@ -116,15 +116,17 @@ defmodule SquidSonar.DashboardTest do
     assert dashboard.load_error == {:missing_config, [:repo]}
   end
 
-  defp run(status, attrs \\ []) do
-    %Run{
-      id: Keyword.get(attrs, :id, "#{status}-run"),
-      workflow: ExampleWorkflow,
-      trigger: Keyword.get(attrs, :trigger, :manual),
+  defp summary(status, attrs \\ []) do
+    %Summary{
+      run_id: Keyword.get(attrs, :run_id, "#{status}-run"),
+      workflow: Keyword.get(attrs, :workflow, "ExampleWorkflow"),
+      queue: Keyword.get(attrs, :queue, "default"),
       status: status,
-      current_step: Keyword.get(attrs, :current_step),
-      inserted_at: Keyword.get(attrs, :inserted_at, @loaded_at),
-      updated_at: Keyword.get(attrs, :updated_at, @loaded_at)
+      terminal?: Keyword.get(attrs, :terminal?, status in [:completed, :failed, :cancelled]),
+      terminal_status: Keyword.get(attrs, :terminal_status, status),
+      indexed_at: Keyword.get(attrs, :indexed_at, @loaded_at),
+      thread_revision: Keyword.get(attrs, :thread_revision, 7),
+      anomalies: Keyword.get(attrs, :anomalies, [])
     }
   end
 end
