@@ -75,7 +75,7 @@ defmodule SquidSonar.MixProject do
   end
 
   defp squid_mesh_dep do
-    {:squid_mesh, "~> 0.1.0-alpha.7"}
+    {:squid_mesh, "~> 0.1.0-beta.1"}
   end
 
   defp aliases do

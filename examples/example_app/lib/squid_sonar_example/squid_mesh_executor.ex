@@ -7,36 +7,6 @@ defmodule SquidSonarExample.SquidMeshExecutor do
   alias SquidMesh.Runtime.Runner
 
   @impl true
-  def enqueue_step(_config, run, step, opts) do
-    run
-    |> Payload.step(step)
-    |> enqueue_payload(opts)
-  end
-
-  @impl true
-  def enqueue_steps(_config, run, steps, opts) do
-    results =
-      Enum.map(steps, fn step ->
-        run
-        |> Payload.step(step)
-        |> enqueue_payload(opts)
-      end)
-
-    if Enum.all?(results, &match?({:ok, _metadata}, &1)) do
-      {:ok, Enum.map(results, fn {:ok, metadata} -> metadata end)}
-    else
-      {:error, {:enqueue_failed, results}}
-    end
-  end
-
-  @impl true
-  def enqueue_compensation(_config, run, opts) do
-    run
-    |> Payload.compensation()
-    |> enqueue_payload(opts)
-  end
-
-  @impl true
   def enqueue_cron(_config, workflow, trigger, opts) do
     workflow
     |> Payload.cron(trigger)
@@ -53,7 +23,7 @@ defmodule SquidSonarExample.SquidMeshExecutor do
       {:ok, pid} ->
         {:ok,
          %{
-           executor: __MODULE__,
+           adapter: __MODULE__,
            pid: inspect(pid),
            schedule_in: schedule_in
          }}

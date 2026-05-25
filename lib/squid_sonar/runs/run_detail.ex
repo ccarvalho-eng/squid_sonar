@@ -3,21 +3,61 @@ defmodule SquidSonar.Runs.RunDetail do
   Detailed run projection for the run detail view.
   """
 
-  alias SquidMesh.Run
-  alias SquidMesh.RunExplanation
-  alias SquidSonar.Runs.RunSummary
+  alias SquidMesh.ReadModel.Explanation.Diagnostic
+  alias SquidMesh.ReadModel.Inspection.Snapshot
+  alias SquidMesh.Runs.GraphInspection
   alias SquidSonar.Runs.WorkflowGraph
 
+  defmodule Summary do
+    @moduledoc false
+
+    @type t :: %__MODULE__{
+            id: String.t(),
+            workflow: String.t() | module() | nil,
+            queue: String.t(),
+            status: atom(),
+            current_step: String.t() | nil,
+            reason: atom(),
+            terminal?: boolean(),
+            terminal_status: atom() | nil,
+            thread_revisions: %{run: non_neg_integer(), dispatch: non_neg_integer()}
+          }
+
+    @enforce_keys [
+      :id,
+      :workflow,
+      :queue,
+      :status,
+      :current_step,
+      :reason,
+      :terminal?,
+      :terminal_status,
+      :thread_revisions
+    ]
+
+    defstruct [
+      :id,
+      :workflow,
+      :queue,
+      :status,
+      :current_step,
+      :reason,
+      :terminal?,
+      :terminal_status,
+      :thread_revisions
+    ]
+  end
+
   @type t :: %__MODULE__{
-          summary: RunSummary.t(),
+          summary: Summary.t(),
           payload: map() | nil,
-          context: map() | nil,
+          context: map(),
           last_error: map() | nil,
-          step_runs: [term()],
-          step_attempts: [map()],
-          audit_events: [term()],
+          planned_runnables: [map()],
+          attempts: [map()],
+          anomalies: [map()],
           workflow_graph: WorkflowGraph.t(),
-          explanation: RunExplanation.t()
+          explanation: Diagnostic.t()
         }
 
   defstruct [
@@ -27,73 +67,45 @@ defmodule SquidSonar.Runs.RunDetail do
     :last_error,
     :explanation,
     :workflow_graph,
-    step_attempts: [],
-    step_runs: [],
-    audit_events: []
+    planned_runnables: [],
+    attempts: [],
+    anomalies: []
   ]
 
   @doc false
-  @spec from_run(Run.t(), RunExplanation.t()) :: t()
-  def from_run(%Run{} = run, %RunExplanation{} = explanation) do
+  @spec from_models(Snapshot.t(), Diagnostic.t(), GraphInspection.t()) :: t()
+  def from_models(%Snapshot{} = snapshot, %Diagnostic{} = explanation, %GraphInspection{} = graph) do
     %__MODULE__{
-      summary: RunSummary.from_run(run),
-      payload: run.payload,
-      context: run.context,
-      last_error: run.last_error,
-      step_runs: List.wrap(run.step_runs),
-      step_attempts: step_attempts(run.step_runs),
-      audit_events: List.wrap(run.audit_events),
-      workflow_graph: WorkflowGraph.from_run(run, explanation),
+      summary: summary(snapshot, explanation, graph),
+      payload: snapshot.input,
+      context: snapshot.context,
+      last_error: latest_error(snapshot.attempts),
+      planned_runnables: List.wrap(snapshot.planned_runnables),
+      attempts: List.wrap(snapshot.attempts),
+      anomalies: List.wrap(snapshot.anomalies),
+      workflow_graph: WorkflowGraph.from_models(snapshot, graph),
       explanation: explanation
     }
   end
 
-  defp step_attempts(step_runs) do
-    step_runs
-    |> List.wrap()
-    |> Enum.flat_map(&attempt_summaries/1)
+  defp summary(%Snapshot{} = snapshot, %Diagnostic{} = explanation, %GraphInspection{} = graph) do
+    %Summary{
+      id: snapshot.run_id,
+      workflow: snapshot.workflow,
+      queue: snapshot.queue,
+      status: snapshot.status,
+      current_step: graph.current_node_id || explanation.step,
+      reason: snapshot.reason,
+      terminal?: snapshot.terminal?,
+      terminal_status: snapshot.terminal_status,
+      thread_revisions: snapshot.thread_revisions
+    }
   end
 
-  defp attempt_summaries(%{attempts: attempts} = step_run) do
+  defp latest_error(attempts) do
     attempts
     |> List.wrap()
-    |> Enum.map(&attempt_summary(step_run, &1))
+    |> Enum.reverse()
+    |> Enum.find_value(fn attempt -> Map.get(attempt, :error) end)
   end
-
-  defp attempt_summaries(_step_run), do: []
-
-  defp attempt_summary(%{step: step}, %{
-         attempt_number: attempt_number,
-         status: status,
-         error: error,
-         inserted_at: inserted_at,
-         updated_at: updated_at
-       }) do
-    %{
-      step: step,
-      attempt_number: attempt_number,
-      status: status,
-      error: error,
-      inserted_at: inserted_at,
-      updated_at: updated_at
-    }
-  end
-
-  defp attempt_summary(%{step: step}, attempt) do
-    %{
-      step: step,
-      attempt_number: attempt_field(attempt, :attempt_number),
-      status: attempt_field(attempt, :status),
-      error: attempt_field(attempt, :error),
-      inserted_at: attempt_field(attempt, :inserted_at),
-      updated_at: attempt_field(attempt, :updated_at)
-    }
-  end
-
-  defp attempt_field(%{attempt_number: value}, :attempt_number), do: value
-  defp attempt_field(%{status: value}, :status), do: value
-  defp attempt_field(%{error: value}, :error), do: value
-  defp attempt_field(%{inserted_at: value}, :inserted_at), do: value
-  defp attempt_field(%{updated_at: value}, :updated_at), do: value
-  defp attempt_field(_attempt, _field), do: nil
 end
