@@ -109,6 +109,8 @@ defmodule Mix.Tasks.Example.Seed do
     end)
   end
 
+  defp settled_status?(%{status: :running, reason: :attempt_scheduled_for_later}), do: true
+
   defp settled_status?(%{status: status})
        when status in [:completed, :failed, :retrying, :paused],
        do: true
