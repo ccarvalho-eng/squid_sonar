@@ -2,6 +2,14 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.5 - 2026-05-24
+
+- Added the journal-aware workflow graph header status and shared read-model
+  fixtures from the SquidSonar review pass.
+- Kept the example seed output focused on completed, failed, retrying, and
+  paused runs.
+- Removed stale lockfile entries so dependency checks stay green.
+
 ## 0.1.4 - 2026-05-24
 
 - Aligned the example app seed with the journal-backed runtime so the seeded
