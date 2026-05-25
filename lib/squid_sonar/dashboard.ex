@@ -141,7 +141,7 @@ defmodule SquidSonar.Dashboard do
     |> Enum.filter(fn run ->
       status_matches?(run, filters.status) and query_matches?(run, filters.query)
     end)
-    |> Enum.sort_by(&sort_value(&1.updated_at), {:desc, DateTime})
+    |> Enum.sort_by(&sort_value(&1.indexed_at), {:desc, DateTime})
   end
 
   defp status_matches?(_run, :all), do: true
@@ -156,7 +156,7 @@ defmodule SquidSonar.Dashboard do
   end
 
   defp searchable_text(run) do
-    [run.id, run.workflow, run.trigger, run.status, run.current_step]
+    [run.id, run.workflow, run.queue, run.status, run.terminal_status]
     |> Enum.map(&format_search_value/1)
     |> Enum.join(" ")
     |> String.downcase()

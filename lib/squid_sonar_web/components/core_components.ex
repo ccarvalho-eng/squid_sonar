@@ -15,6 +15,20 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  attr :mode, :atom, required: true
+
+  def graph_mode_badge(assigns) do
+    ~H"""
+    <span class={[
+      "squid-sonar-badge",
+      "squid-sonar-graph-mode-badge",
+      "squid-sonar-graph-mode-badge-#{@mode}"
+    ]}>
+      {graph_mode_label(@mode)}
+    </span>
+    """
+  end
+
   attr :status, :atom, required: true
   attr :count, :integer, required: true
   attr :active, :boolean, default: false
@@ -155,7 +169,7 @@ defmodule SquidSonarWeb.CoreComponents do
               type="search"
               name="filters[query]"
               value={@dashboard.filters.query}
-              placeholder="Workflow, trigger, step, run ID"
+              placeholder="Workflow, queue, status, run ID"
               phx-debounce="250"
             />
           </label>
@@ -193,10 +207,10 @@ defmodule SquidSonarWeb.CoreComponents do
         <thead>
           <tr>
             <th>Workflow</th>
-            <th>Trigger</th>
+            <th>Queue</th>
             <th>Status</th>
-            <th>Current step</th>
-            <th>Updated</th>
+            <th>Terminal</th>
+            <th>Indexed</th>
           </tr>
         </thead>
         <tbody>
@@ -209,10 +223,10 @@ defmodule SquidSonarWeb.CoreComponents do
                 </.link>
               </div>
             </td>
-            <td>{format_value(run.trigger)}</td>
+            <td>{format_value(run.queue)}</td>
             <td><.status_badge status={run.status} /></td>
-            <td>{format_step(run.current_step)}</td>
-            <td><.timestamp value={run.updated_at} /></td>
+            <td>{format_value(run.terminal_status)}</td>
+            <td><.timestamp value={run.indexed_at} /></td>
           </tr>
         </tbody>
       </table>
@@ -292,10 +306,13 @@ defmodule SquidSonarWeb.CoreComponents do
       </header>
 
       <div class="squid-sonar-detail-grid">
-        <.detail_item label="Trigger" value={format_value(@detail.summary.trigger)} />
+        <.detail_item label="Queue" value={format_value(@detail.summary.queue)} />
         <.detail_item label="Current step" value={format_step(@detail.summary.current_step)} />
-        <.detail_item label="Inserted" value={format_time(@detail.summary.inserted_at)} />
-        <.detail_item label="Updated" value={format_time(@detail.summary.updated_at)} />
+        <.detail_item label="Status" value={format_value(@detail.summary.status)} />
+        <.detail_item
+          label="Thread revisions"
+          value={"run=#{@detail.summary.thread_revisions.run} dispatch=#{@detail.summary.thread_revisions.dispatch}"}
+        />
       </div>
 
       <div class="squid-sonar-detail-columns">
@@ -307,10 +324,10 @@ defmodule SquidSonarWeb.CoreComponents do
         </section>
 
         <section class="squid-sonar-detail-panel">
-          <h3>History</h3>
-          <.detail_item label="Step records" value={length(@detail.step_runs)} />
-          <.detail_item label="Attempts" value={length(@detail.step_attempts)} />
-          <.detail_item label="Audit events" value={length(@detail.audit_events)} />
+          <h3>Journal evidence</h3>
+          <.detail_item label="Planned runnables" value={length(@detail.planned_runnables)} />
+          <.detail_item label="Attempts" value={length(@detail.attempts)} />
+          <.detail_item label="Anomalies" value={length(@detail.anomalies)} />
         </section>
       </div>
 
@@ -323,9 +340,34 @@ defmodule SquidSonarWeb.CoreComponents do
             <% layout = workflow_graph_layout(@detail.workflow_graph) %>
 
             <div class="squid-sonar-workflow-graph-heading">
-              <div>
-                <strong>{format_workflow(@detail.summary.workflow)}</strong>
-                <span>{format_value(@detail.summary.trigger)}</span>
+              <div class="squid-sonar-workflow-graph-heading-copy">
+                <span class="squid-sonar-section-label">Journal-backed runtime</span>
+                <div class="squid-sonar-workflow-graph-heading-title">
+                  <strong>{graph_mode_title(@detail.workflow_graph.mode)}</strong>
+                  <.graph_mode_badge mode={@detail.workflow_graph.mode} />
+                </div>
+                <span>
+                  {format_workflow(@detail.summary.workflow)} · {format_value(@detail.summary.queue)}
+                </span>
+              </div>
+            </div>
+
+            <div class="squid-sonar-workflow-graph-evidence">
+              <div class="squid-sonar-workflow-graph-evidence-item">
+                <span>Current step</span>
+                <strong>{format_step(@detail.summary.current_step)}</strong>
+              </div>
+              <div class="squid-sonar-workflow-graph-evidence-item">
+                <span>Last reason</span>
+                <strong>{explanation_reason(@detail.explanation)}</strong>
+              </div>
+              <div class="squid-sonar-workflow-graph-evidence-item">
+                <span>Next actions</span>
+                <strong>{next_actions(@detail.explanation)}</strong>
+              </div>
+              <div class="squid-sonar-workflow-graph-evidence-item">
+                <span>Attempts</span>
+                <strong>{length(@detail.attempts)}</strong>
               </div>
             </div>
 
@@ -498,4 +540,12 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_graph_status(:waiting), do: "waiting"
   defp format_graph_status(:pending), do: "pending"
   defp format_graph_status(status), do: format_value(status)
+
+  defp graph_mode_label(:transition), do: "Transition"
+  defp graph_mode_label(:dependency), do: "Dependency"
+  defp graph_mode_label(:history), do: "History"
+
+  defp graph_mode_title(:transition), do: "Transition graph"
+  defp graph_mode_title(:dependency), do: "Dependency graph"
+  defp graph_mode_title(:history), do: "History graph"
 end

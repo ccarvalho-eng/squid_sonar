@@ -52,8 +52,8 @@ defmodule Mix.Tasks.Example.Seed do
   defp start_scenario({workflow, trigger, payload}) do
     case SquidMesh.start_run(workflow, trigger, payload) do
       {:ok, run} ->
-        Mix.shell().info("* started #{inspect(workflow)} #{run.id}")
-        [run.id]
+        Mix.shell().info("* started #{inspect(workflow)} #{run.run_id}")
+        [run.run_id]
 
       {:error, reason} ->
         Mix.shell().error("* failed #{inspect(workflow)}: #{inspect(reason)}")
@@ -64,7 +64,7 @@ defmodule Mix.Tasks.Example.Seed do
   defp format_runs(runs) do
     runs
     |> Enum.map_join("\n", fn run ->
-      "  * #{inspect(run.workflow)} #{run.status} current_step=#{inspect(run.current_step)}"
+      "  * #{inspect(run.workflow)} #{run.status} queue=#{inspect(run.queue)} reason=#{inspect(run.reason)} planned=#{length(run.planned_runnable_keys)}"
     end)
   end
 end
