@@ -2,6 +2,16 @@
 
 All notable changes to SquidSonar will be documented in this file.
 
+## 0.1.7 - 2026-05-26
+
+- Clarified the README runtime boundary around SquidSonar's read-only Squid
+  Mesh API usage.
+- Documented that host applications still own workers, scheduling, delivery
+  backends, and lease or fencing adapters.
+- Removed stale `otp_app` router usage from README and module documentation
+  examples.
+- Updated package metadata and install snippets to reference `0.1.7`.
+
 ## 0.1.6 - 2026-05-25
 
 - Added regression coverage for Discord notification payload formatting.
