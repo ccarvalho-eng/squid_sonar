@@ -10,6 +10,7 @@ All notable changes to SquidSonar will be documented in this file.
   backends, and lease or fencing adapters.
 - Removed stale `otp_app` router usage from README and module documentation
   examples.
+- Aligned the README header format with the Squid Mesh package README.
 - Updated package metadata and install snippets to reference `0.1.7`.
 
 ## 0.1.6 - 2026-05-25

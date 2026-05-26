@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>SquidSonar</h1>
-  <p>Embeddable runtime dashboard for Squid Mesh</p>
+
+# SquidSonar — Embeddable runtime dashboard for Squid Mesh
 
   <img width="400" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
