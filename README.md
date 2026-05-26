@@ -1,5 +1,6 @@
 <div align="center">
-  <h2>SquidSonar—Embeddable runtime dashboard for Squid Mesh</h2>
+  <h1>SquidSonar</h1>
+  <p>Embeddable runtime dashboard for Squid Mesh</p>
 
   <img width="400" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
 
@@ -19,16 +20,17 @@
   </p>
 </div>
 
-SquidSonar adds a read-only Phoenix LiveView dashboard to applications that run
-Squid Mesh workflows. Mount it inside an existing Phoenix app to inspect recent
-runs, filter by status, search runtime metadata, and open detail pages that show
-the workflow graph, diagnosis, attempt counts, history counts, and last error
-information.
+SquidSonar is a read-only Phoenix LiveView dashboard for applications that run
+Squid Mesh workflows.
+
+Mount it inside a Phoenix host application to inspect recent runs, filter by
+status, search runtime metadata, and open detail pages with the workflow graph,
+diagnosis, attempt counts, history counts, and last error information.
 
 <img width="1377" height="593" alt="Screenshot 2026-05-24 at 22 17 34" src="https://github.com/user-attachments/assets/abad53f5-7155-44c6-b7ed-e9388b9e8e1c" />
 <img width="1319" height="919" alt="Screenshot 2026-05-24 at 22 17 45" src="https://github.com/user-attachments/assets/f27fdea9-74c9-4683-9c37-3939816d4b1e" />
 
-## Current Shape
+## Runtime Boundary
 
 SquidSonar is distributed as an embeddable library, not a standalone service. A
 host Phoenix application owns authentication, authorization, deployment,
@@ -36,7 +38,37 @@ endpoint configuration, and the Squid Mesh runtime. SquidSonar contributes the
 router macro, LiveViews, static assets, and a small read boundary over Squid
 Mesh public APIs.
 
-The current UI includes:
+SquidSonar reads from Squid Mesh through:
+
+- `SquidMesh.list_runs/2`
+- `SquidMesh.inspect_run/2`
+- `SquidMesh.inspect_run_graph/2`
+- `SquidMesh.explain_run/2`
+
+It does not start, cancel, replay, approve, reject, unblock, lease, or execute
+workflow work. Host applications still own workers, queue delivery, scheduler
+setup, and backend leasing or fencing. When a Squid Mesh host uses Bedrock or
+another delivery backend, that adapter remains part of the host application, not
+SquidSonar.
+
+```text
+Phoenix Host Application
+|
++-- Squid Mesh runtime
+|   +-- workers
+|   +-- scheduler and delivery backend
+|   +-- lease or fencing adapter when needed
+|
++-- SquidSonar
+    +-- router macro
+    +-- read-only LiveViews
+    +-- embedded assets
+    +-- Squid Mesh inspection API client
+```
+
+## Dashboard Surface
+
+The UI includes:
 
 - Recent workflow runs sorted by update time
 - Status counts and filters
@@ -86,7 +118,7 @@ defmodule MyAppWeb.Router do
   scope "/ops" do
     pipe_through [:browser, :require_authenticated_user]
 
-    squid_sonar "/sonar", otp_app: :my_app
+    squid_sonar "/sonar"
   end
 end
 ```
@@ -97,7 +129,6 @@ SquidSonar accepts a few route-level options:
 
 ```elixir
 squid_sonar "/sonar",
-  otp_app: :my_app,
   as: :runtime_sonar,
   socket_path: "/live",
   transport: "websocket"
@@ -107,15 +138,14 @@ squid_sonar "/sonar",
 
 ## Security
 
-SquidSonar intentionally does not ship its own authentication layer. Protect the
-mounted route with the same browser pipeline, session handling, and
-authorization rules used for the rest of the host application's operator
-surface.
+SquidSonar does not ship its own authentication layer. Protect the mounted route
+with the same browser pipeline, session handling, and authorization rules used
+for the rest of the host application's operator surface.
 
-The current dashboard is read-only. It displays runtime data returned by Squid
-Mesh, including workflow names, run IDs, step names, statuses, diagnostic
-signals, and selected error metadata. Treat the mounted dashboard as operational
-visibility and expose it only to trusted users.
+The dashboard is read-only, but it displays runtime data returned by Squid Mesh,
+including workflow names, run IDs, step names, statuses, diagnostic signals, and
+selected error metadata. Treat the mounted dashboard as operational visibility
+and expose it only to trusted users.
 
 ## Example App
 
@@ -147,10 +177,12 @@ Open `http://localhost:4010/sonar` after the server starts.
 ## Community
 
 Use the [Squid Mesh Elixir Forum thread](https://elixirforum.com/t/squid-mesh-workflow-automation-runtime-for-elixir-applications/75162)
-for public discussion and design context around the runtime and dashboard. Use
-[GitHub issues](https://github.com/dark-trench/squid_sonar/issues) for
-dashboard bugs, feature requests, and release-tracked work. For informal
-runtime and Jido-adjacent chat, use the
+for public discussion and design context around the runtime and dashboard.
+
+Use [GitHub issues](https://github.com/dark-trench/squid_sonar/issues) for
+dashboard bugs, feature requests, and release-tracked work.
+
+For informal runtime and Jido-adjacent chat, use the
 [Squid Mesh channel on the Jido Discord](https://discord.com/channels/1323353012235796550/1504122798027571331).
 
 ## License

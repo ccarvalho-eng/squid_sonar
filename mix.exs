@@ -42,7 +42,7 @@ defmodule SquidSonar.MixProject do
   defp elixirc_paths(_), do: ["lib"]
 
   defp description do
-    "Polished, embeddable runtime dashboard for Squid Mesh."
+    "Embeddable runtime dashboard for Squid Mesh."
   end
 
   defp package do
