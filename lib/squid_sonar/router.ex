@@ -25,7 +25,7 @@ defmodule SquidSonar.Router do
       scope "/" do
         pipe_through [:browser]
 
-        squid_sonar "/sonar", otp_app: :my_app
+        squid_sonar "/sonar"
       end
 
   Supported options:
