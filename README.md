@@ -38,15 +38,22 @@ endpoint configuration, and the Squid Mesh runtime. SquidSonar contributes the
 router macro, LiveViews, static assets, and a small read boundary over Squid
 Mesh public APIs.
 
-SquidSonar reads from Squid Mesh through:
+SquidSonar interacts with Squid Mesh through:
 
+### Read Operations
 - `SquidMesh.list_runs/2`
 - `SquidMesh.inspect_run/2`
 - `SquidMesh.inspect_run_graph/2`
 - `SquidMesh.explain_run/2`
 
-It does not start, cancel, replay, approve, reject, unblock, lease, or execute
-workflow work. Host applications still own workers, queue delivery, scheduler
+### Control Operations
+- `SquidMesh.cancel/2` - Cancel running workflows
+- `SquidMesh.resume/3` - Resume paused workflows
+- `SquidMesh.approve/3` - Approve manual approval steps
+- `SquidMesh.reject/3` - Reject manual approval steps
+- `SquidMesh.replay/2` - Replay completed workflows
+
+Host applications still own workers, queue delivery, scheduler
 setup, and backend leasing or fencing. When a Squid Mesh host uses Bedrock or
 another delivery backend, that adapter remains part of the host application, not
 SquidSonar.
@@ -131,10 +138,34 @@ SquidSonar accepts a few route-level options:
 squid_sonar "/sonar",
   as: :runtime_sonar,
   socket_path: "/live",
-  transport: "websocket"
+  transport: "websocket",
+  control_actor: {MyAppWeb.SquidSonarAudit, :control_actor, []}
 ```
 
 `transport` can be `"websocket"` or `"longpoll"`.
+
+`control_actor` is persisted with Squid Mesh manual actions such as resume,
+approve, and reject. It can be a non-empty string, a non-empty map, or an MFA
+tuple. MFA callbacks receive the current `Plug.Conn` as their first argument.
+Prefer a small audit map over a raw user struct:
+
+```elixir
+defmodule MyAppWeb.SquidSonarAudit do
+  def control_actor(conn) do
+    user = conn.assigns.current_user
+
+    %{
+      "type" => "user",
+      "id" => user.id,
+      "email" => user.email
+    }
+  end
+end
+```
+
+If omitted, SquidSonar uses a placeholder actor so local demos can exercise
+manual controls. Production mounts should pass the authenticated operator once
+the host app wires SquidSonar into its own auth pipeline.
 
 ## Security
 
@@ -142,16 +173,17 @@ SquidSonar does not ship its own authentication layer. Protect the mounted route
 with the same browser pipeline, session handling, and authorization rules used
 for the rest of the host application's operator surface.
 
-The dashboard is read-only, but it displays runtime data returned by Squid Mesh,
-including workflow names, run IDs, step names, statuses, diagnostic signals, and
-selected error metadata. Treat the mounted dashboard as operational visibility
+The dashboard can issue Squid Mesh control actions when a run exposes safe
+manual actions. It also displays runtime data returned by Squid Mesh, including
+workflow names, run IDs, step names, statuses, diagnostic signals, and selected
+error metadata. Treat the mounted dashboard as an operational control surface
 and expose it only to trusted users.
 
 ## Example App
 
 The repository includes a Phoenix example app at `examples/example_app`. It
 mounts SquidSonar at `/sonar` and seeds real Squid Mesh workflows that produce
-completed, failed, retrying, and paused runs.
+completed, failed, retrying, paused, and approval-paused runs.
 
 ```bash
 cd examples/example_app
@@ -162,7 +194,7 @@ mix example.seed
 mix phx.server
 ```
 
-Open `http://localhost:4010/sonar` after the server starts.
+Open `http://localhost:4000/sonar` after the server starts.
 
 ## Library Modules
 

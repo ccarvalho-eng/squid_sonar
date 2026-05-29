@@ -31,7 +31,8 @@ defmodule SquidSonar.ReadModelFixtures do
       next_visible_at: Keyword.get(attrs, :next_visible_at),
       expired_claims: Keyword.get(attrs, :expired_claims, []),
       attempts: Keyword.get(attrs, :attempts, []),
-      anomalies: Keyword.get(attrs, :anomalies, [])
+      anomalies: Keyword.get(attrs, :anomalies, []),
+      manual_state: Keyword.get(attrs, :manual_state)
     }
   end
 
@@ -48,7 +49,8 @@ defmodule SquidSonar.ReadModelFixtures do
       summary: Keyword.get(attrs, :summary, "summary"),
       details: Keyword.get(attrs, :details, %{}),
       next_actions: Keyword.get(attrs, :next_actions, []),
-      evidence: Keyword.get(attrs, :evidence, %{})
+      evidence: Keyword.get(attrs, :evidence, %{}),
+      definition_version: Keyword.get(attrs, :definition_version, 1)
     }
   end
 
@@ -69,7 +71,7 @@ defmodule SquidSonar.ReadModelFixtures do
     }
   end
 
-  def graph_node(id, status, current?) do
+  def graph_node(id, status, current?, attrs \\ []) do
     %Node{
       id: id,
       status: status,
@@ -79,7 +81,7 @@ defmodule SquidSonar.ReadModelFixtures do
       error: nil,
       recovery: nil,
       transition: nil,
-      manual_state: nil,
+      manual_state: Keyword.get(attrs, :manual_state),
       attempts: []
     }
   end

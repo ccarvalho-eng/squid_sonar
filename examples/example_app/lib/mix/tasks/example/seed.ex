@@ -45,13 +45,15 @@ defmodule Mix.Tasks.Example.Seed do
        %{order_id: "order-failed-#{unique}", customer_id: "cust_demo"}},
       {SquidSonarExample.Workflows.RetryingCheckout, :retrying_checkout,
        %{order_id: "order-retrying-#{unique}", customer_id: "cust_demo"}},
+      {SquidSonarExample.Workflows.PausedCheckout, :paused_checkout,
+       %{order_id: "order-paused-#{unique}", customer_id: "cust_demo"}},
       {SquidSonarExample.Workflows.ManualReviewCheckout, :manual_review_checkout,
        %{order_id: "order-review-#{unique}", customer_id: "cust_demo"}}
     ]
   end
 
   defp start_scenario({workflow, trigger, payload}) do
-    case SquidMesh.start_run(workflow, trigger, payload) do
+    case SquidMesh.start(workflow, payload, trigger: trigger) do
       {:ok, run} ->
         Mix.shell().info("* started #{inspect(workflow)} #{run.run_id}")
         [run.run_id]

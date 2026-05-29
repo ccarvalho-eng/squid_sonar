@@ -11,6 +11,7 @@ defmodule SquidSonarExample.WorkflowsTest do
       SquidSonarExample.Workflows.CompletedCheckout,
       SquidSonarExample.Workflows.FailingCheckout,
       SquidSonarExample.Workflows.RetryingCheckout,
+      SquidSonarExample.Workflows.PausedCheckout,
       SquidSonarExample.Workflows.ManualReviewCheckout
     ]
 

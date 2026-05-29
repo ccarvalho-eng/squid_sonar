@@ -11,6 +11,12 @@ defmodule SquidSonar.Router do
     transport: "websocket"
   ]
 
+  @default_control_actor %{
+    "id" => "squid_sonar",
+    "type" => "system",
+    "name" => "SquidSonar operator"
+  }
+
   @transport_values ~w(longpoll websocket)
 
   defmacro __using__(_opts) do
@@ -35,6 +41,10 @@ defmodule SquidSonar.Router do
       Defaults to `"/live"`.
     * `:transport` - LiveView client transport. Use `"websocket"` or
       `"longpoll"`. Defaults to `"websocket"`.
+    * `:control_actor` - actor persisted with Squid Mesh manual approval and
+      resume actions. Pass a non-empty binary, a non-empty map, or an MFA tuple
+      `{module, function, args}`. MFA callbacks receive the current `conn` as
+      their first argument.
   """
   defmacro squid_sonar(path, opts \\ []) do
     quote bind_quoted: [path: path, opts: opts] do
@@ -69,7 +79,8 @@ defmodule SquidSonar.Router do
     session_args = [
       prefix,
       opts[:socket_path],
-      opts[:transport]
+      opts[:transport],
+      Keyword.get(opts, :control_actor, @default_control_actor)
     ]
 
     session_opts = [
@@ -85,12 +96,21 @@ defmodule SquidSonar.Router do
 
   @doc false
   def __session__(_conn, prefix, live_path, live_transport) do
+    __session__(%{}, prefix, live_path, live_transport, @default_control_actor)
+  end
+
+  @doc false
+  def __session__(conn, prefix, live_path, live_transport, control_actor) do
     %{
       "prefix" => prefix,
       "live_path" => live_path,
-      "live_transport" => live_transport
+      "live_transport" => live_transport,
+      "control_actor" => resolve_control_actor(conn, control_actor)
     }
   end
+
+  @doc false
+  def default_control_actor, do: @default_control_actor
 
   defp validate_opt!({:transport, transport}) do
     unless transport in @transport_values do
@@ -119,5 +139,35 @@ defmodule SquidSonar.Router do
     end
   end
 
+  defp validate_opt!({:control_actor, actor}) do
+    unless valid_control_actor_spec?(actor) do
+      raise ArgumentError, """
+      invalid :control_actor, expected a non-empty binary, non-empty map,
+      or {module, function, args} tuple, got #{inspect(actor)}
+      """
+    end
+  end
+
   defp validate_opt!(_option), do: :ok
+
+  defp valid_control_actor_spec?(actor) when is_binary(actor), do: actor != ""
+  defp valid_control_actor_spec?(actor) when is_map(actor), do: map_size(actor) > 0
+
+  defp valid_control_actor_spec?({module, function, args}) do
+    is_atom(module) and is_atom(function) and is_list(args)
+  end
+
+  defp valid_control_actor_spec?(_actor), do: false
+
+  defp resolve_control_actor(conn, {module, function, args}) do
+    conn
+    |> then(&apply(module, function, [&1 | args]))
+    |> normalize_control_actor()
+  end
+
+  defp resolve_control_actor(_conn, actor), do: normalize_control_actor(actor)
+
+  defp normalize_control_actor(actor) when is_binary(actor) and actor != "", do: actor
+  defp normalize_control_actor(actor) when is_map(actor) and map_size(actor) > 0, do: actor
+  defp normalize_control_actor(_actor), do: @default_control_actor
 end

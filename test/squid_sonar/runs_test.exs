@@ -274,6 +274,95 @@ defmodule SquidSonar.RunsTest do
     assert {:error, :not_found} = Runs.get_run("run-3", client: @client)
   end
 
+  test "cancels a running workflow" do
+    snapshot =
+      snapshot(:cancelled, workflow: Atom.to_string(CheckoutWorkflow), reason: :cancelled)
+
+    FakeSquidMeshClient.put_cancel({:ok, snapshot})
+
+    assert {:ok, updated_snapshot} = Runs.cancel_run("run-1", client: @client)
+    assert updated_snapshot.run_id == "run-cancelled"
+    assert updated_snapshot.status == :cancelled
+  end
+
+  test "returns cancel errors unchanged" do
+    FakeSquidMeshClient.put_cancel({:error, :invalid_run_id})
+
+    assert {:error, :invalid_run_id} = Runs.cancel_run("bad", client: @client)
+  end
+
+  test "resumes a paused workflow" do
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+
+    FakeSquidMeshClient.put_resume({:ok, snapshot})
+
+    assert {:ok, updated_snapshot} = Runs.resume_run("run-1", %{}, client: @client)
+    assert updated_snapshot.run_id == "run-running"
+    assert updated_snapshot.status == :running
+  end
+
+  test "returns resume errors unchanged" do
+    FakeSquidMeshClient.put_resume({:error, :not_found})
+
+    assert {:error, :not_found} = Runs.resume_run("missing", %{}, client: @client)
+  end
+
+  test "approves a paused approval step" do
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+
+    FakeSquidMeshClient.put_approve({:ok, snapshot})
+
+    assert {:ok, updated_snapshot} =
+             Runs.approve_run("run-1", %{"approved_by" => "admin"}, client: @client)
+
+    assert updated_snapshot.run_id == "run-running"
+    assert updated_snapshot.status == :running
+  end
+
+  test "returns approve errors unchanged" do
+    FakeSquidMeshClient.put_approve({:error, :not_found})
+
+    assert {:error, :not_found} = Runs.approve_run("missing", %{}, client: @client)
+  end
+
+  test "rejects a paused approval step" do
+    snapshot = snapshot(:failed, workflow: Atom.to_string(CheckoutWorkflow), reason: :terminal)
+
+    FakeSquidMeshClient.put_reject({:ok, snapshot})
+
+    assert {:ok, updated_snapshot} =
+             Runs.reject_run("run-1", %{"rejected_by" => "admin"}, client: @client)
+
+    assert updated_snapshot.run_id == "run-failed"
+    assert updated_snapshot.status == :failed
+  end
+
+  test "returns reject errors unchanged" do
+    FakeSquidMeshClient.put_reject({:error, :not_found})
+
+    assert {:error, :not_found} = Runs.reject_run("missing", %{}, client: @client)
+  end
+
+  test "replays a completed workflow" do
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+
+    FakeSquidMeshClient.put_replay({:ok, snapshot})
+
+    assert {:ok, updated_snapshot} = Runs.replay_run("run-1", client: @client)
+    assert updated_snapshot.run_id == "run-running"
+    assert updated_snapshot.status == :running
+  end
+
+  test "returns replay errors unchanged" do
+    FakeSquidMeshClient.put_replay({:error, {:unsafe_replay, :irreversible_step}})
+
+    assert {:error, {:unsafe_replay, :irreversible_step}} =
+             Runs.replay_run("run-1", client: @client)
+  end
+
   defp summary(status, attrs) do
     workflow = Keyword.fetch!(attrs, :workflow)
 
@@ -286,7 +375,8 @@ defmodule SquidSonar.RunsTest do
       terminal_status: Keyword.get(attrs, :terminal_status, status),
       indexed_at: @now,
       thread_revision: Keyword.get(attrs, :thread_revision, 7),
-      anomalies: Keyword.get(attrs, :anomalies, [])
+      anomalies: Keyword.get(attrs, :anomalies, []),
+      definition_version: Keyword.get(attrs, :definition_version, 1)
     }
   end
 end

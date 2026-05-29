@@ -16,7 +16,7 @@ mix example.seed
 mix phx.server
 ```
 
-Open `http://localhost:4010/sonar`.
+Open `http://localhost:4000/sonar`.
 
 ## Included Workflow Runs
 
@@ -26,6 +26,7 @@ immediately:
 - Completed checkout
 - Failed checkout
 - Retrying checkout
+- Paused checkout that can be resumed
 - Manual review checkout paused for approval
 
 Each run can be opened from the dashboard to inspect status, current step,

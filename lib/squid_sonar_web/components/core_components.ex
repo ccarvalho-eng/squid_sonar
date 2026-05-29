@@ -29,6 +29,41 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  attr :flash, :map, required: true
+
+  def flash_messages(assigns) do
+    assigns =
+      assigns
+      |> assign(:info, flash_message(assigns.flash, :info))
+      |> assign(:error, flash_message(assigns.flash, :error))
+
+    ~H"""
+    <div
+      :if={@info || @error}
+      id="squid-sonar-flash"
+      class="squid-sonar-flash-stack"
+      role={if @error, do: "alert", else: "status"}
+      phx-hook="SquidSonarFlash"
+    >
+      <div class={[
+        "squid-sonar-flash",
+        @info && "squid-sonar-flash-info",
+        @error && "squid-sonar-flash-error"
+      ]}>
+        <span>{@info || @error}</span>
+        <button
+          class="squid-sonar-flash-close"
+          type="button"
+          phx-click="clear_flash"
+          aria-label="Dismiss notification"
+        >
+          x
+        </button>
+      </div>
+    </div>
+    """
+  end
+
   attr :status, :atom, required: true
   attr :count, :integer, required: true
   attr :active, :boolean, default: false
@@ -302,7 +337,9 @@ defmodule SquidSonarWeb.CoreComponents do
           <h2>{format_workflow(@detail.summary.workflow)}</h2>
           <p>{@detail.summary.id}</p>
         </div>
-        <.status_badge status={@detail.summary.status} />
+        <div class="squid-sonar-detail-header-actions">
+          <.status_badge status={@detail.summary.status} />
+        </div>
       </header>
 
       <div class="squid-sonar-detail-grid">
@@ -332,7 +369,13 @@ defmodule SquidSonarWeb.CoreComponents do
       </div>
 
       <section class="squid-sonar-detail-panel">
-        <h3>Workflow</h3>
+        <div class="squid-sonar-workflow-panel-heading">
+          <h3>Workflow</h3>
+          <div :if={control_actions?(@detail)} class="squid-sonar-workflow-panel-actions">
+            <.run_control_buttons detail={@detail} />
+          </div>
+        </div>
+
         <%= if @detail.workflow_graph.nodes == [] do %>
           <p class="squid-sonar-muted-line">No workflow graph loaded.</p>
         <% else %>
@@ -549,4 +592,173 @@ defmodule SquidSonarWeb.CoreComponents do
   defp graph_mode_title(:transition), do: "Transition graph"
   defp graph_mode_title(:dependency), do: "Dependency graph"
   defp graph_mode_title(:history), do: "History graph"
+
+  defp flash_message(flash, key) do
+    Phoenix.Flash.get(flash, key) || Map.get(flash, Atom.to_string(key))
+  end
+
+  defp control_actions?(detail), do: available_control_actions(detail) != []
+
+  attr :detail, :map, required: true
+
+  def run_control_buttons(assigns) do
+    available_actions = available_control_actions(assigns.detail)
+
+    assigns = assign(assigns, :available_actions, available_actions)
+
+    ~H"""
+    <div class="squid-sonar-control-buttons">
+      <%= if :cancel in @available_actions do %>
+        <button
+          class="squid-sonar-control-button squid-sonar-control-button-danger"
+          type="button"
+          phx-click="cancel"
+          phx-value-run-id={@detail.summary.id}
+          data-confirm="Are you sure you want to cancel this run?"
+        >
+          Cancel
+        </button>
+      <% end %>
+
+      <%= if :resume in @available_actions do %>
+        <button
+          class="squid-sonar-control-button squid-sonar-control-button-primary"
+          type="button"
+          phx-click="resume"
+          phx-value-run-id={@detail.summary.id}
+        >
+          Resume
+        </button>
+      <% end %>
+
+      <%= if :approve in @available_actions do %>
+        <button
+          class="squid-sonar-control-button squid-sonar-control-button-success"
+          type="button"
+          phx-click="approve"
+          phx-value-run-id={@detail.summary.id}
+        >
+          Approve
+        </button>
+      <% end %>
+
+      <%= if :reject in @available_actions do %>
+        <button
+          class="squid-sonar-control-button squid-sonar-control-button-danger"
+          type="button"
+          phx-click="reject"
+          phx-value-run-id={@detail.summary.id}
+        >
+          Reject
+        </button>
+      <% end %>
+
+      <%= if :replay in @available_actions do %>
+        <button
+          class="squid-sonar-control-button squid-sonar-control-button-secondary"
+          type="button"
+          phx-click="replay"
+          phx-value-run-id={@detail.summary.id}
+          data-confirm="Are you sure you want to replay this run?"
+        >
+          Replay
+        </button>
+      <% end %>
+    </div>
+    """
+  end
+
+  # Determine which control actions are available based on run status and diagnostic
+  defp available_control_actions(%{summary: summary, explanation: explanation}) do
+    status = summary.status
+    terminal? = summary.terminal?
+    next_actions = Map.get(explanation, :next_actions, [])
+    manual_resolution? = :resolve_manual_step in next_actions
+    approval_step? = approval_step?(explanation)
+    pause_step? = pause_step?(explanation, status)
+
+    actions = []
+
+    # Cancel is available for non-terminal runs
+    actions =
+      if not terminal? and status not in [:cancelled], do: [:cancel | actions], else: actions
+
+    # Resume only applies to pause steps; approval pauses use approve/reject.
+    actions =
+      if manual_resolution? and pause_step?,
+        do: [:resume | actions],
+        else: actions
+
+    # Approve/Reject are available for approval steps
+    actions =
+      if manual_resolution? and approval_step?,
+        do: [:approve, :reject | actions],
+        else: actions
+
+    # Replay is available for terminal runs
+    actions = if terminal?, do: [:replay | actions], else: actions
+
+    Enum.reverse(actions)
+  end
+
+  defp pause_step?(explanation, status) do
+    case manual_kind(explanation) do
+      "pause" -> true
+      nil -> status == :paused and not approval_step?(explanation)
+      _kind -> false
+    end
+  end
+
+  defp approval_step?(explanation) do
+    case manual_kind(explanation) do
+      "approval" -> true
+      nil -> approval_step_name?(explanation)
+      _kind -> false
+    end
+  end
+
+  defp manual_kind(%{details: details, evidence: evidence}) do
+    details
+    |> manual_kind_from_map()
+    |> case do
+      nil ->
+        evidence
+        |> manual_state_from_evidence()
+        |> manual_kind_from_map()
+
+      kind ->
+        kind
+    end
+  end
+
+  defp manual_kind(_explanation), do: nil
+
+  defp manual_kind_from_map(map) when is_map(map) do
+    map
+    |> map_value(:kind)
+    |> normalize_manual_kind()
+  end
+
+  defp manual_kind_from_map(_map), do: nil
+
+  defp manual_state_from_evidence(evidence) when is_map(evidence) do
+    map_value(evidence, :manual_state)
+  end
+
+  defp manual_state_from_evidence(_evidence), do: nil
+
+  defp map_value(map, key) when is_atom(key) do
+    Map.get(map, key) || Map.get(map, Atom.to_string(key))
+  end
+
+  defp normalize_manual_kind(kind) when is_atom(kind), do: Atom.to_string(kind)
+  defp normalize_manual_kind(kind) when is_binary(kind), do: kind
+  defp normalize_manual_kind(_kind), do: nil
+
+  defp approval_step_name?(%{step: step}) when is_binary(step) do
+    step = String.downcase(step)
+    String.contains?(step, "approval") or String.contains?(step, "review")
+  end
+
+  defp approval_step_name?(_explanation), do: false
 end
