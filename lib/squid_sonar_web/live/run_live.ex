@@ -23,6 +23,76 @@ defmodule SquidSonarWeb.RunLive do
   end
 
   @impl true
+  def handle_event("cancel", %{"run-id" => run_id}, socket) do
+    case Runs.cancel_run(run_id) do
+      {:ok, _updated_run} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Run cancelled successfully")
+         |> assign_run(run_id)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to cancel run: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_event("resume", %{"run-id" => run_id}, socket) do
+    case Runs.resume_run(run_id, %{}) do
+      {:ok, _updated_run} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Run resumed successfully")
+         |> assign_run(run_id)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to resume run: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_event("approve", %{"run-id" => run_id}, socket) do
+    case Runs.approve_run(run_id, %{"approved_at" => DateTime.utc_now()}) do
+      {:ok, _updated_run} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Run approved successfully")
+         |> assign_run(run_id)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to approve run: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_event("reject", %{"run-id" => run_id}, socket) do
+    case Runs.reject_run(run_id, %{"rejected_at" => DateTime.utc_now()}) do
+      {:ok, _updated_run} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Run rejected successfully")
+         |> assign_run(run_id)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to reject run: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
+  def handle_event("replay", %{"run-id" => run_id}, socket) do
+    case Runs.replay_run(run_id) do
+      {:ok, _new_run} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Run replayed successfully")
+         |> assign_run(run_id)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to replay run: #{inspect(reason)}")}
+    end
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <main

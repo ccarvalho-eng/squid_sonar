@@ -48,7 +48,8 @@ defmodule SquidSonar.ReadModelFixtures do
       summary: Keyword.get(attrs, :summary, "summary"),
       details: Keyword.get(attrs, :details, %{}),
       next_actions: Keyword.get(attrs, :next_actions, []),
-      evidence: Keyword.get(attrs, :evidence, %{})
+      evidence: Keyword.get(attrs, :evidence, %{}),
+      definition_version: Keyword.get(attrs, :definition_version, 1)
     }
   end
 

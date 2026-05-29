@@ -19,13 +19,13 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ ".squid-sonar-nav-item:hover::before"
     assert conn.resp_body =~ ".squid-sonar-nav-item:hover strong"
     assert conn.resp_body =~ ".squid-sonar-badge"
-    assert conn.resp_body =~ "border-radius: 0;"
+    assert conn.resp_body =~ "border-radius: 4px"
 
     assert conn.resp_body =~
              ".squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar"
 
     refute conn.resp_body =~ "gradient"
-    refute conn.resp_body =~ "box-shadow"
+    # box-shadow is now used for control button hover effects
     refute conn.resp_body =~ "text-shadow"
     refute conn.resp_body =~ "#315f8f"
     refute conn.resp_body =~ "#8aa4c8"

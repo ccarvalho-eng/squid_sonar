@@ -126,7 +126,8 @@ defmodule SquidSonar.DashboardTest do
       terminal_status: Keyword.get(attrs, :terminal_status, status),
       indexed_at: Keyword.get(attrs, :indexed_at, @loaded_at),
       thread_revision: Keyword.get(attrs, :thread_revision, 7),
-      anomalies: Keyword.get(attrs, :anomalies, [])
+      anomalies: Keyword.get(attrs, :anomalies, []),
+      definition_version: Keyword.get(attrs, :definition_version, 1)
     }
   end
 end

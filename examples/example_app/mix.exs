@@ -45,7 +45,7 @@ defmodule SquidSonarExample.MixProject do
   end
 
   defp squid_mesh_dep do
-    {:squid_mesh, "~> 0.1.0-beta.1"}
+    {:squid_mesh, github: "dark-trench/squid_mesh", branch: "main"}
   end
 
   defp aliases do

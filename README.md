@@ -38,15 +38,22 @@ endpoint configuration, and the Squid Mesh runtime. SquidSonar contributes the
 router macro, LiveViews, static assets, and a small read boundary over Squid
 Mesh public APIs.
 
-SquidSonar reads from Squid Mesh through:
+SquidSonar interacts with Squid Mesh through:
 
+### Read Operations
 - `SquidMesh.list_runs/2`
 - `SquidMesh.inspect_run/2`
 - `SquidMesh.inspect_run_graph/2`
 - `SquidMesh.explain_run/2`
 
-It does not start, cancel, replay, approve, reject, unblock, lease, or execute
-workflow work. Host applications still own workers, queue delivery, scheduler
+### Control Operations
+- `SquidMesh.cancel/2` - Cancel running workflows
+- `SquidMesh.resume/3` - Resume paused workflows
+- `SquidMesh.approve/3` - Approve manual approval steps
+- `SquidMesh.reject/3` - Reject manual approval steps
+- `SquidMesh.replay/2` - Replay completed workflows
+
+Host applications still own workers, queue delivery, scheduler
 setup, and backend leasing or fencing. When a Squid Mesh host uses Bedrock or
 another delivery backend, that adapter remains part of the host application, not
 SquidSonar.
@@ -162,7 +169,7 @@ mix example.seed
 mix phx.server
 ```
 
-Open `http://localhost:4010/sonar` after the server starts.
+Open `http://localhost:4000/sonar` after the server starts.
 
 ## Library Modules
 

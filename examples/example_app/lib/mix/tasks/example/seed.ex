@@ -51,7 +51,7 @@ defmodule Mix.Tasks.Example.Seed do
   end
 
   defp start_scenario({workflow, trigger, payload}) do
-    case SquidMesh.start_run(workflow, trigger, payload) do
+    case SquidMesh.start(workflow, payload, trigger: trigger) do
       {:ok, run} ->
         Mix.shell().info("* started #{inspect(workflow)} #{run.run_id}")
         [run.run_id]

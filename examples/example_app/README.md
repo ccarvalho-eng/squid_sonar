@@ -16,7 +16,7 @@ mix example.seed
 mix phx.server
 ```
 
-Open `http://localhost:4010/sonar`.
+Open `http://localhost:4000/sonar`.
 
 ## Included Workflow Runs
 
