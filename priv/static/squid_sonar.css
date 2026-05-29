@@ -692,7 +692,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-badge {
   background: transparent;
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 0;
+  border-radius: 4px;
   color: var(--squid-sonar-muted);
   display: inline-flex;
   font-size: 11px;
