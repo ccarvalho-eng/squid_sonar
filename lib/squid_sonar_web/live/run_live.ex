@@ -28,11 +28,11 @@ defmodule SquidSonarWeb.RunLive do
       {:ok, _updated_run} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Run cancelled successfully")
+         |> put_run_flash(:info, "Run cancelled successfully")
          |> assign_run(run_id)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to cancel run: #{inspect(reason)}")}
+      {:error, _reason} ->
+        {:noreply, put_run_flash(socket, :error, "Failed to cancel run.")}
     end
   end
 
@@ -42,11 +42,11 @@ defmodule SquidSonarWeb.RunLive do
       {:ok, _updated_run} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Run resumed successfully")
+         |> put_run_flash(:info, "Run resumed successfully")
          |> assign_run(run_id)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to resume run: #{inspect(reason)}")}
+      {:error, _reason} ->
+        {:noreply, put_run_flash(socket, :error, "Failed to resume run.")}
     end
   end
 
@@ -56,11 +56,11 @@ defmodule SquidSonarWeb.RunLive do
       {:ok, _updated_run} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Run approved successfully")
+         |> put_run_flash(:info, "Run approved successfully")
          |> assign_run(run_id)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to approve run: #{inspect(reason)}")}
+      {:error, _reason} ->
+        {:noreply, put_run_flash(socket, :error, "Failed to approve run.")}
     end
   end
 
@@ -70,25 +70,25 @@ defmodule SquidSonarWeb.RunLive do
       {:ok, _updated_run} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Run rejected successfully")
+         |> put_run_flash(:info, "Run rejected successfully")
          |> assign_run(run_id)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to reject run: #{inspect(reason)}")}
+      {:error, _reason} ->
+        {:noreply, put_run_flash(socket, :error, "Failed to reject run.")}
     end
   end
 
   @impl true
   def handle_event("replay", %{"run-id" => run_id}, socket) do
     case Runs.replay_run(run_id) do
-      {:ok, _new_run} ->
+      {:ok, new_run} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Run replayed successfully")
-         |> assign_run(run_id)}
+         |> put_run_flash(:info, "Run replayed successfully")
+         |> assign_run(new_run.run_id)}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to replay run: #{inspect(reason)}")}
+      {:error, _reason} ->
+        {:noreply, put_run_flash(socket, :error, "Failed to replay run.")}
     end
   end
 
@@ -109,6 +109,8 @@ defmodule SquidSonarWeb.RunLive do
         </.link>
         <.theme_switcher theme={@theme} />
       </header>
+
+      <.flash_messages flash={visible_flash(assigns)} />
 
       <div class="squid-sonar-content">
         <%= if @load_error do %>
@@ -133,6 +135,18 @@ defmodule SquidSonarWeb.RunLive do
         |> assign(:detail, nil)
         |> assign(:load_error, reason)
     end
+  end
+
+  defp put_run_flash(socket, kind, message) do
+    if Map.has_key?(socket.assigns, :flash) do
+      put_flash(socket, kind, message)
+    else
+      assign(socket, :control_flash, %{Atom.to_string(kind) => message})
+    end
+  end
+
+  defp visible_flash(assigns) do
+    Map.get(assigns, :flash, Map.get(assigns, :control_flash, %{}))
   end
 
   defp normalize_theme("system"), do: :system

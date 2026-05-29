@@ -275,7 +275,8 @@ defmodule SquidSonar.RunsTest do
   end
 
   test "cancels a running workflow" do
-    snapshot = snapshot(:cancelled, workflow: Atom.to_string(CheckoutWorkflow), reason: :cancelled)
+    snapshot =
+      snapshot(:cancelled, workflow: Atom.to_string(CheckoutWorkflow), reason: :cancelled)
 
     FakeSquidMeshClient.put_cancel({:ok, snapshot})
 
@@ -291,7 +292,8 @@ defmodule SquidSonar.RunsTest do
   end
 
   test "resumes a paused workflow" do
-    snapshot = snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
 
     FakeSquidMeshClient.put_resume({:ok, snapshot})
 
@@ -307,7 +309,8 @@ defmodule SquidSonar.RunsTest do
   end
 
   test "approves a paused approval step" do
-    snapshot = snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
 
     FakeSquidMeshClient.put_approve({:ok, snapshot})
 
@@ -343,7 +346,8 @@ defmodule SquidSonar.RunsTest do
   end
 
   test "replays a completed workflow" do
-    snapshot = snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
+    snapshot =
+      snapshot(:running, workflow: Atom.to_string(CheckoutWorkflow), reason: :attempt_visible)
 
     FakeSquidMeshClient.put_replay({:ok, snapshot})
 

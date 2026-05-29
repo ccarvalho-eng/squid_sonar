@@ -115,6 +115,185 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "squid-sonar-workflow-graph"
   end
 
+  test "renders feedback after run control events" do
+    snapshot =
+      snapshot(:running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "capture_payment",
+        reason: :attempt_visible
+      )
+
+    graph =
+      graph_inspection(:running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "capture_payment",
+        nodes: [
+          graph_node("capture_payment", :running, true)
+        ]
+      )
+
+    explanation =
+      diagnostic(
+        :running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :attempt_visible,
+        step: "capture_payment",
+        next_actions: [:wait_for_worker_claim]
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    FakeSquidMeshClient.put_cancel(
+      {:ok, snapshot(:cancelled, run_id: "run-1", workflow: Atom.to_string(CheckoutWorkflow))}
+    )
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "run-1"}, "/sonar/runs/run-1", socket)
+    {:noreply, socket} = RunLive.handle_event("cancel", %{"run-id" => "run-1"}, socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Run cancelled successfully"
+  end
+
+  test "renders control errors without leaking internal reason details" do
+    snapshot =
+      snapshot(:running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "capture_payment",
+        reason: :attempt_visible
+      )
+
+    graph =
+      graph_inspection(:running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "capture_payment",
+        nodes: [
+          graph_node("capture_payment", :running, true)
+        ]
+      )
+
+    explanation =
+      diagnostic(
+        :running,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :attempt_visible,
+        step: "capture_payment",
+        next_actions: [:wait_for_worker_claim]
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+    FakeSquidMeshClient.put_cancel({:error, {:missing_config, [:repo]}})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "run-1"}, "/sonar/runs/run-1", socket)
+    {:noreply, socket} = RunLive.handle_event("cancel", %{"run-id" => "run-1"}, socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Failed to cancel run."
+    refute html =~ "missing_config"
+  end
+
+  test "renders the new run after replay succeeds" do
+    source_snapshot =
+      snapshot(:completed,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "send_receipt",
+        reason: :terminal
+      )
+
+    replayed_snapshot =
+      snapshot(:running,
+        run_id: "run-2",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "load_order",
+        reason: :attempt_visible
+      )
+
+    graph =
+      graph_inspection(:completed,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "send_receipt",
+        nodes: [
+          graph_node("send_receipt", :completed, true)
+        ]
+      )
+
+    explanation =
+      diagnostic(
+        :completed,
+        run_id: "run-1",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :terminal,
+        step: "send_receipt",
+        next_actions: [:inspect_terminal_run]
+      )
+
+    FakeSquidMeshClient.put_inspect_run(fn
+      "run-1", _opts -> {:ok, source_snapshot}
+      "run-2", _opts -> {:ok, replayed_snapshot}
+    end)
+
+    FakeSquidMeshClient.put_inspect_run_graph(fn
+      "run-1", _opts ->
+        {:ok, graph}
+
+      "run-2", _opts ->
+        {:ok,
+         graph_inspection(:running,
+           run_id: "run-2",
+           workflow: Atom.to_string(CheckoutWorkflow),
+           current_node_id: "load_order",
+           nodes: [
+             graph_node("load_order", :running, true)
+           ]
+         )}
+    end)
+
+    FakeSquidMeshClient.put_explain_run(fn
+      "run-1", _opts ->
+        {:ok, explanation}
+
+      "run-2", _opts ->
+        {:ok,
+         diagnostic(:running,
+           run_id: "run-2",
+           workflow: Atom.to_string(CheckoutWorkflow),
+           reason: :attempt_visible,
+           step: "load_order",
+           next_actions: [:wait_for_worker_claim]
+         )}
+    end)
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "run-1"}, "/sonar/runs/run-1", socket)
+
+    FakeSquidMeshClient.put_replay({:ok, replayed_snapshot})
+
+    {:noreply, socket} = RunLive.handle_event("replay", %{"run-id" => "run-1"}, socket)
+
+    assert socket.assigns.detail.summary.id == "run-2"
+  end
+
   test "renders journal history graphs when the workflow definition is unavailable" do
     snapshot =
       snapshot(:completed,

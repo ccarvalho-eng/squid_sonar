@@ -29,6 +29,26 @@ defmodule SquidSonarWeb.CoreComponents do
     """
   end
 
+  attr :flash, :map, required: true
+
+  def flash_messages(assigns) do
+    assigns =
+      assigns
+      |> assign(:info, flash_message(assigns.flash, :info))
+      |> assign(:error, flash_message(assigns.flash, :error))
+
+    ~H"""
+    <div :if={@info || @error} class="squid-sonar-flash-stack" role="status">
+      <div :if={@info} class="squid-sonar-flash squid-sonar-flash-info">
+        {@info}
+      </div>
+      <div :if={@error} class="squid-sonar-flash squid-sonar-flash-error" role="alert">
+        {@error}
+      </div>
+    </div>
+    """
+  end
+
   attr :status, :atom, required: true
   attr :count, :integer, required: true
   attr :active, :boolean, default: false
@@ -304,6 +324,7 @@ defmodule SquidSonarWeb.CoreComponents do
         </div>
         <div class="squid-sonar-detail-header-actions">
           <.status_badge status={@detail.summary.status} />
+          <.run_control_buttons detail={@detail} />
         </div>
       </header>
 
@@ -372,10 +393,6 @@ defmodule SquidSonarWeb.CoreComponents do
                 <span>Attempts</span>
                 <strong>{length(@detail.attempts)}</strong>
               </div>
-            </div>
-
-            <div class="squid-sonar-workflow-graph-controls">
-              <.run_control_buttons detail={@detail} />
             </div>
 
             <div
@@ -556,6 +573,10 @@ defmodule SquidSonarWeb.CoreComponents do
   defp graph_mode_title(:dependency), do: "Dependency graph"
   defp graph_mode_title(:history), do: "History graph"
 
+  defp flash_message(flash, key) do
+    Phoenix.Flash.get(flash, key) || Map.get(flash, Atom.to_string(key))
+  end
+
   attr :detail, :map, required: true
 
   def run_control_buttons(assigns) do
@@ -634,7 +655,8 @@ defmodule SquidSonarWeb.CoreComponents do
     actions = []
 
     # Cancel is available for non-terminal runs
-    actions = if not terminal? and status not in [:cancelled], do: [:cancel | actions], else: actions
+    actions =
+      if not terminal? and status not in [:cancelled], do: [:cancel | actions], else: actions
 
     # Resume is available for paused runs
     actions =

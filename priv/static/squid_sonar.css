@@ -168,6 +168,34 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   gap: 10px;
 }
 
+.squid-sonar-flash-stack {
+  display: grid;
+  gap: 8px;
+  margin: 16px auto 0;
+  max-width: var(--squid-sonar-container);
+  padding: 0 var(--squid-sonar-space-6);
+}
+
+.squid-sonar-flash {
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 620;
+  padding: 10px 12px;
+}
+
+.squid-sonar-flash-info {
+  background: var(--squid-sonar-success-muted);
+  border-color: var(--squid-sonar-success);
+  color: var(--squid-sonar-success);
+}
+
+.squid-sonar-flash-error {
+  background: var(--squid-sonar-danger-muted);
+  border-color: var(--squid-sonar-danger);
+  color: var(--squid-sonar-danger);
+}
+
 .squid-sonar-topbar h1 {
   font-size: 15px;
   font-weight: 660;
@@ -856,7 +884,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-detail-header-actions {
   align-items: center;
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  min-width: min(520px, 100%);
 }
 
 .squid-sonar-back-link {
@@ -1051,16 +1082,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   overflow-wrap: anywhere;
 }
 
-.squid-sonar-workflow-graph-controls {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-
 .squid-sonar-workflow-stage {
   min-width: max-content;
   position: relative;
+  display: block;
 }
 
 .squid-sonar-workflow-edge-segment {
@@ -1218,27 +1243,34 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-control-buttons {
   align-items: center;
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .squid-sonar-control-button {
-  background: transparent;
+  background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
   color: var(--squid-sonar-text);
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 560;
-  letter-spacing: 0.01em;
-  min-height: 28px;
-  padding: 5px 12px;
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 650;
+  letter-spacing: 0;
+  min-height: 30px;
+  padding: 5px 11px;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
 }
 
 .squid-sonar-control-button:hover {
+  background: var(--squid-sonar-surface-raised);
+  border-color: var(--squid-sonar-border-strong);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .squid-sonar-control-button:active {
@@ -1272,12 +1304,13 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 .squid-sonar-control-button-primary:hover {
   background: var(--squid-sonar-accent);
   border-color: var(--squid-sonar-accent);
-  box-shadow: 0 2px 8px rgba(128, 97, 216, 0.25);
+  color: white;
 }
 
 .squid-sonar-control-button-success {
-  color: var(--squid-sonar-success);
+  background: var(--squid-sonar-success-muted);
   border-color: var(--squid-sonar-success);
+  color: var(--squid-sonar-success);
 }
 
 .squid-sonar-control-button-success:hover {
@@ -1286,8 +1319,9 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-control-button-danger {
-  color: var(--squid-sonar-danger);
+  background: var(--squid-sonar-danger-muted);
   border-color: var(--squid-sonar-danger);
+  color: var(--squid-sonar-danger);
 }
 
 .squid-sonar-control-button-danger:hover {
@@ -1297,12 +1331,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-control-button-secondary {
   color: var(--squid-sonar-muted);
-  border-color: var(--squid-sonar-border);
 }
 
 .squid-sonar-control-button-secondary:hover {
-  background: var(--squid-sonar-surface-muted);
-  border-color: var(--squid-sonar-border-strong);
+  background: var(--squid-sonar-surface);
   color: var(--squid-sonar-text);
 }
 
@@ -1353,6 +1385,20 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     grid-template-columns: 1fr;
   }
 
+  .squid-sonar-detail-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .squid-sonar-detail-header-actions {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .squid-sonar-control-buttons {
+    justify-content: flex-start;
+  }
+
   .squid-sonar-detail-columns > .squid-sonar-detail-panel {
     height: auto;
   }
@@ -1379,6 +1425,11 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
     padding-right: var(--squid-sonar-space-3);
   }
 
+  .squid-sonar-flash-stack {
+    padding-left: var(--squid-sonar-space-3);
+    padding-right: var(--squid-sonar-space-3);
+  }
+
   .squid-sonar-sidebar-heading {
     display: none;
   }
@@ -1400,10 +1451,6 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
   .squid-sonar-pagination-controls {
     flex-wrap: wrap;
-  }
-
-  .squid-sonar-detail-header {
-    flex-direction: column;
   }
 
   .squid-sonar-workflow-graph-evidence {

@@ -9,18 +9,18 @@ defmodule SquidSonar.FakeSquidMeshClient do
   end
 
   @impl true
-  def inspect_run(_run_id, _opts) do
-    Process.get({__MODULE__, :inspect_run}, {:error, :not_found})
+  def inspect_run(run_id, opts) do
+    result({__MODULE__, :inspect_run}, [run_id, opts], {:error, :not_found})
   end
 
   @impl true
-  def inspect_run_graph(_run_id, _opts) do
-    Process.get({__MODULE__, :inspect_run_graph}, {:error, :not_found})
+  def inspect_run_graph(run_id, opts) do
+    result({__MODULE__, :inspect_run_graph}, [run_id, opts], {:error, :not_found})
   end
 
   @impl true
-  def explain_run(_run_id, _opts) do
-    Process.get({__MODULE__, :explain_run}, {:error, :not_found})
+  def explain_run(run_id, opts) do
+    result({__MODULE__, :explain_run}, [run_id, opts], {:error, :not_found})
   end
 
   @impl true
@@ -57,4 +57,11 @@ defmodule SquidSonar.FakeSquidMeshClient do
   def put_approve(result), do: Process.put({__MODULE__, :approve}, result)
   def put_reject(result), do: Process.put({__MODULE__, :reject}, result)
   def put_replay(result), do: Process.put({__MODULE__, :replay}, result)
+
+  defp result(key, args, default) do
+    case Process.get(key, default) do
+      fun when is_function(fun, length(args)) -> apply(fun, args)
+      result -> result
+    end
+  end
 end
