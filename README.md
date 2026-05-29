@@ -138,10 +138,34 @@ SquidSonar accepts a few route-level options:
 squid_sonar "/sonar",
   as: :runtime_sonar,
   socket_path: "/live",
-  transport: "websocket"
+  transport: "websocket",
+  control_actor: {MyAppWeb.SquidSonarAudit, :control_actor, []}
 ```
 
 `transport` can be `"websocket"` or `"longpoll"`.
+
+`control_actor` is persisted with Squid Mesh manual actions such as resume,
+approve, and reject. It can be a non-empty string, a non-empty map, or an MFA
+tuple. MFA callbacks receive the current `Plug.Conn` as their first argument.
+Prefer a small audit map over a raw user struct:
+
+```elixir
+defmodule MyAppWeb.SquidSonarAudit do
+  def control_actor(conn) do
+    user = conn.assigns.current_user
+
+    %{
+      "type" => "user",
+      "id" => user.id,
+      "email" => user.email
+    }
+  end
+end
+```
+
+If omitted, SquidSonar uses a placeholder actor so local demos can exercise
+manual controls. Production mounts should pass the authenticated operator once
+the host app wires SquidSonar into its own auth pipeline.
 
 ## Security
 
@@ -149,16 +173,17 @@ SquidSonar does not ship its own authentication layer. Protect the mounted route
 with the same browser pipeline, session handling, and authorization rules used
 for the rest of the host application's operator surface.
 
-The dashboard is read-only, but it displays runtime data returned by Squid Mesh,
-including workflow names, run IDs, step names, statuses, diagnostic signals, and
-selected error metadata. Treat the mounted dashboard as operational visibility
+The dashboard can issue Squid Mesh control actions when a run exposes safe
+manual actions. It also displays runtime data returned by Squid Mesh, including
+workflow names, run IDs, step names, statuses, diagnostic signals, and selected
+error metadata. Treat the mounted dashboard as an operational control surface
 and expose it only to trusted users.
 
 ## Example App
 
 The repository includes a Phoenix example app at `examples/example_app`. It
 mounts SquidSonar at `/sonar` and seeds real Squid Mesh workflows that produce
-completed, failed, retrying, and paused runs.
+completed, failed, retrying, paused, and approval-paused runs.
 
 ```bash
 cd examples/example_app

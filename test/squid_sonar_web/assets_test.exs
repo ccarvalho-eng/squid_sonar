@@ -24,6 +24,9 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~
              ".squid-sonar-filter-toggle-input:checked + form .squid-sonar-sidebar"
 
+    assert conn.resp_body =~
+             ~r/\.squid-sonar-flash-close:hover\s*\{[^}]*background: transparent;[^}]*box-shadow: inset 0 0 0 1px var\(--squid-sonar-border-strong\);[^}]*color: var\(--squid-sonar-muted\);/s
+
     refute conn.resp_body =~ "gradient"
     # box-shadow is now used for control button hover effects
     refute conn.resp_body =~ "text-shadow"
@@ -55,6 +58,7 @@ defmodule SquidSonarWeb.AssetsTest do
     assert conn.resp_body =~ "new LiveSocket"
     assert conn.resp_body =~ "squid-sonar-theme"
     assert conn.resp_body =~ "SquidSonarTheme"
+    assert conn.resp_body =~ "SquidSonarFlash"
   end
 
   test "serves packaged LiveView client dependencies" do

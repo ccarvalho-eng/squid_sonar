@@ -75,6 +75,21 @@ defmodule SquidSonarWeb.Assets do
         const theme = storedTheme();
         if (theme) this.pushEvent("set_theme", { theme });
       }
+    },
+    SquidSonarFlash: {
+      mounted() {
+        this.scheduleDismiss();
+      },
+      updated() {
+        this.scheduleDismiss();
+      },
+      destroyed() {
+        window.clearTimeout(this.dismissTimer);
+      },
+      scheduleDismiss() {
+        window.clearTimeout(this.dismissTimer);
+        this.dismissTimer = window.setTimeout(() => this.pushEvent("clear_flash", {}), 5000);
+      }
     }
   };
 

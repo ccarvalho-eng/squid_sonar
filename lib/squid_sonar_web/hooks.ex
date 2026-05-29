@@ -9,6 +9,10 @@ defmodule SquidSonarWeb.Hooks do
       |> assign(:prefix, Map.fetch!(session, "prefix"))
       |> assign(:live_path, Map.fetch!(session, "live_path"))
       |> assign(:live_transport, Map.fetch!(session, "live_transport"))
+      |> assign(
+        :control_actor,
+        Map.get(session, "control_actor", SquidSonar.Router.default_control_actor())
+      )
 
     {:cont, socket}
   end

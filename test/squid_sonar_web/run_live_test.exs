@@ -113,6 +113,7 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "Gateway unavailable"
     assert html =~ "wait_for_worker_claim"
     assert html =~ "squid-sonar-workflow-graph"
+    assert html =~ "squid-sonar-workflow-panel-actions"
   end
 
   test "renders feedback after run control events" do
@@ -162,6 +163,124 @@ defmodule SquidSonarWeb.RunLiveTest do
       |> rendered_to_string()
 
     assert html =~ "Run cancelled successfully"
+    assert html =~ "phx-hook=\"SquidSonarFlash\""
+    assert html =~ "aria-label=\"Dismiss notification\""
+
+    {:noreply, socket} = RunLive.handle_event("clear_flash", %{}, socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    refute html =~ "Run cancelled successfully"
+  end
+
+  test "renders approval controls without resume for approval pauses" do
+    manual_state = %{step: "wait_for_review", kind: "approval"}
+
+    snapshot =
+      snapshot(:paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "wait_for_review",
+        reason: :manual_intervention_required,
+        manual_state: manual_state
+      )
+
+    graph =
+      graph_inspection(:paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "wait_for_review",
+        nodes: [
+          graph_node("wait_for_review", :paused, true, manual_state: manual_state)
+        ]
+      )
+
+    explanation =
+      diagnostic(
+        :paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :manual_intervention_required,
+        step: "wait_for_review",
+        details: manual_state,
+        next_actions: [:resolve_manual_step],
+        evidence: %{manual_state: manual_state}
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+
+    {:noreply, socket} =
+      RunLive.handle_params(%{"id" => "run-approval"}, "/sonar/runs/run-approval", socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Approve"
+    assert html =~ "Reject"
+    refute html =~ "Resume"
+  end
+
+  test "passes the configured control actor to approval decisions" do
+    actor = %{"id" => "user-123", "type" => "operator", "name" => "Ada"}
+    parent = self()
+
+    snapshot =
+      snapshot(:paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "wait_for_review",
+        reason: :manual_intervention_required,
+        manual_state: %{step: "wait_for_review", kind: "approval"}
+      )
+
+    graph =
+      graph_inspection(:paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "wait_for_review",
+        nodes: [
+          graph_node("wait_for_review", :paused, true)
+        ]
+      )
+
+    explanation =
+      diagnostic(
+        :paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :manual_intervention_required,
+        step: "wait_for_review",
+        details: %{step: "wait_for_review", kind: "approval"},
+        next_actions: [:resolve_manual_step]
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    FakeSquidMeshClient.put_approve(fn run_id, attrs, _opts ->
+      send(parent, {:approve_attrs, run_id, attrs})
+      {:ok, snapshot(:running, run_id: run_id, workflow: Atom.to_string(CheckoutWorkflow))}
+    end)
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    socket = Phoenix.Component.assign(socket, :control_actor, actor)
+
+    {:noreply, socket} =
+      RunLive.handle_params(%{"id" => "run-approval"}, "/sonar/runs/run-approval", socket)
+
+    {:noreply, _socket} = RunLive.handle_event("approve", %{"run-id" => "run-approval"}, socket)
+
+    assert_receive {:approve_attrs, "run-approval", %{actor: ^actor}}
   end
 
   test "renders control errors without leaking internal reason details" do

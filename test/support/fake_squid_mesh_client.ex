@@ -24,28 +24,28 @@ defmodule SquidSonar.FakeSquidMeshClient do
   end
 
   @impl true
-  def cancel(_run_id, _opts) do
-    Process.get({__MODULE__, :cancel}, {:error, :not_found})
+  def cancel(run_id, opts) do
+    result({__MODULE__, :cancel}, [run_id, opts], {:error, :not_found})
   end
 
   @impl true
-  def resume(_run_id, _attrs, _opts) do
-    Process.get({__MODULE__, :resume}, {:error, :not_found})
+  def resume(run_id, attrs, opts) do
+    result({__MODULE__, :resume}, [run_id, attrs, opts], {:error, :not_found})
   end
 
   @impl true
-  def approve(_run_id, _attrs, _opts) do
-    Process.get({__MODULE__, :approve}, {:error, :not_found})
+  def approve(run_id, attrs, opts) do
+    result({__MODULE__, :approve}, [run_id, attrs, opts], {:error, :not_found})
   end
 
   @impl true
-  def reject(_run_id, _attrs, _opts) do
-    Process.get({__MODULE__, :reject}, {:error, :not_found})
+  def reject(run_id, attrs, opts) do
+    result({__MODULE__, :reject}, [run_id, attrs, opts], {:error, :not_found})
   end
 
   @impl true
-  def replay(_run_id, _opts) do
-    Process.get({__MODULE__, :replay}, {:error, :not_found})
+  def replay(run_id, opts) do
+    result({__MODULE__, :replay}, [run_id, opts], {:error, :not_found})
   end
 
   def put_list_runs(result), do: Process.put({__MODULE__, :list_runs}, result)

@@ -52,7 +52,12 @@ defmodule SquidSonar.RouterTest do
     assert {:session, {SquidSonar.Router, :__session__, session_args}} =
              List.keyfind(session_opts, :session, 0)
 
-    assert session_args == ["/dev/sonar", "/live", "websocket"]
+    assert session_args == [
+             "/dev/sonar",
+             "/live",
+             "websocket",
+             SquidSonar.Router.default_control_actor()
+           ]
   end
 
   test "supports custom route name and live transport settings" do
@@ -67,7 +72,24 @@ defmodule SquidSonar.RouterTest do
     assert {:session, {SquidSonar.Router, :__session__, session_args}} =
              List.keyfind(session_opts, :session, 0)
 
-    assert session_args == ["/ops/sonar", "/custom/live", "longpoll"]
+    assert session_args == [
+             "/ops/sonar",
+             "/custom/live",
+             "longpoll",
+             SquidSonar.Router.default_control_actor()
+           ]
+  end
+
+  test "supports static control actors" do
+    actor = %{"id" => "user-123", "type" => "operator"}
+
+    assert {:squid_sonar, session_opts, [as: :squid_sonar]} =
+             SquidSonar.Router.__options__("/sonar", control_actor: actor)
+
+    assert {:session, {SquidSonar.Router, :__session__, session_args}} =
+             List.keyfind(session_opts, :session, 0)
+
+    assert session_args == ["/sonar", "/live", "websocket", actor]
   end
 
   test "rejects invalid transport" do
@@ -80,7 +102,27 @@ defmodule SquidSonar.RouterTest do
     assert %{
              "prefix" => "/sonar",
              "live_path" => "/live",
-             "live_transport" => "websocket"
+             "live_transport" => "websocket",
+             "control_actor" => %{"id" => "squid_sonar"}
            } = SquidSonar.Router.__session__(%{}, "/sonar", "/live", "websocket")
+  end
+
+  test "builds live session payload with a dynamic control actor" do
+    conn = Plug.Test.conn(:get, "/sonar")
+
+    assert %{
+             "control_actor" => %{"id" => "conn-user", "type" => "operator"}
+           } =
+             SquidSonar.Router.__session__(
+               conn,
+               "/sonar",
+               "/live",
+               "websocket",
+               {__MODULE__, :control_actor_from_conn, []}
+             )
+  end
+
+  def control_actor_from_conn(%Plug.Conn{}) do
+    %{"id" => "conn-user", "type" => "operator"}
   end
 end
