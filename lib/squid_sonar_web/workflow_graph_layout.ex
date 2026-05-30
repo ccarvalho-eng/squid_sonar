@@ -130,7 +130,13 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
   end
 
   defp recovery_node?(%{recovery: recovery}) when is_map(recovery) do
-    is_map(Map.get(recovery, :compensation) || Map.get(recovery, "compensation"))
+    case Map.get(recovery, :compensation) || Map.get(recovery, "compensation") do
+      compensation when is_map(compensation) ->
+        not is_nil(Map.get(compensation, :callback) || Map.get(compensation, "callback"))
+
+      _other ->
+        false
+    end
   end
 
   defp recovery_node?(_node), do: false
@@ -143,8 +149,8 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
         node: node,
         x: position.x,
         y: position.y,
-        width: @node_width,
-        height: @node_height
+        width: position.width,
+        height: position.height
       }
     end)
   end
