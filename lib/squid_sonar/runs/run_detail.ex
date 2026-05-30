@@ -56,6 +56,7 @@ defmodule SquidSonar.Runs.RunDetail do
           planned_runnables: [map()],
           attempts: [map()],
           anomalies: [map()],
+          graph_inspection: map(),
           workflow_graph: WorkflowGraph.t(),
           explanation: Diagnostic.t()
         }
@@ -66,6 +67,7 @@ defmodule SquidSonar.Runs.RunDetail do
     :context,
     :last_error,
     :explanation,
+    :graph_inspection,
     :workflow_graph,
     planned_runnables: [],
     attempts: [],
@@ -83,6 +85,7 @@ defmodule SquidSonar.Runs.RunDetail do
       planned_runnables: List.wrap(snapshot.planned_runnables),
       attempts: List.wrap(snapshot.attempts),
       anomalies: List.wrap(snapshot.anomalies),
+      graph_inspection: GraphInspection.to_map(graph),
       workflow_graph: WorkflowGraph.from_models(snapshot, graph),
       explanation: explanation
     }

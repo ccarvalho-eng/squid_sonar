@@ -67,7 +67,7 @@ defmodule SquidSonar.ReadModelFixtures do
       terminal?: Keyword.get(attrs, :terminal?, status in [:completed, :failed, :cancelled]),
       nodes: Keyword.get(attrs, :nodes, []),
       edges: Keyword.get(attrs, :edges, []),
-      anomalies: []
+      anomalies: Keyword.get(attrs, :anomalies, [])
     }
   end
 
@@ -76,17 +76,17 @@ defmodule SquidSonar.ReadModelFixtures do
       id: id,
       status: status,
       current?: current?,
-      input: nil,
-      output: nil,
-      error: nil,
-      recovery: nil,
-      transition: nil,
+      input: Keyword.get(attrs, :input),
+      output: Keyword.get(attrs, :output),
+      error: Keyword.get(attrs, :error),
+      recovery: Keyword.get(attrs, :recovery),
+      transition: Keyword.get(attrs, :transition),
       manual_state: Keyword.get(attrs, :manual_state),
       attempts: []
     }
   end
 
-  def graph_edge(from, to, outcome) do
+  def graph_edge(from, to, outcome, attrs \\ []) do
     %Edge{
       id: "#{from}:#{outcome}:#{to}",
       from: from,
@@ -95,7 +95,7 @@ defmodule SquidSonar.ReadModelFixtures do
       status: :pending,
       outcome: outcome,
       condition: nil,
-      recovery: nil
+      recovery: Keyword.get(attrs, :recovery)
     }
   end
 

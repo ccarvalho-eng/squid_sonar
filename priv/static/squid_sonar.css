@@ -967,6 +967,52 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   flex: 0 1 auto;
 }
 
+.squid-sonar-workflow-panel-tabs {
+  align-items: center;
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: var(--squid-sonar-space-4);
+  padding: 4px;
+}
+
+.squid-sonar-workflow-panel-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--squid-sonar-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  min-height: 32px;
+  padding: 0 12px;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.squid-sonar-workflow-panel-tab:hover,
+.squid-sonar-workflow-panel-tab:focus-visible {
+  color: var(--squid-sonar-text);
+}
+
+.squid-sonar-workflow-panel-tab:focus-visible {
+  outline: 2px solid var(--squid-sonar-accent);
+  outline-offset: 2px;
+}
+
+.squid-sonar-workflow-panel-tab.is-active {
+  background: var(--squid-sonar-surface);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 10%);
+  color: var(--squid-sonar-text);
+}
+
 .squid-sonar-back-link {
   color: var(--squid-sonar-accent);
   display: inline-flex;
@@ -1088,6 +1134,31 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   min-height: 190px;
   overflow: auto;
   padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6) var(--squid-sonar-space-6);
+}
+
+.squid-sonar-workflow-raw {
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 8px;
+  margin-top: var(--squid-sonar-space-4);
+  overflow: hidden;
+  padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6) var(--squid-sonar-space-6);
+}
+
+.squid-sonar-workflow-raw-json {
+  background: var(--squid-sonar-surface);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 6px;
+  color: var(--squid-sonar-text);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 0;
+  max-height: 520px;
+  overflow: auto;
+  padding: 14px;
+  tab-size: 2;
+  white-space: pre;
 }
 
 .squid-sonar-workflow-graph-heading {
@@ -1539,5 +1610,16 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
   .squid-sonar-workflow-graph-evidence {
     grid-template-columns: 1fr;
+  }
+
+  .squid-sonar-workflow-panel-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .squid-sonar-workflow-panel-tab {
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
