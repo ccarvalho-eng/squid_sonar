@@ -82,6 +82,8 @@ The UI includes:
   graph visualization
 - Recovery metadata on compensatable graph nodes when Squid Mesh exposes
   rollback policy information
+- Recovery policy summaries that distinguish declared rollback callbacks,
+  non-compensatable steps, and manual-review replay boundaries
 - Step attempt counts on run detail pages
 - Light, dark, and system theme controls
 - Embedded CSS and JavaScript served by the library
@@ -184,7 +186,8 @@ The repository includes a Phoenix example app at `examples/example_app`. It
 mounts SquidSonar at `/sonar` and seeds real Squid Mesh workflows that produce
 completed, failed, retrying, paused, approval-paused, and saga recovery runs.
 The saga recovery run includes a compensatable inventory reservation step so
-the dashboard can show declared rollback metadata without calling rollback code.
+the dashboard can show declared rollback metadata and recovery policy
+diagnostics without calling rollback code.
 
 ```bash
 cd examples/example_app

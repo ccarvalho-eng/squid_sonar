@@ -558,6 +558,114 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert raw_html =~ "ReleaseInventory"
   end
 
+  test "renders recovery policy diagnostics when present" do
+    recovery = compensation_recovery("ReleaseInventory")
+
+    graph =
+      graph_inspection(:failed,
+        run_id: "run-recovery-summary",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "capture_payment",
+        nodes: [
+          graph_node("reserve_inventory", :completed, false, recovery: recovery),
+          graph_node("capture_payment", :failed, true)
+        ],
+        edges: [
+          graph_edge("reserve_inventory", "capture_payment", :ok)
+        ]
+      )
+
+    snapshot =
+      snapshot(:failed,
+        run_id: "run-recovery-summary",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "capture_payment",
+        reason: :terminal
+      )
+
+    explanation =
+      diagnostic(:failed,
+        run_id: "run-recovery-summary",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :terminal,
+        step: "capture_payment",
+        evidence:
+          recovery_policy_evidence(%{
+            reserve_inventory: recovery,
+            capture_payment: %{
+              irreversible?: true,
+              compensatable?: false,
+              replay: :manual_review_required,
+              recovery: :manual_intervention,
+              input: %{card_token: "tok_secret"}
+            }
+          })
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+
+    {:noreply, socket} =
+      RunLive.handle_params(
+        %{"id" => "run-recovery-summary"},
+        "/sonar/runs/run-recovery-summary",
+        socket
+      )
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Recovery policy"
+    assert html =~ "Declared rollback metadata"
+    assert html =~ "reserve_inventory"
+    assert html =~ "ReleaseInventory"
+    assert html =~ "available"
+    assert html =~ "capture_payment"
+    assert html =~ "irreversible"
+    assert html =~ "manual review required"
+    assert html =~ "manual intervention"
+    refute html =~ "tok_secret"
+  end
+
+  test "does not render an empty recovery policy section" do
+    FakeSquidMeshClient.put_inspect_run(
+      {:ok,
+       snapshot(:running, run_id: "run-no-recovery", workflow: Atom.to_string(CheckoutWorkflow))}
+    )
+
+    FakeSquidMeshClient.put_inspect_run_graph(
+      {:ok,
+       graph_inspection(:running,
+         run_id: "run-no-recovery",
+         workflow: Atom.to_string(CheckoutWorkflow)
+       )}
+    )
+
+    FakeSquidMeshClient.put_explain_run(
+      {:ok,
+       diagnostic(:running,
+         run_id: "run-no-recovery",
+         workflow: Atom.to_string(CheckoutWorkflow)
+       )}
+    )
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+    {:noreply, socket} = RunLive.handle_params(%{"id" => "run-no-recovery"}, "", socket)
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    refute html =~ "Recovery policy"
+    refute html =~ "Declared rollback metadata"
+  end
+
   test "renders load errors without leaking internal reason details" do
     FakeSquidMeshClient.put_inspect_run({:error, {:missing_config, [:repo]}})
 
