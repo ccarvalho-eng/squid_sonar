@@ -369,6 +369,30 @@ defmodule SquidSonarWeb.CoreComponents do
         </section>
       </div>
 
+      <section
+        :if={@detail.recovery_policies != []}
+        class="squid-sonar-detail-panel squid-sonar-recovery-policy-panel"
+      >
+        <h3>Recovery policy</h3>
+        <p>
+          Declared rollback metadata only; SquidSonar does not execute rollback from this summary.
+        </p>
+        <div class="squid-sonar-recovery-policy-list">
+          <div :for={policy <- @detail.recovery_policies} class="squid-sonar-recovery-policy-row">
+            <strong>{policy.step}</strong>
+            <div class="squid-sonar-recovery-policy-tags">
+              <span :if={policy.compensation_callback}>
+                Rollback {format_policy_value(policy.compensation_status)} via {policy.compensation_callback}
+              </span>
+              <span :if={policy.irreversible? == true}>irreversible</span>
+              <span :if={policy.compensatable? == false}>non-compensatable</span>
+              <span :if={policy.replay}>replay {format_policy_value(policy.replay)}</span>
+              <span :if={policy.recovery}>recovery {format_policy_value(policy.recovery)}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="squid-sonar-detail-panel">
         <div class="squid-sonar-workflow-panel-heading">
           <h3>Workflow</h3>
@@ -575,6 +599,14 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_value(nil), do: "None"
   defp format_value(value) when is_atom(value), do: Atom.to_string(value)
   defp format_value(value), do: to_string(value)
+
+  defp format_policy_value(nil), do: "unknown"
+
+  defp format_policy_value(value) do
+    value
+    |> format_value()
+    |> String.replace("_", " ")
+  end
 
   defp format_time(nil), do: "Unknown"
 

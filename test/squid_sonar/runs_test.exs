@@ -238,6 +238,91 @@ defmodule SquidSonar.RunsTest do
     assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "capture_payment")).recovery == nil
   end
 
+  test "projects safe recovery policy diagnostics from explanation evidence" do
+    reserve_recovery = compensation_recovery("ReleaseInventory")
+
+    policies =
+      recovery_policy_evidence(%{
+        reserve_inventory: reserve_recovery,
+        capture_payment: %{
+          irreversible?: true,
+          compensatable?: false,
+          replay: :manual_review_required,
+          recovery: :manual_intervention,
+          input: %{card_token: "tok_secret"},
+          output: %{charge_id: "ch_sensitive"}
+        },
+        send_receipt: %{
+          irreversible?: false,
+          compensatable?: false,
+          replay: :manual_review_required,
+          recovery: :manual_intervention,
+          idempotency_key: "receipt-secret"
+        }
+      })
+
+    snapshot =
+      snapshot(:failed,
+        run_id: "run-recovery-policies",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :terminal
+      )
+
+    graph =
+      graph_inspection(:failed,
+        run_id: "run-recovery-policies",
+        workflow: Atom.to_string(CheckoutWorkflow)
+      )
+
+    explanation =
+      diagnostic(:failed,
+        run_id: "run-recovery-policies",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        evidence: policies
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    assert {:ok, %RunDetail{} = detail} =
+             Runs.get_run("run-recovery-policies", client: @client)
+
+    assert detail.recovery_policies == [
+             %RunDetail.RecoveryPolicy{
+               step: "capture_payment",
+               compensation_callback: nil,
+               compensation_status: nil,
+               irreversible?: true,
+               compensatable?: false,
+               replay: :manual_review_required,
+               recovery: :manual_intervention
+             },
+             %RunDetail.RecoveryPolicy{
+               step: "reserve_inventory",
+               compensation_callback: "ReleaseInventory",
+               compensation_status: :available,
+               irreversible?: nil,
+               compensatable?: nil,
+               replay: nil,
+               recovery: nil
+             },
+             %RunDetail.RecoveryPolicy{
+               step: "send_receipt",
+               compensation_callback: nil,
+               compensation_status: nil,
+               irreversible?: false,
+               compensatable?: false,
+               replay: :manual_review_required,
+               recovery: :manual_intervention
+             }
+           ]
+
+    refute inspect(detail.recovery_policies) =~ "tok_secret"
+    refute inspect(detail.recovery_policies) =~ "ch_sensitive"
+    refute inspect(detail.recovery_policies) =~ "receipt-secret"
+  end
+
   test "projects dependency mode from the workflow definition" do
     snapshot =
       snapshot(:running,

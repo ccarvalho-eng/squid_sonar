@@ -48,6 +48,32 @@ defmodule SquidSonar.Runs.RunDetail do
     ]
   end
 
+  defmodule RecoveryPolicy do
+    @moduledoc false
+
+    @type t :: %__MODULE__{
+            step: String.t(),
+            compensation_callback: String.t() | nil,
+            compensation_status: atom() | String.t() | nil,
+            irreversible?: boolean() | nil,
+            compensatable?: boolean() | nil,
+            replay: atom() | String.t() | nil,
+            recovery: atom() | String.t() | nil
+          }
+
+    @enforce_keys [:step]
+
+    defstruct [
+      :step,
+      :compensation_callback,
+      :compensation_status,
+      :irreversible?,
+      :compensatable?,
+      :replay,
+      :recovery
+    ]
+  end
+
   @type t :: %__MODULE__{
           summary: Summary.t(),
           payload: map() | nil,
@@ -58,7 +84,8 @@ defmodule SquidSonar.Runs.RunDetail do
           anomalies: [map()],
           graph_inspection: map(),
           workflow_graph: WorkflowGraph.t(),
-          explanation: Diagnostic.t()
+          explanation: Diagnostic.t(),
+          recovery_policies: [RecoveryPolicy.t()]
         }
 
   defstruct [
@@ -69,6 +96,7 @@ defmodule SquidSonar.Runs.RunDetail do
     :explanation,
     :graph_inspection,
     :workflow_graph,
+    recovery_policies: [],
     planned_runnables: [],
     attempts: [],
     anomalies: []
@@ -87,7 +115,8 @@ defmodule SquidSonar.Runs.RunDetail do
       anomalies: List.wrap(snapshot.anomalies),
       graph_inspection: GraphInspection.to_map(graph),
       workflow_graph: WorkflowGraph.from_models(snapshot, graph),
-      explanation: explanation
+      explanation: explanation,
+      recovery_policies: recovery_policies(explanation)
     }
   end
 
@@ -110,5 +139,61 @@ defmodule SquidSonar.Runs.RunDetail do
     |> List.wrap()
     |> Enum.reverse()
     |> Enum.find_value(fn attempt -> Map.get(attempt, :error) end)
+  end
+
+  defp recovery_policies(%Diagnostic{evidence: evidence}) when is_map(evidence) do
+    case map_value(evidence, :recovery_policies) do
+      policies when is_map(policies) ->
+        policies
+        |> Enum.map(fn {step, policy} -> recovery_policy(step, policy) end)
+        |> Enum.sort_by(& &1.step)
+
+      _missing ->
+        []
+    end
+  end
+
+  defp recovery_policies(_explanation), do: []
+
+  defp recovery_policy(step, policy) when is_map(policy) do
+    compensation = map_value(policy, :compensation)
+
+    %RecoveryPolicy{
+      step: to_string(step),
+      compensation_callback: compensation_callback(compensation),
+      compensation_status: compensation_status(compensation),
+      irreversible?: map_value(policy, :irreversible?),
+      compensatable?: map_value(policy, :compensatable?),
+      replay: map_value(policy, :replay),
+      recovery: map_value(policy, :recovery)
+    }
+  end
+
+  defp recovery_policy(step, _policy), do: %RecoveryPolicy{step: to_string(step)}
+
+  defp compensation_callback(compensation) when is_map(compensation) do
+    case map_value(compensation, :callback) do
+      nil ->
+        nil
+
+      callback ->
+        callback
+        |> to_string()
+        |> String.replace_prefix("Elixir.", "")
+    end
+  end
+
+  defp compensation_callback(_compensation), do: nil
+
+  defp compensation_status(compensation) when is_map(compensation),
+    do: map_value(compensation, :status)
+
+  defp compensation_status(_compensation), do: nil
+
+  defp map_value(map, key) when is_map(map) do
+    case Map.fetch(map, key) do
+      {:ok, value} -> value
+      :error -> Map.get(map, to_string(key))
+    end
   end
 end
