@@ -1153,7 +1153,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-recovery-policy-row > strong {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
   font-size: 12px;
   font-weight: 650;
   min-width: 0;
