@@ -505,6 +505,18 @@ defmodule SquidSonarWeb.CoreComponents do
                   <span class="squid-sonar-workflow-node-status">
                     {format_graph_status(item.node.status)}
                   </span>
+                  <%= if recovery = compensation_recovery(item.node) do %>
+                    <div
+                      class="squid-sonar-workflow-node-recovery-panel"
+                      title={"Rollback #{recovery.status} via #{recovery.callback}"}
+                    >
+                      <span class="squid-sonar-workflow-node-recovery-label">Rollback</span>
+                      <div class="squid-sonar-workflow-node-recovery-meta">
+                        <strong>{recovery.callback}</strong>
+                        <em>{recovery.status}</em>
+                      </div>
+                    </div>
+                  <% end %>
                 </article>
               </div>
             </div>
@@ -637,6 +649,31 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_graph_status(:waiting), do: "waiting"
   defp format_graph_status(:pending), do: "pending"
   defp format_graph_status(status), do: format_value(status)
+
+  defp compensation_recovery(%{recovery: recovery}) when is_map(recovery) do
+    with compensation when is_map(compensation) <-
+           Map.get(recovery, :compensation) || Map.get(recovery, "compensation"),
+         callback when not is_nil(callback) <-
+           Map.get(compensation, :callback) || Map.get(compensation, "callback") do
+      %{
+        callback: format_recovery_callback(callback),
+        status:
+          compensation
+          |> Map.get(:status, Map.get(compensation, "status", :available))
+          |> format_value()
+      }
+    else
+      _other -> nil
+    end
+  end
+
+  defp compensation_recovery(_node), do: nil
+
+  defp format_recovery_callback(callback) do
+    callback
+    |> format_value()
+    |> String.replace_prefix("Elixir.", "")
+  end
 
   defp raw_graph_inspection_json(graph_inspection) do
     graph_inspection

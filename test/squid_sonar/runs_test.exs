@@ -21,6 +21,37 @@ defmodule SquidSonar.RunsTest do
     end
   end
 
+  defmodule ReleaseInventory do
+    use SquidMesh.Step,
+      name: :release_inventory,
+      input_schema: [
+        step: [type: :map, required: true]
+      ]
+
+    @impl true
+    def run(_input, _context), do: {:ok, %{}}
+  end
+
+  defmodule CompensatingWorkflow do
+    use SquidMesh.Workflow
+
+    workflow do
+      trigger :manual do
+        manual()
+      end
+
+      step(:reserve_inventory, :log,
+        message: "reserve inventory",
+        compensate: ReleaseInventory
+      )
+
+      step(:capture_payment, :log, message: "capture payment")
+
+      transition(:reserve_inventory, on: :ok, to: :capture_payment)
+      transition(:capture_payment, on: :ok, to: :complete)
+    end
+  end
+
   defmodule DependencyWorkflow do
     use SquidMesh.Workflow
 
@@ -98,7 +129,11 @@ defmodule SquidSonar.RunsTest do
         current_node_id: "capture_payment",
         nodes: [
           graph_node("load_order", :completed, false),
-          graph_node("capture_payment", :running, true),
+          graph_node("capture_payment", :running, true,
+            recovery: %{
+              compensation: %{callback: "ReleaseInventory", status: :available}
+            }
+          ),
           graph_node("send_receipt", :waiting, false)
         ],
         edges: [
@@ -148,10 +183,62 @@ defmodule SquidSonar.RunsTest do
              "send_receipt"
            ]
 
+    assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "capture_payment")).recovery == %{
+             compensation: %{callback: "ReleaseInventory", status: :available}
+           }
+
     assert Enum.map(detail.workflow_graph.edges, &{&1.from, &1.to, &1.outcome}) == [
              {"load_order", "capture_payment", :ok},
              {"capture_payment", "send_receipt", :ok}
            ]
+  end
+
+  test "adds definition recovery metadata when graph nodes omit it" do
+    snapshot =
+      snapshot(:failed,
+        run_id: "run-recovery-definition",
+        workflow: Atom.to_string(CompensatingWorkflow),
+        reason: :terminal,
+        current_step: "capture_payment"
+      )
+
+    graph =
+      graph_inspection(:failed,
+        run_id: "run-recovery-definition",
+        workflow: Atom.to_string(CompensatingWorkflow),
+        current_node_id: "capture_payment",
+        nodes: [
+          graph_node("reserve_inventory", :completed, false),
+          graph_node("capture_payment", :failed, true)
+        ],
+        edges: [
+          graph_edge("reserve_inventory", "capture_payment", :ok)
+        ]
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+
+    FakeSquidMeshClient.put_explain_run(
+      {:ok,
+       diagnostic(:failed,
+         run_id: "run-recovery-definition",
+         workflow: Atom.to_string(CompensatingWorkflow)
+       )}
+    )
+
+    assert {:ok, %RunDetail{} = detail} =
+             Runs.get_run("run-recovery-definition", client: @client)
+
+    assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "reserve_inventory")).recovery ==
+             %{
+               compensation: %{
+                 callback: ReleaseInventory,
+                 status: :available
+               }
+             }
+
+    assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "capture_payment")).recovery == nil
   end
 
   test "projects dependency mode from the workflow definition" do
