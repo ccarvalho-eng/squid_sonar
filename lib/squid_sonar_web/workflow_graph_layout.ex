@@ -3,6 +3,7 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
 
   @node_width 210
   @node_height 42
+  @recovery_node_height 72
   @column_gap 72
   @row_gap 42
   @padding_x 24
@@ -23,12 +24,13 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
     node_order = node_order(nodes)
     graph_edges = graph_edges(edges, node_order)
     columns = columns(nodes, graph_edges, node_order)
-    positions = positions(nodes, graph_edges, columns, node_order)
+    track_height = track_height(nodes)
+    positions = positions(nodes, graph_edges, columns, node_order, track_height)
     positioned_nodes = positioned_nodes(nodes, positions)
 
     %{
       width: dimension(positions, :column, @node_width, @column_gap, @padding_x),
-      height: dimension(positions, :row, @node_height, @row_gap, @padding_y),
+      height: dimension(positions, :row, track_height, @row_gap, @padding_y),
       nodes: positioned_nodes,
       segments: segments(graph_edges, positions),
       ports: ports(graph_edges, positions)
@@ -66,7 +68,7 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
     end)
   end
 
-  defp positions(nodes, graph_edges, columns, node_order) do
+  defp positions(nodes, graph_edges, columns, node_order, track_height) do
     parents_by_node =
       Enum.reduce(graph_edges, %{}, fn {from, to}, parents ->
         Map.update(parents, to, [from], &[from | &1])
@@ -77,7 +79,7 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
       key = node_key(name)
       {Map.fetch!(columns, key), Map.fetch!(node_order, key)}
     end)
-    |> Enum.reduce({%{}, %{}}, fn %{name: name}, {positions, occupied_rows} ->
+    |> Enum.reduce({%{}, %{}}, fn %{name: name} = node, {positions, occupied_rows} ->
       key = node_key(name)
       column = Map.fetch!(columns, key)
       desired_row = desired_row(Map.get(parents_by_node, key, []), positions)
@@ -87,9 +89,9 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
         column: column,
         row: row,
         x: @padding_x + (column - 1) * (@node_width + @column_gap),
-        y: @padding_y + (row - 1) * (@node_height + @row_gap),
+        y: @padding_y + (row - 1) * (track_height + @row_gap),
         width: @node_width,
-        height: @node_height
+        height: node_height(node)
       }
 
       {
@@ -118,6 +120,20 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
       desired_row
     end
   end
+
+  defp track_height(nodes) do
+    if Enum.any?(nodes, &recovery_node?/1), do: @recovery_node_height, else: @node_height
+  end
+
+  defp node_height(node) do
+    if recovery_node?(node), do: @recovery_node_height, else: @node_height
+  end
+
+  defp recovery_node?(%{recovery: recovery}) when is_map(recovery) do
+    is_map(Map.get(recovery, :compensation) || Map.get(recovery, "compensation"))
+  end
+
+  defp recovery_node?(_node), do: false
 
   defp positioned_nodes(nodes, positions) do
     Enum.map(nodes, fn %{name: name} = node ->

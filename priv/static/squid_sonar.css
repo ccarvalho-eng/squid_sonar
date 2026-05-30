@@ -1260,16 +1260,17 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-workflow-node {
-  align-items: center;
+  align-items: stretch;
   background: var(--squid-sonar-surface);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  justify-content: space-between;
+  justify-content: center;
   min-width: 0;
-  padding: 0 12px;
+  padding: 8px 12px;
   position: absolute;
   transition:
     background-color 120ms ease,
@@ -1291,6 +1292,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   align-items: center;
   display: flex;
   gap: 8px;
+  justify-content: center;
   min-width: 0;
 }
 
@@ -1386,6 +1388,42 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   flex: 0 0 auto;
   font-size: 11px;
   font-weight: 600;
+  text-align: center;
+}
+
+.squid-sonar-workflow-node-recovery {
+  align-items: center;
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 999px;
+  color: var(--squid-sonar-muted);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 24px;
+  padding: 3px 8px;
+}
+
+.squid-sonar-workflow-node-recovery span,
+.squid-sonar-workflow-node-recovery em {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.squid-sonar-workflow-node-recovery strong {
+  color: var(--squid-sonar-text);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .squid-sonar-control-buttons {

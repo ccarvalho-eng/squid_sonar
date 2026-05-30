@@ -528,6 +528,9 @@ defmodule SquidSonarWeb.RunLiveTest do
 
     assert visual_html =~ "Transition graph"
     assert visual_html =~ "Raw inspection"
+    assert visual_html =~ "Rollback"
+    assert visual_html =~ "ReleaseInventory"
+    assert visual_html =~ "available"
     refute visual_html =~ ~s("current_node_ids")
 
     {:noreply, socket} =

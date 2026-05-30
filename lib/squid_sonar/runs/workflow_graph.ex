@@ -15,10 +15,11 @@ defmodule SquidSonar.Runs.WorkflowGraph do
             label: String.t(),
             status: atom(),
             current?: boolean(),
-            terminal?: boolean()
+            terminal?: boolean(),
+            recovery: map() | nil
           }
 
-    defstruct [:name, :label, :status, current?: false, terminal?: false]
+    defstruct [:name, :label, :status, :recovery, current?: false, terminal?: false]
   end
 
   defmodule Edge do
@@ -73,11 +74,12 @@ defmodule SquidSonar.Runs.WorkflowGraph do
 
   defp load_definition(_workflow), do: {:error, {:invalid_workflow, nil}}
 
-  defp graph_node(%{id: id, status: status, current?: current?}) do
+  defp graph_node(%{id: id, status: status, current?: current?} = node) do
     %Node{
       name: id,
       label: format_name(id),
       status: status,
+      recovery: Map.get(node, :recovery),
       current?: current?,
       terminal?: terminal_node?(id, status)
     }
