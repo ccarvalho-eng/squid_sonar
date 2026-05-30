@@ -102,12 +102,40 @@ defmodule SquidSonar.ReadModelFixtures do
   def edge_type(:ready), do: :dependency
   def edge_type(_outcome), do: :transition
 
-  def attempt(step, status, attempt_number, error) do
+  def compensation_recovery(callback, attrs \\ []) do
+    recovery = %{
+      compensation: %{
+        callback: callback,
+        status: Keyword.get(attrs, :status, :available)
+      }
+    }
+
+    maybe_put(recovery, :failure, Keyword.get(attrs, :failure))
+  end
+
+  def recovery_policy_evidence(step, recovery) do
+    recovery_policy_evidence(%{to_string(step) => recovery})
+  end
+
+  def recovery_policy_evidence(recovery_policies) when is_map(recovery_policies) do
+    %{
+      recovery_policies:
+        Map.new(recovery_policies, fn {step, recovery} ->
+          {to_string(step), recovery}
+        end)
+    }
+  end
+
+  def attempt(step, status, attempt_number, error, attrs \\ []) do
     %{
       step: step,
       status: status,
       attempt_number: attempt_number,
       error: error
     }
+    |> maybe_put(:recovery, Keyword.get(attrs, :recovery))
   end
+
+  defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end
