@@ -2,8 +2,8 @@ defmodule SquidSonarWeb.WorkflowGraphLayout do
   @moduledoc false
 
   @node_width 210
-  @node_height 42
-  @recovery_node_height 72
+  @node_height 58
+  @recovery_node_height 112
   @column_gap 72
   @row_gap 42
   @padding_x 24

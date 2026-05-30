@@ -43,6 +43,8 @@ defmodule Mix.Tasks.Example.Seed do
        %{order_id: "order-complete-#{unique}", customer_id: "cust_demo"}},
       {SquidSonarExample.Workflows.FailingCheckout, :failing_checkout,
        %{order_id: "order-failed-#{unique}", customer_id: "cust_demo"}},
+      {SquidSonarExample.Workflows.SagaCheckout, :saga_checkout,
+       %{order_id: "order-saga-#{unique}", customer_id: "cust_demo"}},
       {SquidSonarExample.Workflows.RetryingCheckout, :retrying_checkout,
        %{order_id: "order-retrying-#{unique}", customer_id: "cust_demo"}},
       {SquidSonarExample.Workflows.PausedCheckout, :paused_checkout,

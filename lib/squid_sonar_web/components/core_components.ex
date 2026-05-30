@@ -506,14 +506,16 @@ defmodule SquidSonarWeb.CoreComponents do
                     {format_graph_status(item.node.status)}
                   </span>
                   <%= if recovery = compensation_recovery(item.node) do %>
-                    <span
-                      class="squid-sonar-workflow-node-recovery"
+                    <div
+                      class="squid-sonar-workflow-node-recovery-panel"
                       title={"Rollback #{recovery.status} via #{recovery.callback}"}
                     >
-                      <span>Rollback</span>
-                      <strong>{recovery.callback}</strong>
-                      <em>{recovery.status}</em>
-                    </span>
+                      <span class="squid-sonar-workflow-node-recovery-label">Rollback</span>
+                      <div class="squid-sonar-workflow-node-recovery-meta">
+                        <strong>{recovery.callback}</strong>
+                        <em>{recovery.status}</em>
+                      </div>
+                    </div>
                   <% end %>
                 </article>
               </div>

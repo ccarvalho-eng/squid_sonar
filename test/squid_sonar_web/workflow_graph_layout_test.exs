@@ -23,7 +23,7 @@ defmodule SquidSonarWeb.WorkflowGraphLayoutTest do
         edges: []
       })
 
-    assert [%{height: 72}] = layout.nodes
+    assert [%{height: 112}] = layout.nodes
   end
 
   test "uses the standard track height when compensation callback is absent" do
@@ -44,7 +44,7 @@ defmodule SquidSonarWeb.WorkflowGraphLayoutTest do
         edges: []
       })
 
-    assert [%{height: 42}] = layout.nodes
-    assert layout.height == 82
+    assert [%{height: 58}] = layout.nodes
+    assert layout.height == 98
   end
 end

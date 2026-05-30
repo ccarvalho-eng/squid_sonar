@@ -974,7 +974,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border-radius: 8px;
   display: inline-flex;
   gap: 4px;
-  margin-bottom: var(--squid-sonar-space-4);
+  margin-bottom: var(--squid-sonar-space-2);
   padding: 4px;
 }
 
@@ -1130,7 +1130,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 8px;
-  margin-top: var(--squid-sonar-space-4);
+  margin-top: 0;
   min-height: 190px;
   overflow: auto;
   padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6) var(--squid-sonar-space-6);
@@ -1140,7 +1140,7 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
   border-radius: 8px;
-  margin-top: var(--squid-sonar-space-4);
+  margin-top: 0;
   overflow: hidden;
   padding: var(--squid-sonar-space-5) var(--squid-sonar-space-6) var(--squid-sonar-space-6);
 }
@@ -1265,34 +1265,42 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   border: 1px solid var(--squid-sonar-border);
   border-radius: 6px;
   box-sizing: border-box;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  justify-content: center;
+  gap: 7px;
+  justify-content: flex-start;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 10px 12px;
   position: absolute;
   transition:
     background-color 120ms ease,
-    border-color 120ms ease;
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
   z-index: 2;
 }
 
 .squid-sonar-workflow-node:hover {
   background: var(--squid-sonar-surface-raised);
   border-color: var(--squid-sonar-border-strong);
+  box-shadow: 0 6px 16px rgb(15 23 42 / 10%);
+  transform: translateY(-1px);
 }
 
 .squid-sonar-workflow-node-current {
   background: var(--squid-sonar-surface);
   border-color: var(--squid-sonar-accent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--squid-sonar-accent) 16%, transparent),
+    0 4px 12px rgb(15 23 42 / 8%);
 }
 
 .squid-sonar-workflow-node-main {
   align-items: center;
   display: flex;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
 }
 
@@ -1304,8 +1312,10 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 
 .squid-sonar-workflow-node strong {
   display: block;
+  flex: 1 1 auto;
   font-size: 12px;
   line-height: 1.25;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1384,46 +1394,91 @@ body.squid-sonar-document:has(.squid-sonar-theme-dark) {
 }
 
 .squid-sonar-workflow-node-status {
-  color: var(--squid-sonar-muted);
-  flex: 0 0 auto;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.squid-sonar-workflow-node-recovery {
-  align-items: center;
+  align-self: flex-start;
   background: var(--squid-sonar-surface-muted);
   border: 1px solid var(--squid-sonar-border);
-  border-radius: 999px;
+  border-radius: 4px;
   color: var(--squid-sonar-muted);
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
-  max-width: 100%;
-  min-height: 24px;
-  padding: 3px 8px;
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+  padding: 4px 7px;
+  text-transform: uppercase;
 }
 
-.squid-sonar-workflow-node-recovery span,
-.squid-sonar-workflow-node-recovery em {
+.squid-sonar-workflow-node-completed .squid-sonar-workflow-node-status {
+  background: var(--squid-sonar-success-muted);
+  border-color: color-mix(in srgb, var(--squid-sonar-success) 28%, var(--squid-sonar-border));
+  color: var(--squid-sonar-success);
+}
+
+.squid-sonar-workflow-node-failed .squid-sonar-workflow-node-status,
+.squid-sonar-workflow-node-cancelled .squid-sonar-workflow-node-status {
+  background: var(--squid-sonar-danger-muted);
+  border-color: color-mix(in srgb, var(--squid-sonar-danger) 28%, var(--squid-sonar-border));
+  color: var(--squid-sonar-danger);
+}
+
+.squid-sonar-workflow-node-running .squid-sonar-workflow-node-status,
+.squid-sonar-workflow-node-retrying .squid-sonar-workflow-node-status {
+  background: var(--squid-sonar-warning-muted);
+  border-color: color-mix(in srgb, var(--squid-sonar-warning) 28%, var(--squid-sonar-border));
+  color: var(--squid-sonar-warning);
+}
+
+.squid-sonar-workflow-node-paused .squid-sonar-workflow-node-status,
+.squid-sonar-workflow-node-waiting .squid-sonar-workflow-node-status,
+.squid-sonar-workflow-node-pending .squid-sonar-workflow-node-status {
+  background: var(--squid-sonar-waiting-muted);
+  border-color: color-mix(in srgb, var(--squid-sonar-waiting) 24%, var(--squid-sonar-border));
+  color: var(--squid-sonar-waiting);
+}
+
+.squid-sonar-workflow-node-recovery-panel {
+  align-items: stretch;
+  background: var(--squid-sonar-surface-muted);
+  border: 1px solid var(--squid-sonar-border);
+  border-radius: 5px;
+  color: var(--squid-sonar-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 6px 8px;
+}
+
+.squid-sonar-workflow-node-recovery-label,
+.squid-sonar-workflow-node-recovery-panel em {
   font-size: 10px;
   font-style: normal;
   font-weight: 750;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: 1.1;
   text-transform: uppercase;
 }
 
-.squid-sonar-workflow-node-recovery strong {
+.squid-sonar-workflow-node-recovery-meta {
+  align-items: baseline;
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.squid-sonar-workflow-node-recovery-panel strong {
   color: var(--squid-sonar-text);
+  flex: 1 1 auto;
   font-size: 11px;
   font-weight: 700;
   line-height: 1.1;
+  min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
   white-space: normal;
+}
+
+.squid-sonar-workflow-node-recovery-panel em {
+  flex: 0 0 auto;
 }
 
 .squid-sonar-control-buttons {

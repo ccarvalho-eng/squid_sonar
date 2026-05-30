@@ -10,6 +10,7 @@ defmodule SquidSonarExample.WorkflowsTest do
     workflows = [
       SquidSonarExample.Workflows.CompletedCheckout,
       SquidSonarExample.Workflows.FailingCheckout,
+      SquidSonarExample.Workflows.SagaCheckout,
       SquidSonarExample.Workflows.RetryingCheckout,
       SquidSonarExample.Workflows.PausedCheckout,
       SquidSonarExample.Workflows.ManualReviewCheckout
