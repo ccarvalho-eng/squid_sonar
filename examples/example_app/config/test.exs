@@ -13,4 +13,6 @@ config :squid_sonar_example, SquidSonarExampleWeb.Endpoint,
   secret_key_base: "squid_sonar_example_test_secret_key_base_at_least_sixty_four_bytes_long",
   server: false
 
+config :squid_sonar_example, :journal_run, enabled: false
+
 config :logger, level: :warning

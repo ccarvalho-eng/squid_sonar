@@ -180,6 +180,10 @@ workflow names, run IDs, step names, statuses, diagnostic signals, and selected
 error metadata. Treat the mounted dashboard as an operational control surface
 and expose it only to trusted users.
 
+Run list and run detail pages refresh automatically while they are open. Detail
+pages poll active runs and run list pages reload the current filtered view, so
+manual controls can reflect follow-up workflow work without a browser refresh.
+
 ## Example App
 
 The repository includes a Phoenix example app at `examples/example_app`. It
@@ -187,7 +191,10 @@ mounts SquidSonar at `/sonar` and seeds real Squid Mesh workflows that produce
 completed, failed, retrying, paused, approval-paused, and saga recovery runs.
 The saga recovery run includes a compensatable inventory reservation step so
 the dashboard can show declared rollback metadata and recovery policy
-diagnostics without calling rollback code.
+diagnostics without calling rollback code. The example server also starts a
+small host-owned journal runner, so dashboard control actions such as approving
+or rejecting the manual review checkout can advance their scheduled follow-up
+steps during local preview.
 
 ```bash
 cd examples/example_app

@@ -3,6 +3,9 @@ defmodule SquidSonarWeb.RunLive do
 
   alias SquidSonar.Runs
 
+  @run_refresh_interval_ms 1_000
+  @control_refresh_interval_ms 250
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
@@ -16,7 +19,10 @@ defmodule SquidSonarWeb.RunLive do
 
   @impl true
   def handle_params(%{"id" => run_id}, _uri, socket) do
-    {:noreply, assign_run(socket, run_id)}
+    {:noreply,
+     socket
+     |> assign_run(run_id)
+     |> schedule_run_refresh()}
   end
 
   @impl true
@@ -41,7 +47,8 @@ defmodule SquidSonarWeb.RunLive do
         {:noreply,
          socket
          |> put_run_flash(:info, "Run cancelled successfully")
-         |> assign_run(run_id)}
+         |> assign_run(run_id)
+         |> schedule_control_refresh()}
 
       {:error, _reason} ->
         {:noreply, put_run_flash(socket, :error, "Failed to cancel run.")}
@@ -55,7 +62,8 @@ defmodule SquidSonarWeb.RunLive do
         {:noreply,
          socket
          |> put_run_flash(:info, "Run resumed successfully")
-         |> assign_run(run_id)}
+         |> assign_run(run_id)
+         |> schedule_control_refresh()}
 
       {:error, _reason} ->
         {:noreply, put_run_flash(socket, :error, "Failed to resume run.")}
@@ -69,7 +77,8 @@ defmodule SquidSonarWeb.RunLive do
         {:noreply,
          socket
          |> put_run_flash(:info, "Run approved successfully")
-         |> assign_run(run_id)}
+         |> assign_run(run_id)
+         |> schedule_control_refresh()}
 
       {:error, _reason} ->
         {:noreply, put_run_flash(socket, :error, "Failed to approve run.")}
@@ -83,7 +92,8 @@ defmodule SquidSonarWeb.RunLive do
         {:noreply,
          socket
          |> put_run_flash(:info, "Run rejected successfully")
-         |> assign_run(run_id)}
+         |> assign_run(run_id)
+         |> schedule_control_refresh()}
 
       {:error, _reason} ->
         {:noreply, put_run_flash(socket, :error, "Failed to reject run.")}
@@ -97,7 +107,9 @@ defmodule SquidSonarWeb.RunLive do
         {:noreply,
          socket
          |> put_run_flash(:info, "Run replayed successfully")
-         |> assign_run(new_run.run_id)}
+         |> assign_run(new_run.run_id)
+         |> schedule_control_refresh()
+         |> push_patch(to: run_path(socket, new_run.run_id))}
 
       {:error, _reason} ->
         {:noreply, put_run_flash(socket, :error, "Failed to replay run.")}
@@ -139,19 +151,51 @@ defmodule SquidSonarWeb.RunLive do
     """
   end
 
+  @impl true
+  def handle_info(:refresh_run, socket) do
+    {:noreply,
+     socket
+     |> assign_run(socket.assigns.run_id)
+     |> schedule_run_refresh()}
+  end
+
   defp assign_run(socket, run_id) do
     case Runs.get_run(run_id) do
       {:ok, detail} ->
         socket
+        |> assign(:run_id, run_id)
         |> assign(:detail, detail)
         |> assign(:load_error, nil)
 
       {:error, reason} ->
         socket
+        |> assign(:run_id, run_id)
         |> assign(:detail, nil)
         |> assign(:load_error, reason)
     end
   end
+
+  defp schedule_control_refresh(socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :refresh_run, @control_refresh_interval_ms)
+    end
+
+    socket
+  end
+
+  defp schedule_run_refresh(socket) do
+    if connected?(socket) and refreshable_run?(socket) do
+      Process.send_after(self(), :refresh_run, @run_refresh_interval_ms)
+    end
+
+    socket
+  end
+
+  defp refreshable_run?(%{assigns: %{detail: %{summary: %{terminal?: terminal?}}}}) do
+    not terminal?
+  end
+
+  defp refreshable_run?(_socket), do: false
 
   defp put_run_flash(socket, kind, message) do
     if Map.has_key?(socket.assigns, :flash) do
@@ -184,4 +228,6 @@ defmodule SquidSonarWeb.RunLive do
 
   defp normalize_workflow_panel_view("raw"), do: :raw
   defp normalize_workflow_panel_view(_view), do: :visual
+
+  defp run_path(socket, run_id), do: "#{socket.assigns.prefix}/runs/#{run_id}"
 end

@@ -4,8 +4,8 @@ defmodule SquidSonar.FakeSquidMeshClient do
   @behaviour SquidSonar.SquidMeshClient
 
   @impl true
-  def list_runs(_filters, _opts) do
-    Process.get({__MODULE__, :list_runs}, {:ok, []})
+  def list_runs(filters, opts) do
+    result({__MODULE__, :list_runs}, [filters, opts], {:ok, []})
   end
 
   @impl true

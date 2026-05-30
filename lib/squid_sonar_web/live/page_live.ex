@@ -3,6 +3,8 @@ defmodule SquidSonarWeb.PageLive do
 
   alias SquidSonar.Dashboard
 
+  @dashboard_refresh_interval_ms 2_000
+
   @impl true
   def mount(_params, _session, socket) do
     socket =
@@ -11,6 +13,7 @@ defmodule SquidSonarWeb.PageLive do
       |> assign(:page_title, "SquidSonar Runtime")
       |> assign(:theme, :system)
       |> assign_dashboard()
+      |> schedule_dashboard_refresh()
 
     {:ok, socket}
   end
@@ -53,6 +56,19 @@ defmodule SquidSonarWeb.PageLive do
   @impl true
   def handle_event("set_theme", %{"theme" => theme}, socket) do
     {:noreply, assign(socket, :theme, normalize_theme(theme))}
+  end
+
+  @impl true
+  def handle_info(:refresh_dashboard, socket) do
+    dashboard = socket.assigns.dashboard
+
+    {:noreply,
+     assign_dashboard(socket,
+       filters: dashboard.filters,
+       page: dashboard.page,
+       page_size: dashboard.page_size
+     )
+     |> schedule_dashboard_refresh()}
   end
 
   @impl true
@@ -126,6 +142,14 @@ defmodule SquidSonarWeb.PageLive do
 
   defp assign_dashboard(socket, opts \\ []) do
     assign(socket, :dashboard, Dashboard.load(opts))
+  end
+
+  defp schedule_dashboard_refresh(socket) do
+    if connected?(socket) do
+      Process.send_after(self(), :refresh_dashboard, @dashboard_refresh_interval_ms)
+    end
+
+    socket
   end
 
   defp normalize_theme("system"), do: :system

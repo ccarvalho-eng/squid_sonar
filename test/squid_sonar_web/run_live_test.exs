@@ -176,6 +176,90 @@ defmodule SquidSonarWeb.RunLiveTest do
     refute html =~ "Run cancelled successfully"
   end
 
+  test "refreshes run detail after control feedback while the run is still active" do
+    initial_snapshot =
+      snapshot(:paused,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "wait_for_review",
+        reason: :manual_intervention_required,
+        manual_state: %{step: "wait_for_review", kind: "approval"}
+      )
+
+    running_snapshot =
+      snapshot(:running,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "record_approval",
+        reason: :attempt_visible,
+        planned_runnables: [%{runnable_key: "record_approval"}]
+      )
+
+    completed_snapshot =
+      snapshot(:completed,
+        run_id: "run-approval",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "record_approval",
+        reason: :terminal
+      )
+
+    FakeSquidMeshClient.put_inspect_run(fn
+      "run-approval", _opts ->
+        count = Process.get(:refresh_run_inspections, 0)
+        Process.put(:refresh_run_inspections, count + 1)
+
+        case count do
+          0 -> {:ok, initial_snapshot}
+          1 -> {:ok, running_snapshot}
+          _count -> {:ok, completed_snapshot}
+        end
+    end)
+
+    FakeSquidMeshClient.put_inspect_run_graph(fn run_id, _opts ->
+      {:ok,
+       graph_inspection(:running,
+         run_id: run_id,
+         workflow: Atom.to_string(CheckoutWorkflow),
+         current_node_id: "record_approval",
+         nodes: [graph_node("record_approval", :running, true)]
+       )}
+    end)
+
+    FakeSquidMeshClient.put_explain_run(fn run_id, _opts ->
+      {:ok,
+       diagnostic(:running,
+         run_id: run_id,
+         workflow: Atom.to_string(CheckoutWorkflow),
+         reason: :attempt_visible,
+         step: "record_approval",
+         next_actions: [:wait_for_worker_claim]
+       )}
+    end)
+
+    FakeSquidMeshClient.put_approve({:ok, running_snapshot})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+
+    {:noreply, socket} =
+      RunLive.handle_params(%{"id" => "run-approval"}, "/sonar/runs/run-approval", socket)
+
+    {:noreply, socket} = RunLive.handle_event("approve", %{"run-id" => "run-approval"}, socket)
+
+    assert socket.assigns.detail.summary.status == :running
+
+    {:noreply, socket} = RunLive.handle_info(:refresh_run, socket)
+
+    assert socket.assigns.detail.summary.status == :completed
+
+    html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "Run approved successfully"
+    assert html =~ "record_approval"
+  end
+
   test "renders approval controls without resume for approval pauses" do
     manual_state = %{step: "wait_for_review", kind: "approval"}
 
@@ -411,6 +495,7 @@ defmodule SquidSonarWeb.RunLiveTest do
     {:noreply, socket} = RunLive.handle_event("replay", %{"run-id" => "run-1"}, socket)
 
     assert socket.assigns.detail.summary.id == "run-2"
+    assert {:live, :patch, %{to: "/runs/run-2"}} = socket.redirected
   end
 
   test "renders journal history graphs when the workflow definition is unavailable" do
