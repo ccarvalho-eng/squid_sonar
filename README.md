@@ -1,9 +1,6 @@
-<div align="center">
+# SquidSonar
 
-# SquidSonar — Embeddable runtime dashboard for Squid Mesh
-
-  <img width="400" alt="SquidSonar logo" src="https://github.com/user-attachments/assets/29191586-edda-449c-8d97-ea8e47bc4936" />
-
+<div align="left">
   <p>
     <a href="https://github.com/dark-trench/squid_sonar/actions/workflows/ci.yml">
       <img alt="CI" src="https://github.com/dark-trench/squid_sonar/actions/workflows/ci.yml/badge.svg" />
