@@ -130,9 +130,7 @@ defmodule SquidSonar.RunsTest do
         nodes: [
           graph_node("load_order", :completed, false),
           graph_node("capture_payment", :running, true,
-            recovery: %{
-              compensation: %{callback: "ReleaseInventory", status: :available}
-            }
+            recovery: compensation_recovery("ReleaseInventory")
           ),
           graph_node("send_receipt", :waiting, false)
         ],
@@ -183,9 +181,8 @@ defmodule SquidSonar.RunsTest do
              "send_receipt"
            ]
 
-    assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "capture_payment")).recovery == %{
-             compensation: %{callback: "ReleaseInventory", status: :available}
-           }
+    assert Enum.find(detail.workflow_graph.nodes, &(&1.name == "capture_payment")).recovery ==
+             compensation_recovery("ReleaseInventory")
 
     assert Enum.map(detail.workflow_graph.edges, &{&1.from, &1.to, &1.outcome}) == [
              {"load_order", "capture_payment", :ok},

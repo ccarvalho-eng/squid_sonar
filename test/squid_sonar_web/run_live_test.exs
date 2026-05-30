@@ -475,6 +475,8 @@ defmodule SquidSonarWeb.RunLiveTest do
   end
 
   test "switches the workflow panel to raw graph inspection" do
+    recovery = compensation_recovery("ReleaseInventory")
+
     graph =
       graph_inspection(:running,
         run_id: "run-raw-graph",
@@ -483,10 +485,10 @@ defmodule SquidSonarWeb.RunLiveTest do
         anomalies: [%{kind: :missing_recovery_metadata}],
         nodes: [
           graph_node("capture_payment", :running, true,
-            recovery: %{
-              compensation: %{callback: "ReleaseInventory", status: :available},
-              failure: %{strategy: :compensation, target: "release_inventory"}
-            }
+            recovery:
+              compensation_recovery("ReleaseInventory",
+                failure: %{strategy: :compensation, target: "release_inventory"}
+              )
           )
         ],
         edges: [
@@ -509,7 +511,8 @@ defmodule SquidSonarWeb.RunLiveTest do
         workflow: Atom.to_string(CheckoutWorkflow),
         reason: :attempt_visible,
         step: "capture_payment",
-        next_actions: [:wait_for_worker_claim]
+        next_actions: [:wait_for_worker_claim],
+        evidence: recovery_policy_evidence("capture_payment", recovery)
       )
 
     FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
@@ -520,6 +523,9 @@ defmodule SquidSonarWeb.RunLiveTest do
 
     {:noreply, socket} =
       RunLive.handle_params(%{"id" => "run-raw-graph"}, "/sonar/runs/run-raw-graph", socket)
+
+    assert socket.assigns.detail.explanation.evidence ==
+             recovery_policy_evidence("capture_payment", recovery)
 
     visual_html =
       socket.assigns
