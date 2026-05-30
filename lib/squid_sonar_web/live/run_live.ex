@@ -10,7 +10,8 @@ defmodule SquidSonarWeb.RunLive do
      |> assign_new(:prefix, fn -> "" end)
      |> assign_new(:control_actor, &SquidSonar.Router.default_control_actor/0)
      |> assign(:page_title, "SquidSonar Run")
-     |> assign(:theme, :system)}
+     |> assign(:theme, :system)
+     |> assign(:workflow_panel_view, :visual)}
   end
 
   @impl true
@@ -26,6 +27,11 @@ defmodule SquidSonarWeb.RunLive do
   @impl true
   def handle_event("clear_flash", _params, socket) do
     {:noreply, clear_run_flash(socket)}
+  end
+
+  @impl true
+  def handle_event("select_workflow_panel", %{"view" => view}, socket) do
+    {:noreply, assign(socket, :workflow_panel_view, normalize_workflow_panel_view(view))}
   end
 
   @impl true
@@ -122,7 +128,11 @@ defmodule SquidSonarWeb.RunLive do
         <%= if @load_error do %>
           <.dashboard_error error={@load_error} />
         <% else %>
-          <.run_detail detail={@detail} prefix={@prefix} />
+          <.run_detail
+            detail={@detail}
+            prefix={@prefix}
+            workflow_panel_view={@workflow_panel_view}
+          />
         <% end %>
       </div>
     </main>
@@ -171,4 +181,7 @@ defmodule SquidSonarWeb.RunLive do
   defp normalize_theme("light"), do: :light
   defp normalize_theme("dark"), do: :dark
   defp normalize_theme(_theme), do: :system
+
+  defp normalize_workflow_panel_view("raw"), do: :raw
+  defp normalize_workflow_panel_view(_view), do: :visual
 end

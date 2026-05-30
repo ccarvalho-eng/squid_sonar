@@ -326,6 +326,7 @@ defmodule SquidSonarWeb.CoreComponents do
 
   attr :detail, :map, required: true
   attr :prefix, :string, default: ""
+  attr :workflow_panel_view, :atom, default: :visual
 
   def run_detail(assigns) do
     ~H"""
@@ -376,18 +377,46 @@ defmodule SquidSonarWeb.CoreComponents do
           </div>
         </div>
 
-        <%= if @detail.workflow_graph.nodes == [] do %>
-          <p class="squid-sonar-muted-line">No workflow graph loaded.</p>
-        <% else %>
-          <div class="squid-sonar-workflow-graph">
-            <% layout = workflow_graph_layout(@detail.workflow_graph) %>
+        <div
+          class="squid-sonar-workflow-panel-tabs"
+          role="tablist"
+          aria-label="Workflow inspection view"
+        >
+          <button
+            type="button"
+            role="tab"
+            phx-click="select_workflow_panel"
+            phx-value-view="visual"
+            aria-selected={@workflow_panel_view == :visual}
+            class={[
+              "squid-sonar-workflow-panel-tab",
+              @workflow_panel_view == :visual && "is-active"
+            ]}
+          >
+            Visual graph
+          </button>
+          <button
+            type="button"
+            role="tab"
+            phx-click="select_workflow_panel"
+            phx-value-view="raw"
+            aria-selected={@workflow_panel_view == :raw}
+            class={[
+              "squid-sonar-workflow-panel-tab",
+              @workflow_panel_view == :raw && "is-active"
+            ]}
+          >
+            Raw inspection
+          </button>
+        </div>
 
+        <%= if @workflow_panel_view == :raw do %>
+          <div class="squid-sonar-workflow-raw">
             <div class="squid-sonar-workflow-graph-heading">
               <div class="squid-sonar-workflow-graph-heading-copy">
-                <span class="squid-sonar-section-label">Journal-backed runtime</span>
+                <span class="squid-sonar-section-label">Public graph payload</span>
                 <div class="squid-sonar-workflow-graph-heading-title">
-                  <strong>{graph_mode_title(@detail.workflow_graph.mode)}</strong>
-                  <.graph_mode_badge mode={@detail.workflow_graph.mode} />
+                  <strong>Raw graph inspection</strong>
                   <.status_badge status={@detail.summary.status} />
                 </div>
                 <span>
@@ -396,66 +425,90 @@ defmodule SquidSonarWeb.CoreComponents do
               </div>
             </div>
 
-            <div class="squid-sonar-workflow-graph-evidence">
-              <div class="squid-sonar-workflow-graph-evidence-item">
-                <span>Current step</span>
-                <strong>{format_step(@detail.summary.current_step)}</strong>
-              </div>
-              <div class="squid-sonar-workflow-graph-evidence-item">
-                <span>Last reason</span>
-                <strong>{explanation_reason(@detail.explanation)}</strong>
-              </div>
-              <div class="squid-sonar-workflow-graph-evidence-item">
-                <span>Next actions</span>
-                <strong>{next_actions(@detail.explanation)}</strong>
-              </div>
-              <div class="squid-sonar-workflow-graph-evidence-item">
-                <span>Attempts</span>
-                <strong>{length(@detail.attempts)}</strong>
-              </div>
-            </div>
-
-            <div
-              class="squid-sonar-workflow-stage"
-              style={workflow_stage_style(layout)}
-            >
-              <span
-                :for={segment <- layout.segments}
-                class={[
-                  "squid-sonar-workflow-edge-segment",
-                  "squid-sonar-workflow-edge-segment-#{segment.orientation}"
-                ]}
-                style={workflow_segment_style(segment)}
-              />
-              <span
-                :for={port <- layout.ports}
-                class="squid-sonar-workflow-port"
-                style={workflow_port_style(port)}
-              />
-
-              <article
-                :for={item <- layout.nodes}
-                class={[
-                  "squid-sonar-workflow-node",
-                  "squid-sonar-workflow-node-#{item.node.status}",
-                  item.node.current? && "squid-sonar-workflow-node-current",
-                  item.node.terminal? && "squid-sonar-workflow-node-terminal"
-                ]}
-                style={workflow_node_style(item)}
-              >
-                <div class="squid-sonar-workflow-node-main">
-                  <span class={[
-                    "squid-sonar-workflow-status-icon",
-                    "squid-sonar-workflow-status-icon-#{item.node.status}"
-                  ]} />
-                  <strong>{item.node.label}</strong>
-                </div>
-                <span class="squid-sonar-workflow-node-status">
-                  {format_graph_status(item.node.status)}
-                </span>
-              </article>
-            </div>
+            <pre class="squid-sonar-workflow-raw-json"><code>{raw_graph_inspection_json(@detail.graph_inspection)}</code></pre>
           </div>
+        <% else %>
+          <%= if @detail.workflow_graph.nodes == [] do %>
+            <p class="squid-sonar-muted-line">No workflow graph loaded.</p>
+          <% else %>
+            <div class="squid-sonar-workflow-graph">
+              <% layout = workflow_graph_layout(@detail.workflow_graph) %>
+
+              <div class="squid-sonar-workflow-graph-heading">
+                <div class="squid-sonar-workflow-graph-heading-copy">
+                  <span class="squid-sonar-section-label">Journal-backed runtime</span>
+                  <div class="squid-sonar-workflow-graph-heading-title">
+                    <strong>{graph_mode_title(@detail.workflow_graph.mode)}</strong>
+                    <.graph_mode_badge mode={@detail.workflow_graph.mode} />
+                    <.status_badge status={@detail.summary.status} />
+                  </div>
+                  <span>
+                    {format_workflow(@detail.summary.workflow)} · {format_value(@detail.summary.queue)}
+                  </span>
+                </div>
+              </div>
+
+              <div class="squid-sonar-workflow-graph-evidence">
+                <div class="squid-sonar-workflow-graph-evidence-item">
+                  <span>Current step</span>
+                  <strong>{format_step(@detail.summary.current_step)}</strong>
+                </div>
+                <div class="squid-sonar-workflow-graph-evidence-item">
+                  <span>Last reason</span>
+                  <strong>{explanation_reason(@detail.explanation)}</strong>
+                </div>
+                <div class="squid-sonar-workflow-graph-evidence-item">
+                  <span>Next actions</span>
+                  <strong>{next_actions(@detail.explanation)}</strong>
+                </div>
+                <div class="squid-sonar-workflow-graph-evidence-item">
+                  <span>Attempts</span>
+                  <strong>{length(@detail.attempts)}</strong>
+                </div>
+              </div>
+
+              <div
+                class="squid-sonar-workflow-stage"
+                style={workflow_stage_style(layout)}
+              >
+                <span
+                  :for={segment <- layout.segments}
+                  class={[
+                    "squid-sonar-workflow-edge-segment",
+                    "squid-sonar-workflow-edge-segment-#{segment.orientation}"
+                  ]}
+                  style={workflow_segment_style(segment)}
+                />
+                <span
+                  :for={port <- layout.ports}
+                  class="squid-sonar-workflow-port"
+                  style={workflow_port_style(port)}
+                />
+
+                <article
+                  :for={item <- layout.nodes}
+                  class={[
+                    "squid-sonar-workflow-node",
+                    "squid-sonar-workflow-node-#{item.node.status}",
+                    item.node.current? && "squid-sonar-workflow-node-current",
+                    item.node.terminal? && "squid-sonar-workflow-node-terminal"
+                  ]}
+                  style={workflow_node_style(item)}
+                >
+                  <div class="squid-sonar-workflow-node-main">
+                    <span class={[
+                      "squid-sonar-workflow-status-icon",
+                      "squid-sonar-workflow-status-icon-#{item.node.status}"
+                    ]} />
+                    <strong>{item.node.label}</strong>
+                  </div>
+                  <span class="squid-sonar-workflow-node-status">
+                    {format_graph_status(item.node.status)}
+                  </span>
+                </article>
+              </div>
+            </div>
+          <% end %>
         <% end %>
       </section>
     </section>
@@ -584,6 +637,37 @@ defmodule SquidSonarWeb.CoreComponents do
   defp format_graph_status(:waiting), do: "waiting"
   defp format_graph_status(:pending), do: "pending"
   defp format_graph_status(status), do: format_value(status)
+
+  defp raw_graph_inspection_json(graph_inspection) do
+    graph_inspection
+    |> normalize_graph_inspection()
+    |> Jason.encode!(pretty: true)
+  end
+
+  defp normalize_graph_inspection(%_struct{} = value) do
+    value
+    |> Map.from_struct()
+    |> normalize_graph_inspection()
+  end
+
+  defp normalize_graph_inspection(value) when is_map(value) do
+    Map.new(value, fn {key, nested_value} ->
+      {to_string(key), normalize_graph_inspection(nested_value)}
+    end)
+  end
+
+  defp normalize_graph_inspection(value) when is_list(value) do
+    Enum.map(value, &normalize_graph_inspection/1)
+  end
+
+  defp normalize_graph_inspection(value) when is_tuple(value) do
+    value
+    |> Tuple.to_list()
+    |> normalize_graph_inspection()
+  end
+
+  defp normalize_graph_inspection(value) when is_atom(value), do: Atom.to_string(value)
+  defp normalize_graph_inspection(value), do: value
 
   defp graph_mode_label(:transition), do: "Transition"
   defp graph_mode_label(:dependency), do: "Dependency"

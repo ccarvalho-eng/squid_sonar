@@ -474,6 +474,80 @@ defmodule SquidSonarWeb.RunLiveTest do
     assert html =~ "capture_payment"
   end
 
+  test "switches the workflow panel to raw graph inspection" do
+    graph =
+      graph_inspection(:running,
+        run_id: "run-raw-graph",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_node_id: "capture_payment",
+        anomalies: [%{kind: :missing_recovery_metadata}],
+        nodes: [
+          graph_node("capture_payment", :running, true,
+            recovery: %{
+              compensation: %{callback: "ReleaseInventory", status: :available},
+              failure: %{strategy: :compensation, target: "release_inventory"}
+            }
+          )
+        ],
+        edges: [
+          graph_edge("capture_payment", "release_inventory", :error, recovery: :compensation)
+        ]
+      )
+
+    snapshot =
+      snapshot(:running,
+        run_id: "run-raw-graph",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        current_step: "capture_payment",
+        reason: :attempt_visible
+      )
+
+    explanation =
+      diagnostic(
+        :running,
+        run_id: "run-raw-graph",
+        workflow: Atom.to_string(CheckoutWorkflow),
+        reason: :attempt_visible,
+        step: "capture_payment",
+        next_actions: [:wait_for_worker_claim]
+      )
+
+    FakeSquidMeshClient.put_inspect_run({:ok, snapshot})
+    FakeSquidMeshClient.put_inspect_run_graph({:ok, graph})
+    FakeSquidMeshClient.put_explain_run({:ok, explanation})
+
+    {:ok, socket} = RunLive.mount(%{}, %{}, %Socket{})
+
+    {:noreply, socket} =
+      RunLive.handle_params(%{"id" => "run-raw-graph"}, "/sonar/runs/run-raw-graph", socket)
+
+    visual_html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert visual_html =~ "Transition graph"
+    assert visual_html =~ "Raw inspection"
+    refute visual_html =~ ~s("current_node_ids")
+
+    {:noreply, socket} =
+      RunLive.handle_event("select_workflow_panel", %{"view" => "raw"}, socket)
+
+    raw_html =
+      socket.assigns
+      |> RunLive.render()
+      |> rendered_to_string()
+
+    assert raw_html =~ "Raw graph inspection"
+    assert raw_html =~ "&quot;current_node_ids&quot;"
+    assert raw_html =~ "&quot;nodes&quot;"
+    assert raw_html =~ "&quot;edges&quot;"
+    assert raw_html =~ "&quot;recovery&quot;"
+    assert raw_html =~ "&quot;anomalies&quot;"
+    assert raw_html =~ "missing_recovery_metadata"
+    assert raw_html =~ "ReleaseInventory"
+  end
+
   test "renders load errors without leaking internal reason details" do
     FakeSquidMeshClient.put_inspect_run({:error, {:missing_config, [:repo]}})
 
