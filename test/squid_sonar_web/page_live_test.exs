@@ -137,6 +137,39 @@ defmodule SquidSonarWeb.PageLiveTest do
     assert html =~ "failing_checkout"
   end
 
+  test "refreshes the dashboard while preserving active filters" do
+    FakeSquidMeshClient.put_list_runs(fn filters, _opts ->
+      send(self(), {:list_filters, filters})
+
+      {:ok,
+       [
+         summary(:completed, "completed_checkout", "default"),
+         summary(:failed, "failing_checkout", "error-queue")
+       ]}
+    end)
+
+    {:ok, socket} = PageLive.mount(%{}, %{}, %Socket{})
+
+    {:noreply, socket} =
+      PageLive.handle_event("filter", %{"filters" => %{"status" => "failed"}}, socket)
+
+    FakeSquidMeshClient.put_list_runs(fn filters, _opts ->
+      send(self(), {:list_filters, filters})
+      {:ok, [summary(:failed, "new_failure_checkout", "error-queue")]}
+    end)
+
+    {:noreply, socket} = PageLive.handle_info(:refresh_dashboard, socket)
+
+    html =
+      socket.assigns
+      |> PageLive.render()
+      |> rendered_to_string()
+
+    assert html =~ "new_failure_checkout"
+    refute html =~ "completed_checkout"
+    assert socket.assigns.dashboard.filters.status == :failed
+  end
+
   defp render_page do
     {:ok, socket} = PageLive.mount(%{}, %{}, %Socket{})
 

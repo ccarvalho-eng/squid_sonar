@@ -38,11 +38,13 @@ body.squid-sonar-document {
   min-height: 100%;
 }
 
+html.squid-sonar-document:has(.squid-sonar-theme-dark),
 body.squid-sonar-document:has(.squid-sonar-theme-dark) {
   background: #282c34;
 }
 
 @media (prefers-color-scheme: dark) {
+  html.squid-sonar-document:has(.squid-sonar-theme-system),
   body.squid-sonar-document:has(.squid-sonar-theme-system) {
     background: #282c34;
   }
